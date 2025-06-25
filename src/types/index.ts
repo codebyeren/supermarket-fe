@@ -19,13 +19,27 @@ export interface User {
 }
 
 export interface Product {
-  id: string;
-  name: string;
+  productId: number;
+  productName: string;
   price: number;
-  description: string;
-  category: string;
-  image: string;
+  slug: string;
+  status: string;
+  brand: number;
+  imageUrl: string;
+  quantity: number;
+  isFavorite: boolean;
+  ratingScore: number;
+  promotionType: string;
+  discountPercent?: number | null;
+  discountAmount?: number | null;
+  giftProductId?: number | null;
+  minOrderValue?: number | null;
+  minOrderQuantity?: number | null;
+  startDate: string;
+  endDate: string;
 }
+
+
 
 export interface ApiResponse<T> {
   data: T;
