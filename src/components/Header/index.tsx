@@ -12,7 +12,8 @@ const Header = () => {
                 <div className="container-lg d-flex align-items-center justify-content-between">
                     {/* Logo + Location */}
                     <div className="d-flex align-items-center gap-3">
-                        <div className="fw-bold fs-5">LOGO</div>
+                        <Link to="/" className="fw-bold fs-5 text-white text-decoration-none">LOGO</Link>
+
                         <div className="d-flex align-items-center">
                             <FaMapMarkerAlt className="me-1" />
                             <span style={{ fontSize: '0.9rem' }}>Giao hàng</span>
@@ -39,8 +40,8 @@ const Header = () => {
                             <div className="d-flex align-items-center" role="button">
                                 <FaSignInAlt className="me-1" />
                                 <>
-                                    <Link to="/login" className="text-white me-2 text-decoration-none">Đăng nhập /</Link>
-                                    <Link to="/register" className="text-white text-decoration-none">Đăng ký</Link>
+                                    <Link to="/auth/login" className="text-white me-2 text-decoration-none">Đăng nhập /</Link>
+                                    <Link to="/auth/register" className="text-white text-decoration-none">Đăng ký</Link>
                                 </>
 
                             </div>

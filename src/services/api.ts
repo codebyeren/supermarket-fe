@@ -1,7 +1,7 @@
 import type { LoginFormData, RegisterFormData } from '../types/index';
 
 // API service configuration
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5050/api';
 
 interface ApiResponse<T> {
   success: boolean;

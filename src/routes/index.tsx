@@ -2,6 +2,8 @@ import { Home, Login, Register, Dashboard } from '../pages'
 import MainLayout from '../layouts/MainLayout'
 import AuthLayout from '../layouts/AuthLayout'
 import ProductDetail from '../pages/ProductDetail'
+import About from '../pages/About'
+import Contact from '../pages/Contact'
 
 
 const routes = [
@@ -21,6 +23,14 @@ const routes = [
       {
         path : "/product/:slug",
         element : <ProductDetail />
+      },
+       {
+        path : "/about",
+        element : <About />
+      },
+       {
+        path : "/contact",
+        element : <Contact />
       }
 
     // Example for products page

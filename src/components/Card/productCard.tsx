@@ -12,6 +12,7 @@ const ProductCard = ({ product }: Props) => {
 
   const handleClick = () => {
     navigate(`/product/${product.slug}`);
+    console.log('Product clicked:', product.imageUrl);
   };
 const formatCurrency = (value: number, currency: string = 'USD') =>
   new Intl.NumberFormat('en-US', {
@@ -35,10 +36,10 @@ const formatCurrency = (value: number, currency: string = 'USD') =>
       <span className="position-absolute top-0 end-0 m-2" role="button">
         <FaHeart color={product.isFavorite ? 'red' : 'gray'} />
       </span>
-
+          
       {/* Hình ảnh */}
       <img
-        src={product.imageUrl}
+      src={`/img/${product.imageUrl}`} 
         className="card-img-top p-3"
         alt={product.productName}
         style={{ objectFit: 'contain', height: '150px' }}

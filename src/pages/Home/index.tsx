@@ -37,7 +37,7 @@ const HomePage = () => {
         <section className='mb-5'>
           <h4 className="mb-3 text-start">Sản Phẩm Nổi Bật</h4>
           <div className="row row-cols-2 row-cols-md-4 g-3">
-            {topRatedProducts.map((product) => (
+            {topRatedProducts.slice(0, 4).map((product) => (
               <div className="col-6 col-md-3" key={product.productId}>
                 <ProductCard product={product} />
               </div>

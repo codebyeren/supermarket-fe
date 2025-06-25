@@ -37,7 +37,7 @@ const ProductDetail = () => {
             <div className="row mb-5">
                 <div className="col-md-5 text-center">
                     <img
-                        src="/samsung.jpg"
+                        src={`/img/${product.imageUrl}`}
                         alt={product.productName}
                         className="img-fluid border rounded"
                         style={{ maxHeight: 600, objectFit: 'contain',width: '20vw' }}

@@ -54,6 +54,7 @@ const LoginForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitted(true);
+    navigate('/');
     if (validateForm()) {
       await login(formData.username, formData.password, formData.rememberMe);
     }
