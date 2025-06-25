@@ -2,8 +2,19 @@
 
 export interface User {
   id: string;
-  email: string;
-  name: string;
+  firstName: string;
+  middleName?: string;
+  lastName: string;
+  street?: string;
+  city?: string;
+  state?: string;
+  country: string;
+  homePhone?: string;
+  mobile: string;
+  email?: string;
+  dob?: string;
+  username: string;
+  password?: string;
   role: 'admin' | 'user';
 }
 
@@ -36,14 +47,21 @@ export interface ApiResponse<T> {
   success: boolean;
 }
 
-export interface LoginCredentials {
-  email: string;
+export interface LoginFormData {
+  username: string;
   password: string;
+  rememberMe: boolean;
 }
 
-export interface RegisterData {
-  name: string;
-  email: string;
+export interface RegisterFormData {
+  firstName: string;
+  middleName?: string;
+  lastName: string;
+  country: string;
+  mobile: string;
+  email?: string;
+  dob?: string;
+  username: string;
   password: string;
-  confirmPassword: string;
+  confirmPassword?: string;
 } 
