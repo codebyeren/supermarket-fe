@@ -1,10 +1,16 @@
 import { useRoutes } from 'react-router-dom';
 import routes from './routes';
 import './App.css'
+import { Footer } from './components';
 
 function App() {
   const element = useRoutes(routes);
-  return element;
+  return (
+    <>
+      {element}
+      <Footer />
+    </>
+  );
 }
 
 export default App
