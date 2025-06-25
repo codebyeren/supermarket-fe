@@ -1,14 +1,18 @@
 import React from 'react';
 import type { Product } from '../../types/index';
 import { FaHeart, FaShoppingCart, FaStar } from 'react-icons/fa';
-
+import { useNavigate } from 'react-router-dom';
 interface Props {
   product: Product;
 }
 
 const ProductCard = ({ product }: Props) => {
   const hasDiscount = product.discountPercent && product.discountPercent > 0;
+ const navigate = useNavigate();
 
+  const handleClick = () => {
+    navigate(`/product/${product.slug}`);
+  };
 const formatCurrency = (value: number, currency: string = 'USD') =>
   new Intl.NumberFormat('en-US', {
     style: 'currency',
@@ -19,7 +23,7 @@ const formatCurrency = (value: number, currency: string = 'USD') =>
 
 
   return (
-    <div className="card position-relative shadow-sm h-100" style={{ width: '13rem' }}>
+    <div  onClick={handleClick} role="button" className="card position-relative shadow-sm h-100" style={{ width: '13rem' }}>
       {/* Giảm giá */}
       {hasDiscount && (
         <span className="badge bg-danger position-absolute top-0 start-0 m-2">

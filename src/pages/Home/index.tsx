@@ -2,11 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { fetchHomeProducts } from '../../services/productService';
 import ProductCard from '../../components/Card/productCard';
 import type { Product } from '../../types/index';
+import { useNavigate } from 'react-router-dom';
 
 const HomePage = () => {
   const [topRatedProducts, setTopRatedProducts] = useState<Product[]>([]);
   const [productsByCategory, setProductsByCategory] = useState<Record<string, Product[]>>({});
-
+  
   useEffect(() => {
     const loadData = async () => {
       try {

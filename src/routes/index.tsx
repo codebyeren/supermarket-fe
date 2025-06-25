@@ -1,6 +1,8 @@
 import { Home, Login, Register, Dashboard } from '../pages'
 import MainLayout from '../layouts/MainLayout'
 import AuthLayout from '../layouts/AuthLayout'
+import ProductDetail from '../pages/ProductDetail'
+
 
 const routes = [
   // Routes for main layout
@@ -15,7 +17,14 @@ const routes = [
       {
         path: 'dashboard',
         element: <Dashboard />
+      },
+      {
+        path : "/product/:slug",
+        element : <ProductDetail />
       }
+
+    // Example for products page
+
       // Add other main pages here
     ]
   },

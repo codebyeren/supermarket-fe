@@ -5,6 +5,10 @@ interface HomeProductResponse {
   topRatedProducts: Product[];
   productyByCategory: Record<string, Product[]>;
 }
+interface ProductDetailResponse {
+  productDto: Product;
+  relatedProducts: Product[];
+}
 
 export const fetchHomeProducts = async (): Promise<HomeProductResponse> => {
   const res = await fetch('http://localhost:5050/api/products/home');
@@ -23,6 +27,22 @@ export const fetchHomeProducts = async (): Promise<HomeProductResponse> => {
   }
 
   return data;
+};
+
+
+export const getProductBySlug = async (slug: string): Promise<ProductDetailResponse> => {
+  const res = await fetch(`http://localhost:5050/api/products/${slug}`);
+
+  if (!res.ok) throw new Error('Lỗi HTTP: ' + res.status);
+
+  const json = await res.json();
+
+  if (!json.data) {
+    console.warn('❌ Dữ liệu không hợp lệ:', json);
+    throw new Error('Không có dữ liệu sản phẩm');
+  }
+
+  return json.data ;
 };
 
 
