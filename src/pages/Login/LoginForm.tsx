@@ -54,9 +54,13 @@ const LoginForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitted(true);
-    navigate('/');
     if (validateForm()) {
-      await login(formData.username, formData.password, formData.rememberMe);
+      const result = await login(formData.username, formData.password, formData.rememberMe);
+      if (result?.success) {
+        const userRole = localStorage.getItem('userRole');
+        navigate(userRole === 'admin' ? '/admin/dashboard' : '/dashboard');
+      }
+      // Nếu thất bại, error sẽ được hiển thị qua biến error
     }
   };
 

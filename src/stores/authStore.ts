@@ -63,9 +63,17 @@ class AuthStore {
       const response = await apiService.login({ username, password, rememberMe });
       if (response.success && response.data) {
         const { accessToken, refreshToken, user } = response.data;
-        localStorage.setItem('userRole', user.role);
-        localStorage.setItem('userData', JSON.stringify(user));
-        // Handle remember me
+        if (rememberMe) {
+          localStorage.setItem('userRole', user.role);
+          localStorage.setItem('userData', JSON.stringify(user));
+          sessionStorage.removeItem('userRole');
+          sessionStorage.removeItem('userData');
+        } else {
+          sessionStorage.setItem('userRole', user.role);
+          sessionStorage.setItem('userData', JSON.stringify(user));
+          localStorage.removeItem('userRole');
+          localStorage.removeItem('userData');
+        }
         if (rememberMe) {
           localStorage.setItem('rememberedUsername', username);
         } else {
