@@ -15,11 +15,11 @@ const LoginForm: React.FC = () => {
   const [submitted, setSubmitted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<Partial<LoginFormData>>({});
+  const [message, setMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (isAuthenticated) {
-      const userRole = localStorage.getItem('userRole');
-      navigate(userRole === 'admin' ? '/admin/dashboard' : '/dashboard');
+      navigate('/');
     }
     const savedUsername = localStorage.getItem('rememberedUsername');
     if (savedUsername) {
@@ -56,11 +56,12 @@ const LoginForm: React.FC = () => {
     setSubmitted(true);
     if (validateForm()) {
       const result = await login(formData.username, formData.password, formData.rememberMe);
-      if (result?.success) {
-        const userRole = localStorage.getItem('userRole');
-        navigate(userRole === 'admin' ? '/admin/dashboard' : '/dashboard');
+      if (result?.message) {
+        setMessage(result.message);
       }
-      // Nếu thất bại, error sẽ được hiển thị qua biến error
+      if (result?.success) {
+        navigate('/');
+      }
     }
   };
 
@@ -102,7 +103,7 @@ const LoginForm: React.FC = () => {
         </div>
         <Link to="/auth/forgot-password" className="forgot-password-link">Quên mật khẩu?</Link>
       </div>
-      {error && <div className="alert alert-danger">{error}</div>}
+      {message && <div className="alert alert-danger">{message}</div>}
       <Button type="submit" className="auth-submit-btn" disabled={loading}>
         {loading ? (
           <>

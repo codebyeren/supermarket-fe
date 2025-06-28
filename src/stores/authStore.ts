@@ -57,38 +57,21 @@ class AuthStore {
     this.notify();
   }
 
-  async login(username: string, password: string, rememberMe = false): Promise<{ success: boolean; error?: string }> {
+  async login(username: string, password: string, rememberMe = false): Promise<{ success: boolean; error?: string; message?: string }> {
     this.setState({ loading: true, error: null });
     try {
       const response = await apiService.login({ username, password, rememberMe });
       if (response.success && response.data) {
-        const { accessToken, refreshToken, user } = response.data;
-        if (rememberMe) {
-          localStorage.setItem('userRole', user.role);
-          localStorage.setItem('userData', JSON.stringify(user));
-          sessionStorage.removeItem('userRole');
-          sessionStorage.removeItem('userData');
-        } else {
-          sessionStorage.setItem('userRole', user.role);
-          sessionStorage.setItem('userData', JSON.stringify(user));
-          localStorage.removeItem('userRole');
-          localStorage.removeItem('userData');
-        }
-        if (rememberMe) {
-          localStorage.setItem('rememberedUsername', username);
-        } else {
-          localStorage.removeItem('rememberedUsername');
-        }
         this.setState({
           isAuthenticated: true,
-          user,
+          user: null,
           loading: false,
           error: null
         });
-        return { success: true };
+        return { success: true, message: response.message };
       } else {
         this.setState({ loading: false, error: response.error || 'Đăng nhập thất bại' });
-        return { success: false, error: response.error };
+        return { success: false, error: response.error, message: response.message };
       }
     } catch (error: any) {
       this.setState({ loading: false, error: error.message || 'Có lỗi xảy ra khi đăng nhập' });

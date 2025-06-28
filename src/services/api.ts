@@ -57,8 +57,7 @@ export const apiService = {
         body: JSON.stringify(loginData),
       });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.message || 'Đăng nhập thất bại');
-      // Lưu cả accessToken và refreshToken
+      if (!response.ok) throw { message: data.message || 'Đăng nhập thất bại' };
       setTokens(data.data.accessToken, data.data.refreshToken, loginData.rememberMe);
       return {
         success: true,
@@ -66,7 +65,7 @@ export const apiService = {
         message: data.message || 'Đăng nhập thành công'
       };
     } catch (error: any) {
-      return { success: false, error: error.message || 'Có lỗi xảy ra khi đăng nhập' };
+      return { success: false, message: error.message || 'Có lỗi xảy ra khi đăng nhập' };
     }
   },
 
