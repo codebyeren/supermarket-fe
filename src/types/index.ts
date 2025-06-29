@@ -18,28 +18,33 @@ export interface User {
   role: 'admin' | 'user';
 }
 
+export interface Category {
+  id: number;
+  categoryName: string;
+  slug: string;
+  children: Category[];
+}
+
 export interface Product {
   productId: number;
   productName: string;
   price: number;
   slug: string;
   status: string;
-  brand: number;
+  brand: string;
   imageUrl: string;
   quantity: number;
   isFavorite: boolean;
   ratingScore: number;
-  promotionType: string;
-  discountPercent?: number | null;
-  discountAmount?: number | null;
-  giftProductId?: number | null;
-  minOrderValue?: number | null;
-  minOrderQuantity?: number | null;
+  promotionType: string | null;
+  discountPercent: number | null;
+  discountAmount: number | null;
+  giftProductId: number | null;
+  minOrderValue: number | null;
+  minOrderQuantity: number | null;
   startDate: string;
   endDate: string;
 }
-
-
 
 export interface ApiResponse<T> {
   data: T;

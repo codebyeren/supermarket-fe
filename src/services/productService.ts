@@ -1,5 +1,5 @@
-
 import type { Product } from '../types/index';
+import axios from 'axios';
 
 interface HomeProductResponse {
   topRatedProducts: Product[];
@@ -43,6 +43,30 @@ export const getProductBySlug = async (slug: string): Promise<ProductDetailRespo
   }
 
   return json.data ;
+};
+
+export const fetchProductsByCategory = async (slug: string): Promise<Record<string, import("../types").Product[]>> => {
+  const res = await axios.get(`http://localhost:5050/api/products/category/${slug}`);
+  return res.data.data;
+};
+
+export const fetchAllProducts = async (): Promise<Product[]> => {
+  const res = await axios.get('http://localhost:5050/api/products');
+  return res.data.data;
+};
+
+export const searchProducts = async (
+  params: { searchName?: string; minPrice?: number; maxPrice?: number; page?: number; pageSize?: number }
+): Promise<Product[]> => {
+  const { searchName, minPrice, maxPrice, page = 1, pageSize = 8 } = params;
+  const query = new URLSearchParams();
+  if (searchName) query.append("searchName", searchName);
+  if (minPrice !== undefined) query.append("minPrice", String(minPrice));
+  if (maxPrice !== undefined) query.append("maxPrice", String(maxPrice));
+  query.append("page", String(page));
+  query.append("pageSize", String(pageSize));
+  const res = await axios.get(`http://localhost:5050/api/products?${query.toString()}`);
+  return res.data.data;
 };
 
 

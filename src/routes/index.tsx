@@ -4,6 +4,8 @@ import AuthLayout from '../layouts/AuthLayout'
 import ProductDetail from '../pages/ProductDetail'
 import About from '../pages/About'
 import Contact from '../pages/Contact'
+import CategoryPage from "../pages/Category";
+import SearchPage from "../pages/Search";
 
 
 const routes = [
@@ -31,11 +33,15 @@ const routes = [
        {
         path : "/contact",
         element : <Contact />
+      },
+      {
+        path: '/category/:slug',
+        element: <CategoryPage />
+      },
+      {
+        path: '/search',
+        element: <SearchPage />
       }
-
-    // Example for products page
-
-      // Add other main pages here
     ]
   },
   // Routes for auth layout
