@@ -56,11 +56,13 @@ const CategoryPage: React.FC = () => {
       padding: isMobile ? 8 : 24,
       flexDirection: isMobile ? "column" : "row",
       maxWidth: 1300,
+      minHeight: "90vh",
       margin: "0 auto"
     }}>
       <aside style={{
-        width: isMobile ? "100%" : 300,
+     
         background: "#fff",
+        maxWidth: isMobile ? "100%" : 250,
         borderRadius: 8,
         boxShadow: "0 2px 8px #eee",
         padding: isMobile ? 12 : 16,

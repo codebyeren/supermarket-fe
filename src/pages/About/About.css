@@ -73,16 +73,7 @@
     text-align: center;
   }
   
-  .badge {
-    position: absolute;
-    top: -4px;
-    right: -6px;
-    background-color: red;
-    color: white;
-    font-size: 10px;
-    padding: 2px 5px;
-    border-radius: 10px;
-  }
+
   
   /* Bottom gray nav */
   .header-bottom {
