@@ -25,6 +25,12 @@ export interface Category {
   children: Category[];
 }
 
+export interface Brand {
+  id: number;
+  brandName: string;
+  slug: string;
+}
+
 export interface Product {
   productId: number;
   productName: string;

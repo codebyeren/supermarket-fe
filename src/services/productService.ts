@@ -45,13 +45,23 @@ export const getProductBySlug = async (slug: string): Promise<ProductDetailRespo
   return json.data ;
 };
 
-export const fetchProductsByCategory = async (slug: string): Promise<Record<string, import("../types").Product[]>> => {
-  const res = await axios.get(`http://localhost:5050/api/products/category/${slug}`);
+export const fetchProductsByCategory = async (slug: string, brandSlug?: string): Promise<Record<string, import("../types").Product[]>> => {
+  const params = new URLSearchParams();
+  params.append('category', slug);
+  if (brandSlug) {
+    params.append('brand', brandSlug);
+  }
+  const res = await axios.get(`http://localhost:5050/api/products/filter?${params.toString()}`);
   return res.data.data;
 };
 
 export const fetchAllProducts = async (): Promise<Product[]> => {
-  const res = await axios.get('http://localhost:5050/api/products');
+  const res = await axios.get('http://localhost:5050/api/products/filter');
+  return res.data.data;
+};
+
+export const fetchProductsByBrand = async (brandSlug: string): Promise<Product[]> => {
+  const res = await axios.get(`http://localhost:5050/api/products/filter?brand=${brandSlug}`);
   return res.data.data;
 };
 
