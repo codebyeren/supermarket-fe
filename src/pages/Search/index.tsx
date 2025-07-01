@@ -38,7 +38,7 @@ const SearchPage: React.FC = () => {
     })
       .then((data) => {
         setProducts(data);
-        setTotal(data.length < PAGE_SIZE && page === 1 ? data.length : 100); // Nếu backend trả về total thì dùng, không thì tạm fix
+        // setTotal(data.length < PAGE_SIZE && page === 1 ? data.length : 100); // Nếu backend trả về total thì dùng, không thì tạm fix
       })
       .finally(() => setLoading(false));
   }, [searchName, minPrice, maxPrice, page]);
@@ -173,13 +173,13 @@ const SearchPage: React.FC = () => {
               gridTemplateColumns: `repeat(${gridColumns}, 1fr)`,
               gap: isMobile ? 16 : 32,
               justifyItems: 'center',
-              justifyContent: 'center'
+              justifyContent: 'center', 
             }}>
-              {products.slice(0, PAGE_SIZE).map(product => (
-                <ProductCard key={product.productId} product={product} />
-              ))}
+             {products.map(product => (
+  <ProductCard key={product.productId} product={product} />
+))}
             </div>
-            {/* Pagination */}
+            {/* Pagination
             {totalPages > 1 && (
               <div style={{ marginTop: isMobile ? 16 : 32, display: "flex", justifyContent: "center", gap: 8 }}>
                 {Array.from({ length: totalPages }, (_, i) => (
@@ -201,7 +201,7 @@ const SearchPage: React.FC = () => {
                   </button>
                 ))}
               </div>
-            )}
+            )} */}
           </>
         )}
       </main>

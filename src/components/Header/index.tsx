@@ -90,7 +90,9 @@ const Header = () => {
                                 </>
                             </div>
                         )}
-                        <FaHeart role="button" style={{ fontSize: isMobile ? 22 : 20 }} />
+                        <Link to = '/favorites' className='text-white text-decoration-none'>  <FaHeart role="button" style={{ fontSize: isMobile ? 22 : 20 }} />
+                        </Link>
+                      
                         <FaShoppingCart role="button" style={{ fontSize: isMobile ? 22 : 20 }} />
                     </div>
                 </div>

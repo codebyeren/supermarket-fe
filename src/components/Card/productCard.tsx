@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import type { Product } from '../../types/index';
 import { FaHeart, FaShoppingCart, FaStar } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import PromotionBadge from '../Promotion/PromotionBadge';
+import { useAuthStore } from '../../stores/authStore';
+import { deleteFavorite, toggleFavorite } from '../../services/favoriteService';
 
 interface Props {
   product: Product;
@@ -11,6 +13,25 @@ interface Props {
 const ProductCard = ({ product }: Props) => {
   const hasDiscount = product.discountPercent && product.discountPercent > 0;
   const navigate = useNavigate();
+    const [isFavorite, setIsFavorite] = useState(product.isFavorite);
+  const { isAuthenticated } = useAuthStore();
+
+  const handleToggleFavorite = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!isAuthenticated) return;
+
+    try {
+      if (isFavorite) {
+        await deleteFavorite(product.productId);
+        setIsFavorite(false);
+      } else {
+        await toggleFavorite(product.productId);
+        setIsFavorite(true);
+      }
+    } catch (err) {
+      console.error('Toggle favorite failed', err);
+    }
+  };
 
   const handleClick = () => {
     navigate(`/product/${product.slug}`);
@@ -33,18 +54,18 @@ const ProductCard = ({ product }: Props) => {
     >
       {product.promotionType != null && (
         <PromotionBadge product={product} />
-    )}
+      )}
 
+      {isAuthenticated && (
+        <span
+          className="position-absolute top-0 end-0 m-2"
+          role="button"
+          onClick={handleToggleFavorite}
+        >
+          <FaHeart color={isFavorite ? 'red' : 'gray'} />
+        </span>
+      )}
 
-
-      {/* Icon yêu thích */}
-      <span
-        className="position-absolute top-0 end-0 m-2"
-        role="button"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <FaHeart color={product.isFavorite ? 'red' : 'gray'} />
-      </span>
 
       {/* Hình ảnh */}
       <img
@@ -52,6 +73,7 @@ const ProductCard = ({ product }: Props) => {
         className="card-img-top p-3"
         alt={product.productName}
         style={{
+          minWidth: '170px',
           objectFit: 'contain',
           height: '180px',
           transition: 'transform 0.3s ease',
@@ -73,12 +95,20 @@ const ProductCard = ({ product }: Props) => {
 
         {/* Tên sản phẩm */}
         <p
-          className="card-text small fw-medium mb-2 text-truncate text-start"
+          className="card-text small fw-medium mb-2 text-start truncate-2"
           title={product.productName}
-          style={{ fontSize: '0.9rem' }}
+          style={{
+            fontSize: '0.9rem',
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}
         >
           {product.productName}
         </p>
+
 
 
         <div className="d-flex justify-content-between align-items-center mt-auto">
@@ -113,7 +143,7 @@ const ProductCard = ({ product }: Props) => {
         <FaShoppingCart /> Thêm Giỏ Hàng
       </button>
 
-      
+
     </div>
   );
 };

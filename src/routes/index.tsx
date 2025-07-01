@@ -6,6 +6,8 @@ import About from '../pages/About'
 import Contact from '../pages/Contact'
 import CategoryPage from "../pages/Category";
 import SearchPage from "../pages/Search";
+import Favorites from '../pages/Favorites'
+import ProtectedRoute from './ProtectedRoute'
 
 
 const routes = [
@@ -41,6 +43,10 @@ const routes = [
       {
         path: '/search',
         element: <SearchPage />
+      },
+      {
+        path : '/favorites',
+        element: <ProtectedRoute><Favorites /></ProtectedRoute>
       }
     ]
   },

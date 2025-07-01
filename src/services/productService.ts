@@ -9,9 +9,16 @@ interface ProductDetailResponse {
   productDto: Product;
   relatedProducts: Product[];
 }
-
+const token =
+      sessionStorage.getItem('accessToken') || localStorage.getItem('accessToken');
 export const fetchHomeProducts = async (): Promise<HomeProductResponse> => {
-  const res = await fetch('http://localhost:5050/api/products/home');
+   const res = await fetch('http://localhost:5050/api/products/home', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+  });
 
  if (!res.ok) throw new Error('Lỗi HTTP: ' + res.status);
 
@@ -31,8 +38,13 @@ export const fetchHomeProducts = async (): Promise<HomeProductResponse> => {
 
 
 export const getProductBySlug = async (slug: string): Promise<ProductDetailResponse> => {
-  const res = await fetch(`http://localhost:5050/api/products/${slug}`);
-
+const res = await fetch(`http://localhost:5050/api/products/${slug}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+  });
   if (!res.ok) throw new Error('Lỗi HTTP: ' + res.status);
 
   const json = await res.json();
@@ -75,7 +87,13 @@ export const searchProducts = async (
   if (maxPrice !== undefined) query.append("maxPrice", String(maxPrice));
   query.append("page", String(page));
   query.append("pageSize", String(pageSize));
-  const res = await axios.get(`http://localhost:5050/api/products?${query.toString()}`);
+   const res = await axios.get('http://localhost:5050/api/products?${query.toString()}', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+  });
   return res.data.data;
 };
 
