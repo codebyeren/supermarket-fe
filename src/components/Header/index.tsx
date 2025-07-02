@@ -2,11 +2,15 @@ import React, { useState } from 'react';
 import { FaHeart, FaShoppingCart, FaUser, FaMapMarkerAlt, FaBars, FaSignInAlt, FaSignOutAlt } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
+import { jwtDecode } from 'jwt-decode';
+
 
 const Header = () => {
     const navigate = useNavigate();
     const { isAuthenticated, user, logout } = useAuthStore();
     const [searchValue, setSearchValue] = useState("");
+    const token  = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+    const decoded = token ? jwtDecode(token) : null;
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
     React.useEffect(() => {
         const handleResize = () => setWindowWidth(window.innerWidth);
@@ -75,7 +79,7 @@ const Header = () => {
                             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                                 <FaUser className="me-1" />
                                 <span style={{ fontSize: isMobile ? 14 : '0.9rem' }}>
-                                    {user?.firstName} {user?.lastName}
+                                    {decoded?.sub || user?.username || 'Người dùng'} 
                                 </span>
                                 <button onClick={handleLogout} className="btn btn-link text-white p-0 ms-2" style={{textDecoration: 'none', fontSize: isMobile ? 14 : 16}}>
                                     <FaSignOutAlt className="me-1" /> Đăng xuất
