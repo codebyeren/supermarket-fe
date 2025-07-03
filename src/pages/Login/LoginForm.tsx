@@ -15,11 +15,11 @@ const LoginForm: React.FC = () => {
   const [submitted, setSubmitted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<Partial<LoginFormData>>({});
-  const [message, setMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/');
+      const userRole = localStorage.getItem('userRole');
+      navigate(userRole === 'admin' ? '/admin/dashboard' : '/dashboard');
     }
     const savedUsername = localStorage.getItem('rememberedUsername');
     if (savedUsername) {
@@ -31,22 +31,29 @@ const LoginForm: React.FC = () => {
     return () => clearError();
   }, [clearError]);
 
-  const validateForm = (): boolean => {
-    const newErrors: Partial<LoginFormData> = {};
-    if (!formData.username.trim()) newErrors.username = 'Vui lòng nhập tên tài khoản';
-    if (!formData.password) newErrors.password = 'Vui lòng nhập mật khẩu';
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+  const validateField = (name: string, value: string) => {
+    let error = '';
+    if (name === 'username') {
+      if (!value.trim()) error = 'Vui lòng nhập tên tài khoản';
+    }
+    if (name === 'password') {
+      if (!value) error = 'Vui lòng nhập mật khẩu';
+    }
+    setErrors(prev => ({ ...prev, [name]: error }));
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value, type } = e.target;
+    let fieldValue: string | boolean = value;
+    if (type === 'checkbox' && e.target instanceof HTMLInputElement) {
+      fieldValue = e.target.checked;
+    }
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: fieldValue
     }));
-    if (submitted) {
-      setErrors(prev => ({ ...prev, [name]: undefined }));
+    if (name === 'username' || name === 'password') {
+      validateField(name, fieldValue.toString());
     }
     if (error) clearError();
   };
@@ -55,14 +62,16 @@ const LoginForm: React.FC = () => {
     e.preventDefault();
     setSubmitted(true);
     if (validateForm()) {
-      const result = await login(formData.username, formData.password, formData.rememberMe);
-      if (result?.message) {
-        setMessage(result.message);
-      }
-      if (result?.success) {
-        navigate('/');
-      }
+      await login(formData.username, formData.password, formData.rememberMe);
     }
+  };
+
+  const validateForm = (): boolean => {
+    const newErrors: Partial<LoginFormData> = {};
+    if (!formData.username.trim()) newErrors.username = 'Vui lòng nhập tên tài khoản';
+    if (!formData.password) newErrors.password = 'Vui lòng nhập mật khẩu';
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   return (
@@ -103,7 +112,7 @@ const LoginForm: React.FC = () => {
         </div>
         <Link to="/auth/forgot-password" className="forgot-password-link">Quên mật khẩu?</Link>
       </div>
-      {message && <div className="alert alert-danger">{message}</div>}
+      {error && <div className="alert alert-danger">{error}</div>}
       <Button type="submit" className="auth-submit-btn" disabled={loading}>
         {loading ? (
           <>

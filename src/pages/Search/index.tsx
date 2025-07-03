@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { searchProducts } from "../../services/productService";
-import type { Product } from "../../types";
 import ProductCard from "../../components/Card/productCard";
+import Pagination from '../../components/Pagination';
+import '../../components/Pagination.css';
+import type { Product } from "../../types";
 
 const PAGE_SIZE = 8;
 const MIN_PRICE = 0;
@@ -10,10 +11,13 @@ const MAX_PRICE = 100;
 
 const SearchPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
   const [total, setTotal] = useState(0);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const productsPerPage = 8;
 
   // Responsive columns
   let gridColumns = 4;
@@ -28,20 +32,12 @@ const SearchPage: React.FC = () => {
 
   // Fetch products
   useEffect(() => {
-    setLoading(true);
-    searchProducts({
-      searchName: searchName || undefined,
-      minPrice,
-      maxPrice,
-      page,
-      pageSize: PAGE_SIZE
-    })
-      .then((data) => {
-        setProducts(data);
-        setTotal(data.length < PAGE_SIZE && page === 1 ? data.length : 100); // Nếu backend trả về total thì dùng, không thì tạm fix
-      })
-      .finally(() => setLoading(false));
-  }, [searchName, minPrice, maxPrice, page]);
+    // TODO: fetchAllProducts() hoặc lấy từ props/mock
+    // Giả sử có hàm fetchAllProducts trả về toàn bộ sản phẩm
+    import('../../services/productService').then(mod => {
+      mod.fetchAllProducts().then(data => setAllProducts(data));
+    });
+  }, []);
 
   // Responsive: listen window resize
   useEffect(() => {
@@ -49,6 +45,14 @@ const SearchPage: React.FC = () => {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  // Filter FE
+  useEffect(() => {
+    let filtered = allProducts;
+    if (searchName) filtered = filtered.filter(p => p.productName.toLowerCase().includes(searchName.toLowerCase()));
+    filtered = filtered.filter(p => p.price >= minPrice && p.price <= maxPrice);
+    setProducts(filtered);
+  }, [allProducts, searchName, minPrice, maxPrice]);
 
   // Xử lý filter giá
   const handlePriceChange = (type: 'min' | 'max', value: number) => {
@@ -82,10 +86,20 @@ const SearchPage: React.FC = () => {
   };
 
   // Tính tổng số trang
-  const totalPages = Math.ceil(total / PAGE_SIZE);
+  const totalPages = Math.ceil(products.length / productsPerPage);
 
   // Responsive layout
   const isMobile = windowWidth < 900;
+
+  const paginatedProducts = products.slice((currentPage-1)*productsPerPage, currentPage*productsPerPage);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchName, minPrice, maxPrice]);
+
+  useEffect(() => {
+    if (currentPage > totalPages) setCurrentPage(1);
+  }, [totalPages, currentPage]);
 
   return (
     <div style={{
@@ -175,33 +189,11 @@ const SearchPage: React.FC = () => {
               justifyItems: 'center',
               justifyContent: 'center'
             }}>
-              {products.slice(0, PAGE_SIZE).map(product => (
+              {paginatedProducts.map(product => (
                 <ProductCard key={product.productId} product={product} />
               ))}
             </div>
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div style={{ marginTop: isMobile ? 16 : 32, display: "flex", justifyContent: "center", gap: 8 }}>
-                {Array.from({ length: totalPages }, (_, i) => (
-                  <button
-                    key={i + 1}
-                    onClick={() => handlePageChange(i + 1)}
-                    style={{
-                      padding: isMobile ? "8px 10px" : "10px 16px",
-                      borderRadius: 6,
-                      border: i + 1 === page ? "2px solid #2e7d32" : "1px solid #ccc",
-                      background: i + 1 === page ? "#e8f5e9" : "#fff",
-                      color: "#222",
-                      fontWeight: i + 1 === page ? "bold" : "normal",
-                      cursor: "pointer",
-                      fontSize: isMobile ? 14 : 16
-                    }}
-                  >
-                    {i + 1}
-                  </button>
-                ))}
-              </div>
-            )}
+            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
           </>
         )}
       </main>

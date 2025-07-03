@@ -9,16 +9,14 @@ const Register: React.FC = () => {
     setTimeout(() => navigate('/auth/login'), 2000);
   };
   return (
-    <div className="auth-container">
-      <div className="auth-form-wrapper" style={{maxWidth: '600px'}}>
-        <div className="auth-header">
-          <h2>Đăng Ký</h2>
-        </div>
-        <RegisterForm onSuccess={handleSuccess} />
-        <p className="auth-link">
-          Đã có tài khoản? <Link to="/auth/login">Đăng nhập tại đây</Link>
-        </p>
-      </div>
+    <div className="auth-form-box">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/SPX_Express_logo.png" alt="Logo" className="auth-logo" />
+      <h2>Đăng Ký</h2>
+      <p>Chào mừng bạn mới!</p>
+      <RegisterForm twoColumn />
+      <p className="auth-link">
+        Đã có tài khoản? <Link to="/auth/login">Đăng nhập tại đây</Link>
+      </p>
     </div>
   );
 };

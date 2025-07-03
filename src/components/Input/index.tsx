@@ -4,7 +4,7 @@ interface InputProps {
   type?: 'text' | 'email' | 'password' | 'number' | 'tel' | 'date';
   label: string;
   value?: string;
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
   name?: string;
   id?: string;
   required?: boolean;
@@ -12,6 +12,9 @@ interface InputProps {
   className?: string;
   error?: string;
   children?: React.ReactNode;
+  inputMode?: 'text' | 'email' | 'tel' | 'search' | 'url' | 'none' | 'numeric' | 'decimal';
+  select?: boolean;
+  options?: { value: string; label: string }[];
 }
 
 const Input: React.FC<InputProps> = ({
@@ -26,23 +29,46 @@ const Input: React.FC<InputProps> = ({
   className = '',
   error,
   children,
+  inputMode,
+  select = false,
+  options = [],
 }) => {
   const generatedId = useId();
   const inputId = id || generatedId;
 
   return (
     <div className={`form-group ${className}`}>
-      <input
-        type={type}
-        id={inputId}
-        name={name}
-        value={value}
-        onChange={onChange}
-        placeholder=" " // Required for the :placeholder-shown selector
-        required={required}
-        disabled={disabled}
-        className={`form-control ${error ? 'is-invalid' : ''}`}
-      />
+      {select ? (
+        <select
+          id={inputId}
+          name={name}
+          value={value}
+          onChange={onChange}
+          required={required}
+          disabled={disabled}
+          className={`form-control ${error ? 'is-invalid' : ''}`}
+        >
+          <option value="">Chọn...</option>
+          {options.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+      ) : (
+        <input
+          type={type}
+          id={inputId}
+          name={name}
+          value={value}
+          onChange={onChange}
+          placeholder=" "
+          required={required}
+          disabled={disabled}
+          className={`form-control ${error ? 'is-invalid' : ''}`}
+          inputMode={inputMode}
+        />
+      )}
       <label htmlFor={inputId}>{label}</label>
       {children}
       {error && <div className="invalid-feedback">{error}</div>}

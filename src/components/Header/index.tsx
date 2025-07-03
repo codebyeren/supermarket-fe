@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { FaHeart, FaShoppingCart, FaUser, FaMapMarkerAlt, FaBars, FaSignInAlt, FaSignOutAlt } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
+import MiniCart from './MiniCart';
 
 const Header = () => {
     const navigate = useNavigate();
     const { isAuthenticated, user, logout } = useAuthStore();
     const [searchValue, setSearchValue] = useState("");
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+    const [showMiniCart, setShowMiniCart] = useState(false);
     React.useEffect(() => {
         const handleResize = () => setWindowWidth(window.innerWidth);
         window.addEventListener("resize", handleResize);
@@ -91,7 +93,7 @@ const Header = () => {
                             </div>
                         )}
                         <FaHeart role="button" style={{ fontSize: isMobile ? 22 : 20 }} />
-                        <FaShoppingCart role="button" style={{ fontSize: isMobile ? 22 : 20 }} />
+                        <FaShoppingCart role="button" style={{ fontSize: isMobile ? 22 : 20 }} onClick={() => setShowMiniCart(s => !s)} />
                     </div>
                 </div>
             </div>
@@ -108,6 +110,7 @@ const Header = () => {
                     </div>
                 </div>
             )}
+            {showMiniCart && <MiniCart onClose={() => setShowMiniCart(false)} />}
         </header>
     );
 };
