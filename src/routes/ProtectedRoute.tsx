@@ -1,12 +1,18 @@
 import React from 'react';
+import { Navigate } from 'react-router-dom';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  // Authentication logic will be implemented here
+  const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+
+  if (!token) {
+    return <Navigate to="/auth/login" replace />;
+  }
+
   return <>{children}</>;
 };
 
-export default ProtectedRoute; 
+export default ProtectedRoute;

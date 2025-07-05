@@ -13,7 +13,7 @@ interface Props {
 const ProductCard = ({ product }: Props) => {
   const hasDiscount = product.discountPercent && product.discountPercent > 0;
   const navigate = useNavigate();
-    const [isFavorite, setIsFavorite] = useState(product.isFavorite);
+  const [isFavorite, setIsFavorite] = useState(product.isFavorite);
   const { isAuthenticated } = useAuthStore();
 
   const handleToggleFavorite = async (e: React.MouseEvent) => {
@@ -66,19 +66,17 @@ const ProductCard = ({ product }: Props) => {
         </span>
       )}
 
-
-      {/* Hình ảnh */}
       <img
         src={`/img/${product.imageUrl}`}
-        className="card-img-top p-3"
+        className="card-img-top p-3 img-fluid d-block"
         alt={product.productName}
         style={{
-          minWidth: '170px',
           objectFit: 'contain',
           height: '180px',
           transition: 'transform 0.3s ease',
         }}
       />
+
 
       {/* Nội dung */}
       <div className="card-body d-flex flex-column justify-content-between p-2">

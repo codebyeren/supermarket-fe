@@ -8,6 +8,8 @@ import CategoryPage from "../pages/Category";
 import SearchPage from "../pages/Search";
 import Favorites from '../pages/Favorites'
 import ProtectedRoute from './ProtectedRoute'
+import UserInfoPage from '../pages/UserInfo'
+import CartPage from '../pages/Cart'
 
 
 const routes = [
@@ -47,6 +49,14 @@ const routes = [
       {
         path : '/favorites',
         element: <ProtectedRoute><Favorites /></ProtectedRoute>
+      },
+       {
+        path : '/user-info',
+        element: <ProtectedRoute><UserInfoPage /></ProtectedRoute>
+      },
+       {
+        path : '/card',
+        element: <ProtectedRoute><CartPage /></ProtectedRoute>
       }
     ]
   },

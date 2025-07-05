@@ -40,7 +40,7 @@ const CarouselComponent = ({
         infinite
         autoPlay
         autoPlaySpeed={3000}
-        arrows={false}
+        arrows={true}
         showDots={false}
         draggable={true}
         pauseOnHover

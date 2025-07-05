@@ -8,19 +8,23 @@ const HomePage = () => {
   const [topRatedProducts, setTopRatedProducts] = useState<Product[]>([]);
   const [productsByCategory, setProductsByCategory] = useState<Record<string, Product[]>>({});
 
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        const data = await fetchHomeProducts();
-        setTopRatedProducts(data.topRatedProducts);
-        setProductsByCategory(data.productyByCategory);
-      } catch (error) {
-        console.error('Lỗi khi tải dữ liệu:', error);
-      }
-    };
+ useEffect(() => {
+  const token = localStorage.getItem('asscessToken') || sessionStorage.getItem('accessToken');
+  if (!token) return; // hoặc delay, hoặc load guest data
 
-    loadData();
-  }, []);
+  const loadData = async () => {
+    try {
+      const data = await fetchHomeProducts();
+      setTopRatedProducts(data.topRatedProducts);
+      setProductsByCategory(data.productyByCategory);
+    } catch (error) {
+      console.error('Lỗi khi tải dữ liệu:', error);
+    }
+  };
+
+  loadData();
+}, []);
+
 
   return (
     <div className="container my-4">

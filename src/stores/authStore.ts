@@ -100,6 +100,12 @@ class AuthStore {
     this.setState({ loading: true });
     try {
       await apiService.logout();
+      localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('userRole');
+        localStorage.removeItem('userData');
+        sessionStorage.removeItem('accessToken');
+        sessionStorage.removeItem('refreshToken');
       this.setState({
         isAuthenticated: false,
         user: null,
@@ -117,7 +123,7 @@ class AuthStore {
   }
 
   async checkAuth(): Promise<boolean> {
-    const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
     if (!token) {
       this.setState({ isAuthenticated: false, user: null });
       return false;
@@ -139,6 +145,8 @@ class AuthStore {
         localStorage.removeItem('refreshToken');
         localStorage.removeItem('userRole');
         localStorage.removeItem('userData');
+        sessionStorage.removeItem('accessToken');
+        sessionStorage.removeItem('refreshToken');
         this.setState({
           isAuthenticated: false,
           user: null,
@@ -152,6 +160,8 @@ class AuthStore {
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('userRole');
+      sessionStorage.removeItem('accessToken');
+      sessionStorage.removeItem('refreshToken');
       localStorage.removeItem('userData');
       this.setState({
         isAuthenticated: false,

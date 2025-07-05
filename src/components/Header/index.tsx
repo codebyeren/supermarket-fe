@@ -2,17 +2,18 @@ import React, { useState } from 'react';
 import { FaHeart, FaShoppingCart, FaUser, FaMapMarkerAlt, FaBars, FaSignInAlt, FaSignOutAlt } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
+import MiniCart from './MiniCart';
 import { jwtDecode } from 'jwt-decode';
-
-
 const Header = () => {
     const navigate = useNavigate();
-    const { isAuthenticated, user, logout } = useAuthStore();
+    const { isAuthenticated, user, logout,checkAuth } = useAuthStore();
     const [searchValue, setSearchValue] = useState("");
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+    const [showMiniCart, setShowMiniCart] = useState(false);
     const token  = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
     const decoded = token ? jwtDecode(token) : null;
-    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
     React.useEffect(() => {
+        checkAuth();
         const handleResize = () => setWindowWidth(window.innerWidth);
         window.addEventListener("resize", handleResize);
         return () => window.removeEventListener("resize", handleResize);
@@ -77,8 +78,8 @@ const Header = () => {
                     <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 10 : 18, justifyContent: isMobile ? 'center' : 'flex-end', fontSize: isMobile ? 20 : 18 }}>
                         {isAuthenticated ? (
                             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                <FaUser className="me-1" />
-                                <span style={{ fontSize: isMobile ? 14 : '0.9rem' }}>
+                            <Link to='user-info' className="fw-bold fs-5 text-white text-decoration-none">    <FaUser className="me-1" /></Link>
+                                 <span style={{ fontSize: isMobile ? 14 : '0.9rem' }}>
                                     {decoded?.sub || user?.username || 'Người dùng'} 
                                 </span>
                                 <button onClick={handleLogout} className="btn btn-link text-white p-0 ms-2" style={{textDecoration: 'none', fontSize: isMobile ? 14 : 16}}>
@@ -94,10 +95,10 @@ const Header = () => {
                                 </>
                             </div>
                         )}
-                        <Link to = '/favorites' className='text-white text-decoration-none'>  <FaHeart role="button" style={{ fontSize: isMobile ? 22 : 20 }} />
+                          <Link to = '/favorites' className='text-white text-decoration-none'>  <FaHeart role="button" style={{ fontSize: isMobile ? 22 : 20 }} />
                         </Link>
                       
-                        <FaShoppingCart role="button" style={{ fontSize: isMobile ? 22 : 20 }} />
+                        <FaShoppingCart role="button" style={{ fontSize: isMobile ? 22 : 20 }} onClick={() => setShowMiniCart(s => !s)} />
                     </div>
                 </div>
             </div>
@@ -114,6 +115,7 @@ const Header = () => {
                     </div>
                 </div>
             )}
+            {showMiniCart && <MiniCart onClose={() => setShowMiniCart(false)} />}
         </header>
     );
 };

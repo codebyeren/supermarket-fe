@@ -6,6 +6,8 @@ import { fetchProductsByCategory, fetchAllProducts, fetchProductsByBrand } from 
 import type { Category, Product, Brand } from "../../types";
 import CategorySidebar from "../../components/CategorySidebar";
 import ProductCard from "../../components/Card/productCard";
+import Pagination from '../../components/Pagination';
+import '../../components/Pagination.css';
 
 const CategoryPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -15,6 +17,10 @@ const CategoryPage: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const productsPerPage = 8;
+  const paginatedProducts = products.slice((currentPage-1)*productsPerPage, currentPage*productsPerPage);
+  const totalPages = Math.ceil(products.length / productsPerPage);
 
   const currentBrand = searchParams.get('brand');
 
@@ -51,6 +57,10 @@ const CategoryPage: React.FC = () => {
       }
     }
   }, [slug, currentBrand]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [products]);
 
   // Responsive: listen window resize
   React.useEffect(() => {
@@ -93,11 +103,12 @@ const CategoryPage: React.FC = () => {
             justifyItems: 'center',
             justifyContent: 'center'
           }}>
-            {products.map((product) => (
+            {paginatedProducts.map((product) => (
               <ProductCard key={product.productId} product={product} />
             ))}
           </div>
         )}
+        <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
       </main>
     </div>
   );

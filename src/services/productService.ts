@@ -63,22 +63,41 @@ export const fetchProductsByCategory = async (slug: string, brandSlug?: string):
   if (brandSlug) {
     params.append('brand', brandSlug);
   }
-  const res = await axios.get(`http://localhost:5050/api/products/filter?${params.toString()}`);
+  const res = await axios.get(`http://localhost:5050/api/products/filter?${params.toString()}`,{
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+  });
   return res.data.data;
 };
 
 export const fetchAllProducts = async (): Promise<Product[]> => {
-  const res = await axios.get('http://localhost:5050/api/products/filter');
+  const res = await axios.get('http://localhost:5050/api/products/filter', {
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+  }
+  );
   return res.data.data;
 };
 
 export const fetchProductsByBrand = async (brandSlug: string): Promise<Product[]> => {
-  const res = await axios.get(`http://localhost:5050/api/products/filter?brand=${brandSlug}`);
+  const res = await axios.get(`http://localhost:5050/api/products/filter?brand=${brandSlug}`,
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+    }
+  );
   return res.data.data;
 };
 
 export const searchProducts = async (
-  params: { searchName?: string; minPrice?: number; maxPrice?: number; page?: number; pageSize?: number }
+  params: { searchName?: string; minPrice?: number; maxPrice?: number; page?: number; pageSize?: number },
+
 ): Promise<Product[]> => {
   const { searchName, minPrice, maxPrice, page = 1, pageSize = 8 } = params;
   const query = new URLSearchParams();
@@ -87,14 +106,16 @@ export const searchProducts = async (
   if (maxPrice !== undefined) query.append("maxPrice", String(maxPrice));
   query.append("page", String(page));
   query.append("pageSize", String(pageSize));
-   const res = await axios.get('http://localhost:5050/api/products?${query.toString()}', {
-    method: 'GET',
+
+  const res = await axios.get(`http://localhost:5050/api/products?${query.toString()}`, {
     headers: {
       'Content-Type': 'application/json',
       ...(token && { Authorization: `Bearer ${token}` }),
     },
   });
+
   return res.data.data;
 };
+
 
 
