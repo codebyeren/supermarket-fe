@@ -1,19 +1,34 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import type { Product } from '../../types';
+import type { Product, Rating } from '../../types';
 import ProductCard from '../../components/Card/productCard';
 import { getProductBySlug } from '../../services/productService';
 import PromotionDescription from '../../components/Promotion/PromotionDescription';
 import CarouselComponent from '../../components/Carousel/CarouselComponent';
-
+import RatingModal from '../../components/Rating/addProductRating';
+import RatingEditModal from '../../components/Rating/editProductRating';
+import { jwtDecode } from 'jwt-decode';
+import ProductRatings from '../../components/Rating/listProductRatings';
 
 const ProductDetail = () => {
     const { slug } = useParams<{ slug: string }>();
     const [product, setProduct] = useState<Product | null>(null);
+    const [ratings, setRatings] = useState<Rating[]>([]);
+    const [showRatingModal, setShowRatingModal] = useState(false);
+    const [showRatingEditModal, setShowRatingEditModal] = useState(false); 
+
     const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
+    const [hasUserRated, setHasUserRated] = useState(false);
+    const [userRatingId, setUserRatingId] = useState<number | null>(null);
 
     useEffect(() => {
+        const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+        if (!token) {
+            setLoading(false);
+            return;
+        }
+
         const loadProduct = async () => {
             try {
                 if (!slug) return;
@@ -21,6 +36,20 @@ const ProductDetail = () => {
                 const data = await getProductBySlug(slug);
                 setProduct(data.productDto);
                 setRelatedProducts(data.relatedProducts);
+                setRatings(data.ratings);
+
+                const decoded = jwtDecode<{ userId?: string; id?: string }>(token);
+                const userId = decoded?.userId || decoded?.id;
+
+                const userRating = data.ratings.find((r) => r.userId === userId);
+                if (userRating) {
+                    setHasUserRated(true);
+                    setUserRatingId(userRating.ratingId); 
+                    if(hasUserRated ==true){
+                        console.log('✅ Người dùng đã đánh giá sản phẩm:', userRating);
+                    }
+                    console.log('✅ ID đánh giá của người dùng:', userRating.ratingId);
+                }
             } catch (err) {
                 console.error('❌ Lỗi khi tải sản phẩm:', err);
             } finally {
@@ -49,9 +78,7 @@ const ProductDetail = () => {
 
                 <div className="col-md-7">
                     <h4 className="fw-bold text-start">{product.productName}</h4>
-                       <PromotionDescription product={product} />
-        
-
+                    <PromotionDescription product={product} />
                     <p className="text-muted small mb-1 text-start">Thương hiệu: {product.brand}</p>
 
                     <div className="d-flex align-items-center mb-2">
@@ -64,35 +91,67 @@ const ProductDetail = () => {
                     </div>
 
                     <div className="mb-3 text-start">
-                        <h5 className="text-danger mb-0">
-                            {product.price - (product.discountAmount ?? 0)} ₫
-                        </h5>
+                        <h5 className="text-danger mb-0">{product.price - (product.discountAmount ?? 0)} ₫</h5>
                         {product.discountAmount != null && product.discountAmount > 0 && (
                             <small className="text-muted text-decoration-line-through">
                                 {product.price} ₫
                             </small>
                         )}
                     </div>
-                  
+
                     <div className="d-flex align-items-center gap-3">
                         <span className="fw-semibold">Tồn kho: {product.quantity}</span>
-                        
                     </div>
 
-                        <button className="btn btn-success btn-sm w-100 p-2 mt-2">+ Add to cart</button>
-                    
+                    {localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken') ? (
+                        <button
+                            onClick={() => {
+                                if (hasUserRated) {
+                                    setShowRatingEditModal(true); 
+                                } else {
+                                    setShowRatingModal(true);
+                                }
+                            }}
+                            className="btn btn-outline-primary btn-sm mt-3"
+                        >
+                            Gửi đánh giá sản phẩm
+                        </button>
+                    ) : null}
+
+                    {showRatingModal && (
+                        <RatingModal
+                            productId={product.productId}
+                            onClose={() => setShowRatingModal(false)}
+                            onSuccess={async () => {
+                                const data = await getProductBySlug(slug!);
+                                setRatings(data.ratings);
+                                setProduct(data.productDto);
+                            }}
+                        />
+                    )}
+
+                    {showRatingEditModal && userRatingId && (
+                        <RatingEditModal
+                            ratingId={userRatingId}
+                            onClose={() => setShowRatingEditModal(false)}
+                            onSuccess={async () => {
+                                const data = await getProductBySlug(slug!);
+                                setRatings(data.ratings);
+                                setProduct(data.productDto);
+                            }}
+                        />
+                    )}
+
+                    <button className="btn btn-success btn-sm w-100 p-2 mt-2">+ Add to cart</button>
                 </div>
             </div>
 
             {/* Sản phẩm liên quan */}
             {relatedProducts.length > 0 && (
-                <>
-                   
-            
-                        <CarouselComponent title="Sản Phẩm Liên Quan " products={relatedProducts}  itemsPerView={{ desktop: 5, tablet: 3, mobile: 2 }}/>
-                   
-                </>
+                <CarouselComponent title="Sản Phẩm Liên Quan" products={relatedProducts} itemsPerView={{ desktop: 5, tablet: 3, mobile: 2 }} />
             )}
+
+            {ratings.length > 0 && <ProductRatings ratings={ratings} ratingScore={product.ratingScore} />}
         </div>
     );
 };

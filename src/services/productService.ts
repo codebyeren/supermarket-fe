@@ -1,18 +1,21 @@
-import type { Product } from '../types/index';
+import type { PostRatingPayload, Product, Rating } from '../types/index';
 import axios from 'axios';
 
 interface HomeProductResponse {
   topRatedProducts: Product[];
   productyByCategory: Record<string, Product[]>;
 }
+
 interface ProductDetailResponse {
   productDto: Product;
   relatedProducts: Product[];
+  ratings: Rating[];
 }
+
 const token =
-      sessionStorage.getItem('accessToken') || localStorage.getItem('accessToken');
+  sessionStorage.getItem('accessToken') || localStorage.getItem('accessToken');
 export const fetchHomeProducts = async (): Promise<HomeProductResponse> => {
-   const res = await fetch('http://localhost:5050/api/products/home', {
+  const res = await fetch('http://localhost:5050/api/products/home', {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -20,7 +23,7 @@ export const fetchHomeProducts = async (): Promise<HomeProductResponse> => {
     },
   });
 
- if (!res.ok) throw new Error('Lỗi HTTP: ' + res.status);
+  if (!res.ok) throw new Error('Lỗi HTTP: ' + res.status);
 
   const text = await res.text();
   if (!text) throw new Error('Response rỗng');
@@ -38,7 +41,7 @@ export const fetchHomeProducts = async (): Promise<HomeProductResponse> => {
 
 
 export const getProductBySlug = async (slug: string): Promise<ProductDetailResponse> => {
-const res = await fetch(`http://localhost:5050/api/products/${slug}`, {
+  const res = await fetch(`http://localhost:5050/api/products/${slug}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -54,7 +57,7 @@ const res = await fetch(`http://localhost:5050/api/products/${slug}`, {
     throw new Error('Không có dữ liệu sản phẩm');
   }
 
-  return json.data ;
+  return json.data;
 };
 
 export const fetchProductsByCategory = async (slug: string, brandSlug?: string): Promise<Record<string, import("../types").Product[]>> => {
@@ -63,7 +66,7 @@ export const fetchProductsByCategory = async (slug: string, brandSlug?: string):
   if (brandSlug) {
     params.append('brand', brandSlug);
   }
-  const res = await axios.get(`http://localhost:5050/api/products/filter?${params.toString()}`,{
+  const res = await axios.get(`http://localhost:5050/api/products/filter?${params.toString()}`, {
     headers: {
       'Content-Type': 'application/json',
       ...(token && { Authorization: `Bearer ${token}` }),
@@ -117,5 +120,46 @@ export const searchProducts = async (
   return res.data.data;
 };
 
+export async function postRating(payload: PostRatingPayload) {
+  const response = await fetch('http://localhost:5050/api/ratings', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token && { Authorization: `Bearer ${token}` }),
 
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+
+    console.error('❌ Lỗi từ server:', errorText);
+    throw new Error(errorText || 'Gửi đánh giá thất bại');
+  }
+
+
+  return await response.json();
+}
+export async function putRating(payload: PostRatingPayload, ratingId: number) {
+  const response = await fetch(`http://localhost:5050/api/ratings/${ratingId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+    body: JSON.stringify({
+      ratingScore: payload.ratingScore,
+      comment: payload.comment,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error('❌ Lỗi từ server:', errorText);
+    throw new Error(errorText || 'Gửi đánh giá thất bại');
+  }
+
+  return await response.json();
+}
 

@@ -17,7 +17,20 @@ export interface User {
   password?: string;
   role: 'admin' | 'user';
 }
-
+export interface Rating {
+  ratingId: number;
+  userId: string;
+  customerName : string;
+  productId: number;
+  ratingScore: number;
+  comment: string;
+  createdAt: string;
+}
+export interface PostRatingPayload {
+  productId?: number;
+  ratingScore: number;
+  comment: string;
+}
 export interface Category {
   id: number;
   categoryName: string;

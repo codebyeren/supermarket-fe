@@ -10,7 +10,7 @@ const HomePage = () => {
 
  useEffect(() => {
   const token = localStorage.getItem('asscessToken') || sessionStorage.getItem('accessToken');
-  if (!token) return; // hoặc delay, hoặc load guest data
+  if (!token) return; 
 
   const loadData = async () => {
     try {
