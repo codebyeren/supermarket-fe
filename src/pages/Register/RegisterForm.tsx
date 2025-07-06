@@ -3,7 +3,8 @@ import { Button, Input, LoadingSpinner } from '../../components';
 import { useAuthStore } from '../../stores/authStore';
 import type { RegisterFormData } from '../../types/index';
 import { validation, getFieldName } from '../../utils/validation';
-import Select from 'react-select';
+import { useNavigate } from 'react-router-dom';
+import styles from './RegisterForm.module.css';
 
 interface RegisterFormProps {
   onSuccess?: () => void;
@@ -12,6 +13,7 @@ interface RegisterFormProps {
 
 const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, twoColumn }) => {
   const { register, loading, error, clearError } = useAuthStore();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState<RegisterFormData>({
     firstName: '',
     middleName: '',
@@ -31,6 +33,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, twoColumn }) => 
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const countryOptions = [
+    { value: '', label: 'Chọn quốc gia...' },
     { value: 'VN', label: 'Việt Nam' },
     { value: 'US', label: 'Hoa Kỳ' },
     { value: 'JP', label: 'Nhật Bản' },
@@ -41,8 +44,26 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, twoColumn }) => 
     { value: 'GB', label: 'Anh' },
     { value: 'SG', label: 'Singapore' },
     { value: 'TH', label: 'Thái Lan' },
-    // Add more as needed
+    { value: 'AU', label: 'Úc' },
+    { value: 'CA', label: 'Canada' },
+    { value: 'MY', label: 'Malaysia' },
+    { value: 'ID', label: 'Indonesia' },
+    { value: 'PH', label: 'Philippines' },
   ];
+
+  // Tính toán ngày tối đa (18 tuổi trở lên)
+  const getMaxDate = () => {
+    const today = new Date();
+    const maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+    return maxDate.toISOString().split('T')[0];
+  };
+
+  // Tính toán ngày tối thiểu (100 tuổi trở xuống)
+  const getMinDate = () => {
+    const today = new Date();
+    const minDate = new Date(today.getFullYear() - 100, today.getMonth(), today.getDate());
+    return minDate.toISOString().split('T')[0];
+  };
 
   useEffect(() => () => clearError(), [clearError]);
 
@@ -62,7 +83,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, twoColumn }) => 
     if (!error) error = validation.maxLength(lastName, 32, 'Tên');
     if (error) newErrors.lastName = error;
 
-    // Country
+    // Country - bắt buộc
     error = validation.required(country, 'Quốc gia');
     if (error) newErrors.country = error;
 
@@ -71,17 +92,30 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, twoColumn }) => 
     if (!error) error = validation.phoneNumber(mobile);
     if (error) newErrors.mobile = error;
 
-    // Email (optional, but if provided, must be valid)
-    if (email) {
-      error = validation.email(email);
-      if (error) newErrors.email = error;
-    }
+    // Email - bắt buộc
+    error = validation.required(email || '', 'Email');
+    if (!error) error = validation.email(email || '');
+    if (error) newErrors.email = error;
 
-    // Date of Birth (optional, but if provided, must be valid)
-    if (dob) {
-      error = validation.dateOfBirth(dob);
-      if (error) newErrors.dob = error;
+    // Date of Birth - bắt buộc và validation tuổi
+    error = validation.required(dob || '', 'Ngày sinh');
+    if (!error && dob) {
+      const birthDate = new Date(dob);
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      
+      if (age < 18) {
+        error = 'Bạn phải từ 18 tuổi trở lên để đăng ký';
+      } else if (age > 100) {
+        error = 'Ngày sinh không hợp lệ';
+      }
     }
+    if (error) newErrors.dob = error;
 
     // Username
     error = validation.required(username, 'Tên đăng nhập');
@@ -122,10 +156,26 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, twoColumn }) => 
         error = validation.required(mobile, 'Di động') || validation.phoneNumber(mobile);
         break;
       case 'email':
-        if (email) error = validation.email(email);
+        error = validation.required(email || '', 'Email') || validation.email(email || '');
         break;
       case 'dob':
-        if (dob) error = validation.dateOfBirth(dob);
+        error = validation.required(dob || '', 'Ngày sinh');
+        if (!error && dob) {
+          const birthDate = new Date(dob);
+          const today = new Date();
+          let age = today.getFullYear() - birthDate.getFullYear();
+          const monthDiff = today.getMonth() - birthDate.getMonth();
+          
+          if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+          }
+          
+          if (age < 18) {
+            error = 'Bạn phải từ 18 tuổi trở lên để đăng ký';
+          } else if (age > 100) {
+            error = 'Ngày sinh không hợp lệ';
+          }
+        }
         break;
       case 'username':
         error = validation.required(username, 'Tên đăng nhập') || validation.username(username) || validation.minLength(username, 3, 'Tên đăng nhập') || validation.maxLength(username, 32, 'Tên đăng nhập');
@@ -153,12 +203,24 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, twoColumn }) => 
     e.preventDefault();
     setSubmitted(true);
     setSuccessMessage('');
+    clearError(); // Clear previous errors
+    
     if (validate()) {
       const { confirmPassword, ...registerData } = formData;
-      const success = await register(registerData);
-      if (success) {
+      const result = await register(registerData);
+      
+      if (result.success) {
         setSuccessMessage('Đăng ký thành công! Bạn sẽ được chuyển hướng đến trang đăng nhập.');
         if (onSuccess) onSuccess();
+        // Tự động chuyển hướng sau 2 giây
+        setTimeout(() => {
+          navigate('/auth/login');
+        }, 2000);
+      } else {
+        // Hiển thị lỗi từ API
+        if (result.error) {
+          setErrors(prev => ({ ...prev, api: result.error || 'Có lỗi xảy ra' }));
+        }
       }
     }
   };
@@ -167,45 +229,44 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, twoColumn }) => 
     <form onSubmit={handleSubmit} noValidate>
       {successMessage && <div className="alert alert-success">{successMessage}</div>}
       {error && <div className="alert alert-danger">{error}</div>}
+      {errors.api && <div className="alert alert-danger">{errors.api}</div>}
       <div className={twoColumn ? 'form-grid form-grid-2col' : 'form-grid'}>
         {/* Cột trái */}
         <div>
-          <Input name="firstName" label="Họ" value={formData.firstName} onChange={handleInputChange} error={errors.firstName} />
+          <Input name="firstName" label="Họ *" value={formData.firstName} onChange={handleInputChange} error={errors.firstName} />
           <Input name="middleName" label="Tên đệm" value={formData.middleName} onChange={handleInputChange} error={errors.middleName} />
-          <Input name="lastName" label="Tên" value={formData.lastName} onChange={handleInputChange} error={errors.lastName} />
-          <Input name="dob" type="date" label="Ngày sinh" value={formData.dob} onChange={handleInputChange} error={errors.dob} />
-          <div className="form-group">
-            <label htmlFor="country-select">Quốc gia</label>
-            <Select
-              inputId="country-select"
-              name="country"
-              value={countryOptions.find(opt => opt.value === formData.country) || null}
-              onChange={option => {
-                setFormData(prev => ({ ...prev, country: option ? option.value : '' }));
-                validateField('country', option ? option.value : '');
-                if (error) clearError();
-              }}
-              options={countryOptions}
-              placeholder="Chọn..."
-              classNamePrefix="react-select"
-              isSearchable={true}
-              menuPortalTarget={document.body}
-              styles={{ menuPortal: base => ({ ...base, zIndex: 2000 }) }}
-            />
-            {errors.country && <div className="invalid-feedback" style={{display:'block'}}>{errors.country}</div>}
-          </div>
+          <Input name="lastName" label="Tên *" value={formData.lastName} onChange={handleInputChange} error={errors.lastName} />
+          <Input
+            name="dob"
+            type="date"
+            label="Ngày sinh *"
+            value={formData.dob}
+            onChange={handleInputChange}
+            error={errors.dob}
+            min={getMinDate()}
+            max={getMaxDate()}
+          />
+          <Input
+            name="country"
+            label="Quốc gia *"
+            value={formData.country}
+            onChange={handleInputChange}
+            error={errors.country}
+            select
+            options={countryOptions}
+          />
         </div>
         {/* Cột phải */}
         <div>
-          <Input name="email" type="email" label="Email" value={formData.email} onChange={handleInputChange} error={errors.email} />
-          <Input name="mobile" label="Di động" value={formData.mobile} onChange={handleInputChange} error={errors.mobile} type="tel" inputMode="numeric" />
-          <Input name="username" label="Tên đăng nhập" value={formData.username} onChange={handleInputChange} error={errors.username} />
-          <Input name="password" type={showPassword ? 'text' : 'password'} label="Mật khẩu" value={formData.password} onChange={handleInputChange} error={errors.password}>
+          <Input name="email" type="email" label="Email *" value={formData.email} onChange={handleInputChange} error={errors.email} />
+          <Input name="mobile" label="Di động *" value={formData.mobile} onChange={handleInputChange} error={errors.mobile} type="tel" inputMode="numeric" />
+          <Input name="username" label="Tên đăng nhập *" value={formData.username} onChange={handleInputChange} error={errors.username} />
+          <Input name="password" type={showPassword ? 'text' : 'password'} label="Mật khẩu *" value={formData.password} onChange={handleInputChange} error={errors.password}>
             <span className="password-toggle" onClick={() => setShowPassword(!showPassword)}>
               <i className={`fa ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
             </span>
           </Input>
-          <Input name="confirmPassword" type={showConfirmPassword ? 'text' : 'password'} label="Xác nhận mật khẩu" value={formData.confirmPassword} onChange={handleInputChange} error={errors.confirmPassword}>
+          <Input name="confirmPassword" type={showConfirmPassword ? 'text' : 'password'} label="Xác nhận mật khẩu *" value={formData.confirmPassword} onChange={handleInputChange} error={errors.confirmPassword}>
             <span className="password-toggle" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
               <i className={`fa ${showConfirmPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
             </span>

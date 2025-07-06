@@ -29,6 +29,7 @@ const CategorySidebar: React.FC<Props> = ({ categories, brands }) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   const currentBrand = searchParams.get('brand');
+  const currentRating = searchParams.get('ratingScore');
 
   // Đóng dropdown khi click ra ngoài
   useEffect(() => {
@@ -53,6 +54,25 @@ const CategorySidebar: React.FC<Props> = ({ categories, brands }) => {
     }
     setSearchParams(newSearchParams);
   };
+
+  const handleRatingSelect = (ratingValue: string) => {
+    const newSearchParams = new URLSearchParams(searchParams);
+    if (ratingValue === 'all') {
+      newSearchParams.delete('ratingScore');
+    } else {
+      newSearchParams.set('ratingScore', ratingValue);
+    }
+    setSearchParams(newSearchParams);
+  };
+
+  const ratingOptions = [
+    { value: 'all', label: 'Tất cả đánh giá' },
+    { value: '1', label: '>= 1 sao' },
+    { value: '2', label: '>= 2 sao' },
+    { value: '3', label: '>= 3 sao' },
+    { value: '4', label: '>= 4 sao' },
+    { value: '5', label: '5 sao' }
+  ];
 
   return (
     <nav
@@ -171,6 +191,95 @@ const CategorySidebar: React.FC<Props> = ({ categories, brands }) => {
           );
         })}
       </ul>
+
+      {/* Rating Section */}
+      <div style={{ marginTop: 40, borderTop: "1px solid #eee", paddingTop: 30 }}>
+        <h3 style={{ margin: "0 0 20px 0", fontSize: 24, fontWeight: "bold", color: "#2e7d32" }}>
+          Đánh giá
+        </h3>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: 8,
+            marginBottom: 8
+          }}
+        >
+          {[1,2,3].map((num) => (
+            <button
+              key={num}
+              onClick={() => handleRatingSelect(num.toString())}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 14,
+                padding: '6px 4px',
+                background: currentRating === num.toString() ? '#e8f5e9' : '#fff',
+                border: currentRating === num.toString() ? '2px solid #2e7d32' : '1px solid #e0e0e0',
+                borderRadius: 6,
+                cursor: 'pointer',
+                fontWeight: currentRating === num.toString() ? 'bold' : 'normal',
+                color: currentRating === num.toString() ? '#2e7d32' : '#222',
+                transition: 'all 0.2s',
+                minWidth: 0
+              }}
+            >
+              <span style={{marginRight: 2}}>⭐</span> {'>='} {num}
+            </button>
+          ))}
+        </div>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: 8
+          }}
+        >
+          {[4,5].map((num) => (
+            <button
+              key={num}
+              onClick={() => handleRatingSelect(num.toString())}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 14,
+                padding: '6px 4px',
+                background: currentRating === num.toString() ? '#e8f5e9' : '#fff',
+                border: currentRating === num.toString() ? '2px solid #2e7d32' : '1px solid #e0e0e0',
+                borderRadius: 6,
+                cursor: 'pointer',
+                fontWeight: currentRating === num.toString() ? 'bold' : 'normal',
+                color: currentRating === num.toString() ? '#2e7d32' : '#222',
+                transition: 'all 0.2s',
+                minWidth: 0
+              }}
+            >
+              <span style={{marginRight: 2}}>⭐</span> {num === 4 ? <>{'>='} 4</> : '5'}
+            </button>
+          ))}
+          {/* Button tất cả đánh giá */}
+          <button
+            onClick={() => handleRatingSelect('all')}
+            style={{
+              gridColumn: '3/4',
+              fontSize: 13,
+              padding: '6px 4px',
+              background: !currentRating ? '#e8f5e9' : '#fff',
+              border: !currentRating ? '2px solid #2e7d32' : '1px solid #e0e0e0',
+              borderRadius: 6,
+              cursor: 'pointer',
+              fontWeight: !currentRating ? 'bold' : 'normal',
+              color: !currentRating ? '#2e7d32' : '#222',
+              transition: 'all 0.2s',
+              minWidth: 0
+            }}
+          >
+            Tất cả
+          </button>
+        </div>
+      </div>
 
       {/* Brands Section */}
       <div style={{ marginTop: 40, borderTop: "1px solid #eee", paddingTop: 30 }}>

@@ -11,6 +11,7 @@ import { jwtDecode } from 'jwt-decode';
 import ProductRatings from '../../components/Rating/listProductRatings';
 import CompareTable from '../../components/Compare/CompareTable';
 import ComparePopup from '../../components/Compare/CompareTable';
+import { useCartStore } from '../../stores/cartStore';
 
 const ProductDetail = () => {
     const { slug } = useParams<{ slug: string }>();
@@ -26,6 +27,7 @@ const ProductDetail = () => {
     const [showCompareModal, setShowCompareModal] = useState(false);
     const [compareProducts, setCompareProducts] = useState<Product[]>([]);
 
+    const addToCart = useCartStore(state => state.addToCart);
 
     useEffect(() => {
         const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
@@ -177,7 +179,30 @@ const ProductDetail = () => {
                         />
                     )}
 
-                    <button className="btn btn-success btn-sm w-100 p-2 mt-2">+ Add to cart</button>
+                    <button className="btn btn-success btn-sm w-100 p-2 mt-2"
+                        onClick={() => {
+                            if (!product) return;
+                            addToCart({
+                                productId: product.productId,
+                                productName: product.productName,
+                                price: product.price,
+                                slug: product.slug,
+                                status: product.status,
+                                brand: product.brand,
+                                imageUrl: product.imageUrl,
+                                stock: product.quantity,
+                                quantity: 1,
+                                promotionType: product.promotionType,
+                                discountPercent: product.discountPercent,
+                                discountAmount: product.discountAmount,
+                                giftProductId: product.giftProductId,
+                                minOrderValue: product.minOrderValue,
+                                minOrderQuantity: product.minOrderQuantity,
+                                startDate: product.startDate,
+                                endDate: product.endDate,
+                            });
+                        }}
+                    >+ Add to cart</button>
                 </div>
             </div>
 

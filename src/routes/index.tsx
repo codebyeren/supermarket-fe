@@ -55,7 +55,7 @@ const routes = [
         element: <ProtectedRoute><UserInfoPage /></ProtectedRoute>
       },
        {
-        path : '/card',
+        path : '/cart',
         element: <ProtectedRoute><CartPage /></ProtectedRoute>
       }
     ]

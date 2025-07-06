@@ -1,13 +1,34 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import ProductCard from "../../components/Card/productCard";
 import Pagination from '../../components/Pagination';
+import SortPanel from '../../components/SortPanel';
+import { sortProducts, sortGroups } from '../../utils/sortUtils';
+import type { SortState } from '../../utils/sortUtils';
 import '../../components/Pagination.css';
 import type { Product } from "../../types";
 
 const PAGE_SIZE = 8;
 const MIN_PRICE = 0;
 const MAX_PRICE = 100;
+
+function parseSortState(sortParam: string | null): SortState {
+  if (!sortParam) return {};
+  const state: SortState = {};
+  sortParam.split(',').forEach(pair => {
+    const [key, value] = pair.split(':');
+    if (key && value && ['asc','desc'].includes(value)) {
+      (state as any)[key] = value;
+    }
+  });
+  return state;
+}
+function stringifySortState(state: SortState): string {
+  return Object.entries(state)
+    .filter(([_, v]) => v)
+    .map(([k, v]) => `${k}:${v}`)
+    .join(',');
+}
 
 const SearchPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -29,11 +50,10 @@ const SearchPage: React.FC = () => {
   const [maxPrice, setMaxPrice] = useState(Number(searchParams.get("maxPrice") || MAX_PRICE));
   const [page, setPage] = useState(Number(searchParams.get("page") || 1));
   const searchName = searchParams.get("searchName") || "";
+  const sortState = useMemo(() => parseSortState(searchParams.get('sort')), [searchParams]);
 
   // Fetch products
   useEffect(() => {
-    // TODO: fetchAllProducts() hoặc lấy từ props/mock
-    // Giả sử có hàm fetchAllProducts trả về toàn bộ sản phẩm
     import('../../services/productService').then(mod => {
       mod.fetchAllProducts().then(data => setAllProducts(data));
     });
@@ -66,40 +86,67 @@ const SearchPage: React.FC = () => {
   // Khi nhập hoặc kéo thả xong thì filter
   const handlePriceCommit = () => {
     setPage(1);
-    setSearchParams({
+    const params: Record<string, string> = {
       searchName,
       minPrice: String(minPrice),
       maxPrice: String(maxPrice),
       page: "1"
-    });
+    };
+    if (Object.keys(sortState).length > 0) {
+      params.sort = stringifySortState(sortState);
+    }
+    setSearchParams(params);
   };
 
   // Xử lý chuyển trang
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
-    setSearchParams({
+    const params: Record<string, string> = {
       searchName,
       minPrice: String(minPrice),
       maxPrice: String(maxPrice),
       page: String(newPage)
-    });
+    };
+    if (Object.keys(sortState).length > 0) {
+      params.sort = stringifySortState(sortState);
+    }
+    setSearchParams(params);
   };
-
-  // Tính tổng số trang
-  const totalPages = Math.ceil(products.length / productsPerPage);
 
   // Responsive layout
   const isMobile = windowWidth < 900;
 
-  const paginatedProducts = products.slice((currentPage-1)*productsPerPage, currentPage*productsPerPage);
+  // Sort products
+  const sortedProducts = useMemo(() => {
+    return sortProducts(products, sortState);
+  }, [products, sortState]);
+
+  const paginatedProducts = sortedProducts.slice((currentPage-1)*productsPerPage, currentPage*productsPerPage);
+
+  // Tính tổng số trang
+  const totalPages = Math.ceil(sortedProducts.length / productsPerPage);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchName, minPrice, maxPrice]);
+  }, [searchName, minPrice, maxPrice, sortState]);
 
   useEffect(() => {
     if (currentPage > totalPages) setCurrentPage(1);
   }, [totalPages, currentPage]);
+
+  const handleSortChange = (key: keyof SortState, value: 'asc' | 'desc' | undefined) => {
+    const newSortState: SortState = { ...sortState, [key]: value };
+    const params: Record<string, string> = {
+      searchName,
+      minPrice: String(minPrice),
+      maxPrice: String(maxPrice),
+      page: String(page)
+    };
+    if (Object.keys(newSortState).length > 0) {
+      params.sort = stringifySortState(newSortState);
+    }
+    setSearchParams(params);
+  };
 
   return (
     <div style={{
@@ -182,6 +229,11 @@ const SearchPage: React.FC = () => {
           <div>Loading...</div>
         ) : (
           <>
+            <SortPanel
+              sortState={sortState}
+              onSortChange={handleSortChange}
+              sortGroups={sortGroups as any as { key: keyof SortState; label: string; options: { value: 'asc' | 'desc'; label: string; description: string }[]; }[]}
+            />
             <div style={{
               display: "grid",
               gridTemplateColumns: `repeat(${gridColumns}, 1fr)`,

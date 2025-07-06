@@ -1,16 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { FaHeart, FaShoppingCart, FaUser, FaMapMarkerAlt, FaBars, FaSignInAlt, FaSignOutAlt } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
-import MiniCart from './MiniCart';
+import { useCartLogout } from '../../stores/cartStore';
 import { jwtDecode } from 'jwt-decode';
 import type { MyJwtPayload } from '../../types';
+import DropdownCart from '../DropdownCart';
 const Header = () => {
     const navigate = useNavigate();
     const { isAuthenticated, user, logout, checkAuth } = useAuthStore();
+    const { handleLogout: handleCartLogout } = useCartLogout();
     const [searchValue, setSearchValue] = useState("");
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-    const [showMiniCart, setShowMiniCart] = useState(false);
+    const [showDropdownCart, setShowDropdownCart] = useState(false);
+    const [dropdownCartPos, setDropdownCartPos] = useState<{top: number, left: number}>({top: 0, left: 0});
+    const cartIconRef = useRef<HTMLDivElement>(null);
     const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
     const decoded = token ? jwtDecode<MyJwtPayload>(token) : null;
     React.useEffect(() => {
@@ -22,6 +26,7 @@ const Header = () => {
     const isMobile = windowWidth < 700;
 
     const handleLogout = async () => {
+        await handleCartLogout();
         await logout();
         navigate('/auth/login');
     };
@@ -99,7 +104,26 @@ const Header = () => {
                         <Link to='/favorites' className='text-white text-decoration-none'>  <FaHeart role="button" style={{ fontSize: isMobile ? 22 : 20 }} />
                         </Link>
 
-                        <FaShoppingCart role="button" style={{ fontSize: isMobile ? 22 : 20 }} onClick={() => setShowMiniCart(s => !s)} />
+                        <div
+                          style={{ position: 'relative', display: 'inline-block' }}
+                          ref={cartIconRef}
+                          onMouseEnter={e => {
+                            setShowDropdownCart(true);
+                            if (cartIconRef.current) {
+                              const rect = cartIconRef.current.getBoundingClientRect();
+                              setDropdownCartPos({
+                                top: rect.bottom + 4,
+                                left: rect.right - 340 // width của popup
+                              });
+                            }
+                          }}
+                          onMouseLeave={() => setShowDropdownCart(false)}
+                        >
+                          <FaShoppingCart role="button" style={{ fontSize: isMobile ? 22 : 20 }}
+                            onClick={() => navigate('/cart')}
+                          />
+                          {showDropdownCart && <DropdownCart onClose={() => setShowDropdownCart(false)} position={dropdownCartPos} />}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -116,7 +140,6 @@ const Header = () => {
                     </div>
                 </div>
             )}
-            {showMiniCart && <MiniCart onClose={() => setShowMiniCart(false)} />}
         </header>
     );
 };

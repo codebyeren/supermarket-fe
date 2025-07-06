@@ -1,0 +1,65 @@
+.formGroup {
+  margin-bottom: 18px;
+}
+
+.label {
+  font-weight: 500;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.inputDate {
+  height: 40px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid #ced4da;
+  width: 100%;
+}
+
+.selectCountry {
+  height: 40px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid #ced4da;
+  padding: 0 12px;
+  width: 100%;
+  background: #fff;
+  transition: border-color 0.2s;
+}
+.selectCountry:focus {
+  border-color: #28a745;
+  outline: none;
+  box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.15);
+}
+.selectCountry.is-invalid {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.08);
+}
+
+.reactSelectInputContainer {
+  display: none !important;
+}
+
+.reactSelectControl {
+  min-height: 40px !important;
+  font-size: 1rem !important;
+  border-radius: 8px !important;
+}
+
+.reactSelectValueContainer {
+  height: 40px !important;
+  padding: 0 12px !important;
+}
+
+.reactSelectMenuPortal {
+  z-index: 9999 !important;
+}
+
+.reactSelectMenu {
+  z-index: 9999 !important;
+}
+
+.reactSelectPlaceholder {
+  font-size: 1rem !important;
+  color: #aaa !important;
+} 
