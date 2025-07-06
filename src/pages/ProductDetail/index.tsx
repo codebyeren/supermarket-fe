@@ -121,40 +121,47 @@ const ProductDetail = () => {
                         <span className="ms-2 text-muted small">{product.ratingScore.toFixed(1)}</span>
                     </div>
 
-                    <div className="mb-3 text-start">
-                        <h5 className="text-danger mb-0">{product.price - (product.discountAmount ?? 0)} ₫</h5>
-                        {product.discountAmount != null && product.discountAmount > 0 && (
-                            <small className="text-muted text-decoration-line-through">
-                                {product.price} ₫
-                            </small>
+                    <div className="d-flex align-items-baseline gap-2">
+                        {/* Giá sau giảm */}
+                        <div className="fw-bold text-danger" style={{ fontSize: '1.1rem' }}>
+                            {formatCurrency(product.price * (1 - (product.discountPercent ?? 0) / 100))}
+                        </div>
+
+                        {/* Giá gốc nếu có giảm */}
+                        {product.discountPercent && (
+                            <div
+                                className="text-muted text-decoration-line-through"
+                                style={{ fontSize: '0.9rem' }}
+                            >
+                                {formatCurrency(product.price)}
+                            </div>
                         )}
                     </div>
 
-                    <div className="d-flex align-items-center gap-3">
-                        <span className="fw-semibold">Tồn kho: {product.quantity}</span>
+                    
+                    <div className="row g-2">
+                        <div className="col-6">
+                            <button
+                                className="btn btn-outline-primary btn-sm w-100"
+                                onClick={() => setShowCompareModal(true)}
+                            >
+                                So sánh sản phẩm
+                            </button>
+                        </div>
+
+                        {(localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken')) && (
+                            <div className="col-6">
+                                <button
+                                    className="btn btn-outline-primary btn-sm w-100"
+                                    onClick={() => {
+                                        hasUserRated ? setShowRatingEditModal(true) : setShowRatingModal(true);
+                                    }}
+                                >
+                                    Gửi đánh giá
+                                </button>
+                            </div>
+                        )}
                     </div>
-                    <button
-                        className="btn btn-outline-secondary btn-sm mt-2 w-100"
-                        onClick={() => setShowCompareModal(true)}
-                    >
-                        So sánh sản phẩm cùng danh mục
-                    </button>
-
-
-                    {localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken') ? (
-                        <button
-                            onClick={() => {
-                                if (hasUserRated) {
-                                    setShowRatingEditModal(true);
-                                } else {
-                                    setShowRatingModal(true);
-                                }
-                            }}
-                            className="btn btn-outline-primary btn-sm mt-3"
-                        >
-                            Gửi đánh giá sản phẩm
-                        </button>
-                    ) : null}
 
                     {showRatingModal && (
                         <RatingModal

@@ -9,8 +9,7 @@ const HomePage = () => {
   const [productsByCategory, setProductsByCategory] = useState<Record<string, Product[]>>({});
 
  useEffect(() => {
-  const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
-  console.log(token)
+
 
   const loadData = async () => {
     try {
