@@ -39,17 +39,25 @@ const LoginForm: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
-    if (submitted) {
-      setErrors(prev => ({ ...prev, [name]: undefined }));
-    }
-    if (error) clearError();
-  };
+ const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const { name, value, type } = e.target;
+
+  const newValue =
+    type === 'checkbox' && 'checked' in e.target
+      ? (e.target as HTMLInputElement).checked
+      : value;
+
+  setFormData(prev => ({
+    ...prev,
+    [name]: newValue
+  }));
+
+  if (submitted) {
+    setErrors(prev => ({ ...prev, [name]: undefined }));
+  }
+  if (error) clearError();
+};
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,7 +81,7 @@ const LoginForm: React.FC = () => {
         name="username"
         label="Tên Tài Khoản"
         value={formData.username}
-        onChange={handleInputChange}
+        onChange = {handleInputChange}
         error={errors.username}
       />
       <Input
@@ -82,7 +90,7 @@ const LoginForm: React.FC = () => {
         name="password"
         label="Mật Khẩu"
         value={formData.password}
-        onChange={handleInputChange}
+        onChange = {handleInputChange}
         error={errors.password}
       >
         <span className="password-toggle" onClick={() => setShowPassword(!showPassword)}>

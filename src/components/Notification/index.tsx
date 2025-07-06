@@ -19,7 +19,7 @@ const Notification: React.FC<NotificationProps> = ({
   useEffect(() => {
     const timer = setTimeout(() => {
       setVisible(false);
-      setTimeout(onClose, 300); // wait for fade-out animation
+      setTimeout(onClose, 300); 
     }, duration);
 
     return () => clearTimeout(timer);
