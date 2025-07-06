@@ -9,6 +9,7 @@ interface HomeProductResponse {
 interface ProductDetailResponse {
   productDto: Product;
   relatedProducts: Product[];
+  categories: { id: number; categoryName: string; slug: string }[];
   ratings: Rating[];
 }
 

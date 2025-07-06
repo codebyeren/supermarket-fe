@@ -4,14 +4,15 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import MiniCart from './MiniCart';
 import { jwtDecode } from 'jwt-decode';
+import type { MyJwtPayload } from '../../types';
 const Header = () => {
     const navigate = useNavigate();
-    const { isAuthenticated, user, logout,checkAuth } = useAuthStore();
+    const { isAuthenticated, user, logout, checkAuth } = useAuthStore();
     const [searchValue, setSearchValue] = useState("");
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
     const [showMiniCart, setShowMiniCart] = useState(false);
-    const token  = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
-    const decoded = token ? jwtDecode(token) : null;
+    const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+    const decoded = token ? jwtDecode<MyJwtPayload>(token) : null;
     React.useEffect(() => {
         checkAuth();
         const handleResize = () => setWindowWidth(window.innerWidth);
@@ -78,11 +79,11 @@ const Header = () => {
                     <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 10 : 18, justifyContent: isMobile ? 'center' : 'flex-end', fontSize: isMobile ? 20 : 18 }}>
                         {isAuthenticated ? (
                             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <Link to='user-info' className="fw-bold fs-5 text-white text-decoration-none">    <FaUser className="me-1" /></Link>
-                                 <span style={{ fontSize: isMobile ? 14 : '0.9rem' }}>
-                                    {decoded?.sub || user?.username || 'Người dùng'} 
-                                </span>
-                                <button onClick={handleLogout} className="btn btn-link text-white p-0 ms-2" style={{textDecoration: 'none', fontSize: isMobile ? 14 : 16}}>
+                                <Link to='user-info' className="fw-bold fs-5 text-white text-decoration-none">    <FaUser className="me-1" />
+                                    <span style={{ fontSize: isMobile ? 14 : '0.9rem' }}>
+                                        {decoded?.fullName || user?.username || 'Người dùng'}
+                                    </span></Link>
+                                <button onClick={handleLogout} className="btn btn-link text-white p-0 ms-2" style={{ textDecoration: 'none', fontSize: isMobile ? 14 : 16 }}>
                                     <FaSignOutAlt className="me-1" /> Đăng xuất
                                 </button>
                             </div>
@@ -95,9 +96,9 @@ const Header = () => {
                                 </>
                             </div>
                         )}
-                          <Link to = '/favorites' className='text-white text-decoration-none'>  <FaHeart role="button" style={{ fontSize: isMobile ? 22 : 20 }} />
+                        <Link to='/favorites' className='text-white text-decoration-none'>  <FaHeart role="button" style={{ fontSize: isMobile ? 22 : 20 }} />
                         </Link>
-                      
+
                         <FaShoppingCart role="button" style={{ fontSize: isMobile ? 22 : 20 }} onClick={() => setShowMiniCart(s => !s)} />
                     </div>
                 </div>
@@ -108,8 +109,8 @@ const Header = () => {
                     <div className="container-lg d-flex align-items-center justify-content-between">
                         <div className="d-flex align-items-center gap-2">
                             <FaBars />
-                            <button className="btn btn-link text-black p-0 ms-2" style={{textDecoration: 'none', fontSize: isMobile ? 14 : 16}}>
-                            <Link to="/category/all" className="text-black text-decoration-none" style={{ fontSize: isMobile ? 14 : 16 }} >Danh Mục</Link>
+                            <button className="btn btn-link text-black p-0 ms-2" style={{ textDecoration: 'none', fontSize: isMobile ? 14 : 16 }}>
+                                <Link to="/category/all" className="text-black text-decoration-none" style={{ fontSize: isMobile ? 14 : 16 }} >Danh Mục</Link>
                             </button>
                         </div>
                     </div>

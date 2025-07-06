@@ -19,7 +19,7 @@ export interface User {
 }
 export interface Rating {
   ratingId: number;
-  userId: string;
+  customerId: string;
   customerName : string;
   productId: number;
   ratingScore: number;
@@ -89,3 +89,12 @@ export interface RegisterFormData {
   password: string;
   confirmPassword?: string;
 } 
+export type MyJwtPayload = {
+  id: string;
+  sub: string;
+  fullName: string;
+  role: string;
+  exp: number;
+  iss: string;
+  aud: string;
+};
