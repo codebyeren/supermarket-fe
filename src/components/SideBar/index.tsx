@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
+import { useCartLogout } from '../../stores/cartStore';
 
 interface JwtPayload {
   sub?: string;
@@ -11,6 +12,7 @@ interface JwtPayload {
 export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation(); // ← Lấy path hiện tại
+  const { handleLogout: handleCartLogout } = useCartLogout();
   const [username, setUsername] = useState<string | null>(null);
 
   useEffect(() => {
@@ -26,7 +28,10 @@ export default function Sidebar() {
     }
   }, []);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    // Xử lý cart logout trước
+    await handleCartLogout();
+    // Sau đó xóa token
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     sessionStorage.removeItem('accessToken');

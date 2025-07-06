@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import PromotionBadge from '../Promotion/PromotionBadge';
 import { useAuthStore } from '../../stores/authStore';
 import { deleteFavorite, toggleFavorite } from '../../services/favoriteService';
+import { useCartStore } from '../../stores/cartStore';
 
 interface Props {
   product: Product;
@@ -15,6 +16,7 @@ const ProductCard = ({ product }: Props) => {
   const navigate = useNavigate();
   const [isFavorite, setIsFavorite] = useState(product.isFavorite);
   const { isAuthenticated } = useAuthStore();
+  const addToCart = useCartStore(state => state.addToCart);
 
   const handleToggleFavorite = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -135,7 +137,25 @@ const ProductCard = ({ product }: Props) => {
         className="btn btn-outline-success btn-sm"
         onClick={(e) => {
           e.stopPropagation();
-
+          addToCart({
+            productId: product.productId,
+            productName: product.productName,
+            price: product.price,
+            slug: product.slug,
+            status: product.status,
+            brand: product.brand,
+            imageUrl: product.imageUrl,
+            stock: product.quantity,
+            quantity: 1,
+            promotionType: product.promotionType,
+            discountPercent: product.discountPercent,
+            discountAmount: product.discountAmount,
+            giftProductId: product.giftProductId,
+            minOrderValue: product.minOrderValue,
+            minOrderQuantity: product.minOrderQuantity,
+            startDate: product.startDate,
+            endDate: product.endDate,
+          });
         }}
       >
         <FaShoppingCart /> Thêm Giỏ Hàng

@@ -61,11 +61,14 @@ export const getProductBySlug = async (slug: string): Promise<ProductDetailRespo
   return json.data;
 };
 
-export const fetchProductsByCategory = async (slug: string, brandSlug?: string): Promise<Record<string, import("../types").Product[]>> => {
+export const fetchProductsByCategory = async (slug: string, brandSlug?: string, ratingScore?: string): Promise<Record<string, import("../types").Product[]>> => {
   const params = new URLSearchParams();
   params.append('category', slug);
   if (brandSlug) {
     params.append('brand', brandSlug);
+  }
+  if (ratingScore) {
+    params.append('ratingScore', ratingScore);
   }
   const res = await axios.get(`http://localhost:5050/api/products/filter?${params.toString()}`, {
     headers: {
@@ -76,8 +79,12 @@ export const fetchProductsByCategory = async (slug: string, brandSlug?: string):
   return res.data.data;
 };
 
-export const fetchAllProducts = async (): Promise<Product[]> => {
-  const res = await axios.get('http://localhost:5050/api/products/filter', {
+export const fetchAllProducts = async (ratingScore?: string): Promise<Product[]> => {
+  const params = new URLSearchParams();
+  if (ratingScore) {
+    params.append('ratingScore', ratingScore);
+  }
+  const res = await axios.get(`http://localhost:5050/api/products/filter?${params.toString()}`, {
     headers: {
       'Content-Type': 'application/json',
       ...(token && { Authorization: `Bearer ${token}` }),
@@ -87,8 +94,13 @@ export const fetchAllProducts = async (): Promise<Product[]> => {
   return res.data.data;
 };
 
-export const fetchProductsByBrand = async (brandSlug: string): Promise<Product[]> => {
-  const res = await axios.get(`http://localhost:5050/api/products/filter?brand=${brandSlug}`,
+export const fetchProductsByBrand = async (brandSlug: string, ratingScore?: string): Promise<Product[]> => {
+  const params = new URLSearchParams();
+  params.append('brand', brandSlug);
+  if (ratingScore) {
+    params.append('ratingScore', ratingScore);
+  }
+  const res = await axios.get(`http://localhost:5050/api/products/filter?${params.toString()}`,
     {
       headers: {
         'Content-Type': 'application/json',

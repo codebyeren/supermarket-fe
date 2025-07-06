@@ -1,4 +1,5 @@
 import React, { useId } from 'react';
+import styles from '../../pages/Register/RegisterForm.module.css';
 
 interface InputProps {
   type?: 'text' | 'email' | 'password' | 'number' | 'tel' | 'date';
@@ -15,6 +16,9 @@ interface InputProps {
   inputMode?: 'text' | 'email' | 'tel' | 'search' | 'url' | 'none' | 'numeric' | 'decimal';
   select?: boolean;
   options?: { value: string; label: string }[];
+  min?: string;
+  max?: string;
+  step?: string;
 }
 
 const Input: React.FC<InputProps> = ({
@@ -32,6 +36,9 @@ const Input: React.FC<InputProps> = ({
   inputMode,
   select = false,
   options = [],
+  min,
+  max,
+  step,
 }) => {
   const generatedId = useId();
   const inputId = id || generatedId;
@@ -46,7 +53,7 @@ const Input: React.FC<InputProps> = ({
           onChange={onChange}
           required={required}
           disabled={disabled}
-          className={`form-control ${error ? 'is-invalid' : ''}`}
+          className={`form-control${name === 'country' ? ' ' + styles.selectCountry : ''}${error ? ' is-invalid' : ''}`}
         >
           <option value="">Chọn...</option>
           {options.map((opt) => (
@@ -67,6 +74,9 @@ const Input: React.FC<InputProps> = ({
           disabled={disabled}
           className={`form-control ${error ? 'is-invalid' : ''}`}
           inputMode={inputMode}
+          min={min}
+          max={max}
+          step={step}
         />
       )}
       <label htmlFor={inputId}>{label}</label>
