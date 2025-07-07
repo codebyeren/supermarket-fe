@@ -1,7 +1,7 @@
 import type { LoginFormData, RegisterFormData } from '../types/index';
 
 // API service configuration
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5050/api';
+const API_URL = import.meta.env.VITE_API_URL;
 
 interface ApiResponse<T> {
   success: boolean;
@@ -51,7 +51,7 @@ export const apiService = {
   // Login method
   async login(loginData: LoginFormData): Promise<ApiResponse<any>> {
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/login`, {
+      const response = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(loginData),
@@ -72,7 +72,7 @@ export const apiService = {
   // Register method
   async register(registerData: RegisterFormData): Promise<ApiResponse<any>> {
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/register`, {
+      const response = await fetch(`${API_URL}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(registerData),
@@ -92,7 +92,7 @@ export const apiService = {
   // Check if user is authenticated
   async checkAuth(): Promise<ApiResponse<any>> {
     try {
-      const response = await fetchWithAuth(`${API_BASE_URL}/auth/me`, { method: 'GET' });
+      const response = await fetchWithAuth(`${API_URL}/auth/me`, { method: 'GET' });
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || 'Token không hợp lệ');
       return { success: true, data: data.data || data };
@@ -105,7 +105,7 @@ export const apiService = {
     try {
       const refreshToken = localStorage.getItem('refreshToken') || sessionStorage.getItem('refreshToken');
       if (!refreshToken) throw new Error('Không có refresh token');
-      const response = await fetch(`${API_BASE_URL}/auth/refresh-token`, {
+      const response = await fetch(`${API_URL}/auth/refresh-token`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ refreshToken }),
@@ -125,7 +125,7 @@ export const apiService = {
     try {
       const token = localStorage.getItem('accessToken');
       if (token) {
-        await fetchWithAuth(`${API_BASE_URL}/auth/logout`, { method: 'POST' });
+        await fetchWithAuth(`${API_URL}/auth/logout`, { method: 'POST' });
       }
       clearTokens();
       return { success: true, message: 'Đăng xuất thành công' };

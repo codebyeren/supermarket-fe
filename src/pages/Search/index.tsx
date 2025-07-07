@@ -7,6 +7,8 @@ import { sortProducts, sortGroups } from '../../utils/sortUtils';
 import type { SortState } from '../../utils/sortUtils';
 import '../../components/Pagination.css';
 import type { Product } from "../../types";
+import { fetchAllProducts } from '../../services/productService';
+import axiosInstance from '../../services/axiosInstance';
 
 const PAGE_SIZE = 8;
 const MIN_PRICE = 0;
@@ -54,10 +56,18 @@ const SearchPage: React.FC = () => {
 
   // Fetch products
   useEffect(() => {
-    import('../../services/productService').then(mod => {
-      mod.fetchAllProducts().then(data => setAllProducts(data));
-    });
-  }, []);
+    setLoading(true);
+    const params = new URLSearchParams();
+    if (searchParams.get('category')) params.append('category', searchParams.get('category')!);
+    if (searchParams.get('brand')) params.append('brand', searchParams.get('brand')!);
+    if (searchParams.get('ratingScore')) params.append('ratingScore', searchParams.get('ratingScore')!);
+    axiosInstance.get(`/products/filter?${params.toString()}`)
+      .then(res => {
+        setAllProducts(res.data.data || []);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, [searchParams]);
 
   // Responsive: listen window resize
   useEffect(() => {

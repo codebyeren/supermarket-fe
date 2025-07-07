@@ -45,12 +45,16 @@ export const getProductBySlug = async (slug: string): Promise<ProductDetailRespo
 
 export const fetchProductsByCategory = async (
   slug: string,
-  brandSlug?: string
+  brandSlug?: string,
+  ratingScore?: string
 ): Promise<Record<string, Product[]>> => {
   const params = new URLSearchParams();
   params.append('category', slug);
   if (brandSlug) {
     params.append('brand', brandSlug);
+  }
+  if (ratingScore) {
+    params.append('ratingScore', ratingScore);
   }
   const res = await axiosInstance.get(`/products/filter?${params.toString()}`);
   return res.data.data;

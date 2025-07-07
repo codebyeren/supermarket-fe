@@ -45,7 +45,7 @@ const DropdownCart: React.FC<{ onClose: () => void; position: { top: number; lef
           <>
             {items.slice(0, MAX_SHOW).map(item => (
               <div className="dropdown-cart-item" key={item.productId}>
-                <img src={item.imageUrl} alt={item.productName} className="dropdown-cart-img" />
+                <img src={`/img/${item.imageUrl}`} alt={item.productName} className="dropdown-cart-img" />
                 <div className="dropdown-cart-info">
                   <div className="dropdown-cart-name" title={item.productName}>{item.productName}</div>
                 </div>

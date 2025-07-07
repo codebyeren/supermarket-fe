@@ -62,6 +62,25 @@ const Input: React.FC<InputProps> = ({
             </option>
           ))}
         </select>
+      ) : type === 'password' ? (
+        <div className="password-field" style={{position: 'relative'}}>
+          <input
+            type={type}
+            id={inputId}
+            name={name}
+            value={value}
+            onChange={onChange}
+            placeholder=" "
+            required={required}
+            disabled={disabled}
+            className={`form-control ${error ? 'is-invalid' : ''}`}
+            inputMode={inputMode}
+            min={min}
+            max={max}
+            step={step}
+          />
+          {children}
+        </div>
       ) : (
         <input
           type={type}
@@ -80,7 +99,6 @@ const Input: React.FC<InputProps> = ({
         />
       )}
       <label htmlFor={inputId}>{label}</label>
-      {children}
       {error && <div className="invalid-feedback">{error}</div>}
     </div>
   );

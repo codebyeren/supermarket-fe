@@ -1,6 +1,8 @@
 import axios from "axios";
 import type { Category } from "../types";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function mapCategoryApiToFE(apiCat: any): Category {
   const { id, categoryName, slug } = apiCat.categoryDto;
   return {
@@ -14,7 +16,7 @@ function mapCategoryApiToFE(apiCat: any): Category {
 }
 
 export const fetchCategories = async (): Promise<Category[]> => {
-  const res = await axios.get("http://localhost:5050/api/categories");
+  const res = await axios.get(`${API_URL}/categories`);
   const apiData = res.data.data;
   return Array.isArray(apiData) ? apiData.map(mapCategoryApiToFE) : [];
 }; 

@@ -37,7 +37,8 @@ interface CartState {
 }
 
 const CART_STORAGE_KEY = 'cart_items_v2';
-const API_URL = '/api/cart'; // Sửa lại endpoint đúng với BE
+const API_URL = import.meta.env.VITE_API_URL;
+const CART_API_URL = `${API_URL}/carts`;
 
 export const useCartStore = create<CartState>((set, get) => ({
   items: [],
@@ -81,7 +82,7 @@ export const useCartStore = create<CartState>((set, get) => ({
   },
   getCartFromAPI: async () => {
     try {
-      const res = await fetch(API_URL, { credentials: 'include' });
+      const res = await fetch(CART_API_URL, { credentials: 'include' });
       if (!res.ok) throw new Error('Lỗi lấy giỏ hàng từ server');
       const data = await res.json();
       if (data && Array.isArray(data.data)) {
@@ -94,7 +95,7 @@ export const useCartStore = create<CartState>((set, get) => ({
   },
   syncCartToAPI: async () => {
     try {
-      await fetch(API_URL, {
+      await fetch(CART_API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

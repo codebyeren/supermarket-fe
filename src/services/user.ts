@@ -1,3 +1,5 @@
+const API_URL = import.meta.env.VITE_API_URL;
+
 export interface UserInfo {
   customerId: number;
   username: string;
@@ -34,7 +36,7 @@ export async function getUserInfo(): Promise<UserInfo> {
     throw new Error('Token không tồn tại');
   }
 
-  const res = await fetch('http://localhost:5050/api/auth/me', {
+  const res = await fetch(`${API_URL}/auth/me`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -66,7 +68,7 @@ export async function updateUserInfo(userInfo: UpdateUserInfoInput): Promise<Api
     throw new Error('Token không tồn tại');
   }
 
-  const res = await fetch('http://localhost:5050/api/auth/update-info', {
+  const res = await fetch(`${API_URL}/auth/update-info`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

@@ -39,7 +39,7 @@ const CartPage: React.FC = () => {
             {items.map(item => (
               <div className="cart-item" key={item.productId}>
                 <div className="item-image">
-                  <img src={item.imageUrl} alt={item.productName} />
+                  <img src={`/img/${item.imageUrl}`} alt={item.productName} />
                 </div>
                 <div className="item-details">
                   <h3>{item.productName}</h3>
@@ -66,12 +66,13 @@ const CartPage: React.FC = () => {
                   </div>
                   <div className="quantity-controls">
                     <button onClick={() => updateQuantity(item.productId, Math.max(1, item.quantity - 1))} disabled={item.quantity <= 1}>
-                    <FaMinus style={{ color: '#222' }} />
+                    <span>-</span>
                     </button>
                     <span>{item.quantity}</span>
                     <button onClick={() => updateQuantity(item.productId, Math.min(item.quantity + 1, item.stock))} disabled={item.quantity >= item.stock}>
-                    <FaPlus style={{ color: '#222' }} />
+               <span>+</span>
                     </button>
+
                   </div>
                   <div className="item-total">
                     <span>Tổng:</span>

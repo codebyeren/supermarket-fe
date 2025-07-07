@@ -1,5 +1,6 @@
 import axios from 'axios';
 
+const API_URL = import.meta.env.VITE_API_URL;
 
 const token =
       sessionStorage.getItem('accessToken') || localStorage.getItem('accessToken');
@@ -8,7 +9,7 @@ export const toggleFavorite = async (productId: number) => {
   try {
     
     const response = await axios.post(
-      `http://localhost:5050/api/favorites/${productId}`,
+      `${API_URL}/favorites/${productId}`,
       null,
       {
         headers: {
@@ -26,7 +27,7 @@ export const toggleFavorite = async (productId: number) => {
 
 export const getAllFavorites = async () => {
   try {
-    const response = await axios.get('http://localhost:5050/api/favorites', {
+    const response = await axios.get(`${API_URL}/favorites`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -42,7 +43,7 @@ export const deleteFavorite = async (productId: number) => {
 
 
   try {
-    const response = await axios.delete(`http://localhost:5050/api/favorites/${productId}`, {
+    const response = await axios.delete(`${API_URL}/favorites/${productId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
