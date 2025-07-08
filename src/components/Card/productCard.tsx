@@ -7,17 +7,19 @@ import { useAuthStore } from '../../stores/authStore';
 import { deleteFavorite, toggleFavorite } from '../../services/favoriteService';
 import { useCartStore } from '../../stores/cartStore';
 
+
 interface Props {
   product: Product;
+  onAddToCartSuccess?: () => void;
+  onAddToCartFail?: () => void;
 }
 
-const ProductCard = ({ product }: Props) => {
+const ProductCard = ({ product,onAddToCartSuccess ,onAddToCartFail}: Props) => {
   const hasDiscount = product.discountPercent && product.discountPercent > 0;
   const navigate = useNavigate();
   const [isFavorite, setIsFavorite] = useState(product.isFavorite);
   const { isAuthenticated } = useAuthStore();
   const addToCart = useCartStore(state => state.addToCart);
-
   const handleToggleFavorite = async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!isAuthenticated) return;
@@ -48,6 +50,7 @@ const ProductCard = ({ product }: Props) => {
     }).format(value);
 
   return (
+
     <div
       onClick={handleClick}
       role="button"
@@ -137,7 +140,8 @@ const ProductCard = ({ product }: Props) => {
         className="btn btn-outline-success btn-sm"
         onClick={(e) => {
           e.stopPropagation();
-          addToCart({
+          try {
+  addToCart({
             productId: product.productId,
             productName: product.productName,
             price: product.price,
@@ -156,6 +160,10 @@ const ProductCard = ({ product }: Props) => {
             startDate: product.startDate,
             endDate: product.endDate,
           });
+  onAddToCartSuccess?.(); 
+} catch (error) {
+  onAddToCartFail?.();    
+}
         }}
       >
         <FaShoppingCart /> Thêm Giỏ Hàng

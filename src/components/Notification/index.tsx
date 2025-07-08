@@ -5,6 +5,7 @@ type NotificationProps = {
   message: string;
   duration?: number;
   borderColor?: 'green' | 'red' | 'yellow' | 'gray';
+
   onClose: () => void;
 };
 

@@ -12,6 +12,7 @@ import ProductRatings from '../../components/Rating/listProductRatings';
 import CompareTable from '../../components/Compare/CompareTable';
 import ComparePopup from '../../components/Compare/CompareTable';
 import { useCartStore } from '../../stores/cartStore';
+import Notification from '../../components/Notification';
 
 const ProductDetail = () => {
     const { slug } = useParams<{ slug: string }>();
@@ -26,6 +27,8 @@ const ProductDetail = () => {
     const [userRatingId, setUserRatingId] = useState<number | null>(null);
     const [showCompareModal, setShowCompareModal] = useState(false);
     const [compareProducts, setCompareProducts] = useState<Product[]>([]);
+    const [showNotification, setShowNotification] = useState(false);
+    const [success, setSuccess] = useState(true)
 
     const addToCart = useCartStore(state => state.addToCart);
 
@@ -138,7 +141,7 @@ const ProductDetail = () => {
                         )}
                     </div>
 
-                    
+
                     <div className="row g-2">
                         <div className="col-6">
                             <button
@@ -186,37 +189,60 @@ const ProductDetail = () => {
                         />
                     )}
 
-                    <button className="btn btn-success btn-sm w-100 p-2 mt-2"
+                    <button
+                        className="btn btn-success btn-sm w-100 p-2 mt-2"
                         onClick={() => {
-                            if (!product) return;
-                            addToCart({
-                                productId: product.productId,
-                                productName: product.productName,
-                                price: product.price,
-                                slug: product.slug,
-                                status: product.status,
-                                brand: product.brand,
-                                imageUrl: product.imageUrl,
-                                stock: product.quantity,
-                                quantity: 1,
-                                promotionType: product.promotionType,
-                                discountPercent: product.discountPercent,
-                                discountAmount: product.discountAmount,
-                                giftProductId: product.giftProductId,
-                                minOrderValue: product.minOrderValue,
-                                minOrderQuantity: product.minOrderQuantity,
-                                startDate: product.startDate,
-                                endDate: product.endDate,
-                            });
+                            try {
+                                if (!product) return;
+                                addToCart({
+                                    productId: product.productId,
+                                    productName: product.productName,
+                                    price: product.price,
+                                    slug: product.slug,
+                                    status: product.status,
+                                    brand: product.brand,
+                                    imageUrl: product.imageUrl,
+                                    stock: product.quantity,
+                                    quantity: 1,
+                                    promotionType: product.promotionType,
+                                    discountPercent: product.discountPercent,
+                                    discountAmount: product.discountAmount,
+                                    giftProductId: product.giftProductId,
+                                    minOrderValue: product.minOrderValue,
+                                    minOrderQuantity: product.minOrderQuantity,
+                                    startDate: product.startDate,
+                                    endDate: product.endDate,
+                                });
+                                setSuccess(true); // ✅ Thành công
+                                setShowNotification(true);
+                            } catch (error) {
+                                console.error("Lỗi thêm vào giỏ hàng", error);
+                                setSuccess(false); // ✅ Thất bại
+                                setShowNotification(true);
+                            }
                         }}
-                    >+ Add to cart</button>
+
+                    >
+                        + Add to cart
+                    </button>
+
                 </div>
             </div>
 
-            {/* Sản phẩm liên quan */}
-            {relatedProducts.length > 0 && (
-                <CarouselComponent title="Sản Phẩm Liên Quan" products={relatedProducts} itemsPerView={{ desktop: 5, tablet: 3, mobile: 2 }} />
-            )}
+            <CarouselComponent
+                title="Sản Phẩm Liên Quan"
+                products={relatedProducts}
+                itemsPerView={{ desktop: 5, tablet: 3, mobile: 2 }}
+                onAddToCartSuccess={() => {
+                    setSuccess(true);
+                    setShowNotification(true);
+                }}
+                onAddToCartFail={() => {
+                    setSuccess(false);
+                    setShowNotification(true);
+                }}
+            />
+
 
             {ratings.length > 0 && <ProductRatings ratings={ratings} ratingScore={product.ratingScore} />}
             {showCompareModal && (
@@ -227,6 +253,14 @@ const ProductDetail = () => {
                 />
             )}
 
+            {showNotification && (
+                <Notification
+                    message={success ? 'Đã thêm vào giỏ hàng' : 'Thêm vào giỏ hàng thất bại'}
+                    duration={2000}
+                    borderColor={success ? 'green' : 'red'}
+                    onClose={() => setShowNotification(false)}
+                />
+            )}
 
         </div>
     );

@@ -1,5 +1,5 @@
 const API_URL = import.meta.env.VITE_API_URL;
-
+import axiosInstance from './axiosInstance';
 export interface UserInfo {
   customerId: number;
   username: string;
@@ -28,66 +28,33 @@ export interface ApiResponse {
   message: string;
   data?: any;
 }
-
-export async function getUserInfo(): Promise<UserInfo> {
-  const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
-  
-  if (!token) {
-    throw new Error('Token không tồn tại');
-  }
-
-  const res = await fetch(`${API_URL}/auth/me`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  if (!res.ok) {
-    const message = `HTTP error ${res.status} – ${res.statusText}`;
-    throw new Error(message);
-  }
-
-  let json: any;
+export const getUserInfo = async (): Promise<UserInfo> => {
   try {
-    json = await res.json();
-  } catch {
-    throw new Error('Phản hồi từ server không hợp lệ (không phải JSON)');
+    const response = await axiosInstance.get('/auth/me');
+    const json = response.data;
+
+    if (json.code !== 200 || !json.data) {
+      throw new Error(json.message || 'Lỗi khi lấy thông tin người dùng');
+    }
+
+    return json.data as UserInfo;
+  } catch (error) {
+    console.error('Lỗi khi gọi getUserInfo:', error);
+    throw error;
   }
+};
 
-  if (json.code !== 200 || !json.data) {
-    throw new Error(json.message || 'Lỗi khi lấy thông tin người dùng');
-  }
-
-  return json.data as UserInfo;
-}
-
-export async function updateUserInfo(userInfo: UpdateUserInfoInput): Promise<ApiResponse> {
-  const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
-  
-  if (!token) {
-    throw new Error('Token không tồn tại');
-  }
-
-  const res = await fetch(`${API_URL}/auth/update-info`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(userInfo),
-  });
-
-  if (!res.ok) {
-    const message = `HTTP error ${res.status} – ${res.statusText}`;
-    throw new Error(message);
-  }
-
-  let json: any;
+/**
+ * Gửi cập nhật thông tin người dùng.
+ */
+export const updateUserInfo = async (
+  userInfo: UpdateUserInfoInput
+): Promise<ApiResponse> => {
   try {
-    json = await res.json();
-  } catch {
-    throw new Error('Phản hồi từ server không hợp lệ (không phải JSON)');
+    const response = await axiosInstance.post('/auth/update-info', userInfo);
+    return response.data as ApiResponse;
+  } catch (error) {
+    console.error('Lỗi khi gọi updateUserInfo:', error);
+    throw error;
   }
-
-  return json as ApiResponse; 
-}
+};

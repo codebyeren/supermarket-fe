@@ -22,7 +22,9 @@ const responsive = {
 const CarouselComponent = ({
   title,
   products,
-  itemsPerView = { desktop: 4, tablet: 2, mobile: 1 }  
+  itemsPerView = { desktop: 4, tablet: 2, mobile: 1 }  ,
+   onAddToCartSuccess,
+   onAddToCartFail,
 }: {
   title: string;
   products: Product[];
@@ -31,6 +33,8 @@ const CarouselComponent = ({
     tablet?: number;
     mobile?: number;
   };
+     onAddToCartSuccess?: () => void;
+     onAddToCartFail? : () => void;
 }) => {
   return (
     <section className="mb-5">
@@ -48,7 +52,7 @@ const CarouselComponent = ({
       >
         {products.map((product) => (
           <div key={product.productId} className="px-2">
-            <ProductCard product={product} />
+            <ProductCard product={product} onAddToCartSuccess={onAddToCartSuccess} onAddToCartFail={onAddToCartFail}/>
           </div>
         ))}
       </Carousel>

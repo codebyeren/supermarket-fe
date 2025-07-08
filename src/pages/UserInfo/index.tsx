@@ -59,9 +59,7 @@ export default function UserInfoPage() {
         setEditing(false);
         setSuccess(true);
         setTimeout(() => setSuccess(false), 3000);
-      } else {
-        setSuccess(false);
-      }
+      } 
     } catch (error) {
       console.error('Update error:', error);
       setSuccess(false);
