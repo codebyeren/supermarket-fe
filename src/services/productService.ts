@@ -60,13 +60,23 @@ export const fetchProductsByCategory = async (
   return res.data.data;
 };
 
-export const fetchAllProducts = async (): Promise<Product[]> => {
-  const res = await axiosInstance.get('/products/filter');
+export const fetchAllProducts = async (ratingScore?: string): Promise<Product[]> => {
+  const params = new URLSearchParams();
+  if (ratingScore) {
+    params.append('ratingScore', ratingScore);
+  }
+  const url = params.toString() ? `/products/filter?${params.toString()}` : '/products/filter';
+  const res = await axiosInstance.get(url);
   return res.data.data;
 };
 
-export const fetchProductsByBrand = async (brandSlug: string): Promise<Product[]> => {
-  const res = await axiosInstance.get(`/products/filter?brand=${brandSlug}`);
+export const fetchProductsByBrand = async (brandSlug: string, ratingScore?: string): Promise<Product[]> => {
+  const params = new URLSearchParams();
+  params.append('brand', brandSlug);
+  if (ratingScore) {
+    params.append('ratingScore', ratingScore);
+  }
+  const res = await axiosInstance.get(`/products/filter?${params.toString()}`);
   return res.data.data;
 };
 
