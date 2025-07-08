@@ -1,6 +1,7 @@
 import React from 'react';
 import { create } from 'zustand';
 import { useAuthStore } from './authStore';
+import axiosInstance from '../services/axiosInstance';
 
 export interface CartItem {
   productId: number;
@@ -80,32 +81,27 @@ export const useCartStore = create<CartState>((set, get) => ({
       return sum + price * i.quantity;
     }, 0);
   },
-  getCartFromAPI: async () => {
-    try {
-      const res = await fetch(CART_API_URL, { credentials: 'include' });
-      if (!res.ok) throw new Error('Lỗi lấy giỏ hàng từ server');
-      const data = await res.json();
-      if (data && Array.isArray(data.data)) {
-        get().mergeCart(data.data);
-      }
-    } catch (e) {
-      // Có thể show toast lỗi
-      // alert('Không thể lấy giỏ hàng từ server');
+getCartFromAPI: async () => {
+  try {
+    const res = await axiosInstance.get('/carts');
+    const data = res.data;
+    if (data && Array.isArray(data.data)) {
+      get().mergeCart(data.data);
     }
-  },
-  syncCartToAPI: async () => {
-    try {
-      await fetch(CART_API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(get().items)
-      });
-      // alert('Đồng bộ giỏ hàng thành công!');
-    } catch (e) {
-      // alert('Đồng bộ giỏ hàng thất bại!');
-    }
-  },
+  } catch (e) {
+    // alert('Không thể lấy giỏ hàng từ server');
+  }
+},
+
+syncCartToAPI: async () => {
+  try {
+    await axiosInstance.post('/carts', get().items);
+    // alert('Đồng bộ giỏ hàng thành công!');
+  } catch (e) {
+    // alert('Đồng bộ giỏ hàng thất bại!');
+  }
+},
+
   loadCartFromStorage: () => {
     const raw = localStorage.getItem(CART_STORAGE_KEY);
     if (raw) {
