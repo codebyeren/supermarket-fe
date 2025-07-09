@@ -2,6 +2,10 @@ import React, { useEffect, useState } from 'react';
 import Sidebar from '../../components/SideBar';
 import { getUserInfo, updateUserInfo, type UserInfo } from '../../services/user';
 import Notification from '../../components/Notification';
+import OrderHistory from '../../components/OrderHistory';
+import { Tabs } from 'antd';
+
+const { TabPane } = Tabs;
 
 export default function UserInfoPage() {
   const [user, setUser] = useState<UserInfo | null>(null);
@@ -10,6 +14,7 @@ export default function UserInfoPage() {
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [success, setSuccess] = useState(false);
+  const [activeTab, setActiveTab] = useState('profile');
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -35,7 +40,20 @@ export default function UserInfoPage() {
   const handleSave = async () => {
     if (!formData) return;
 
-    const [firstName, middleName = '', lastName = ''] = formData.fullName.trim().split(' ');
+    // Tách tên thành các phần
+    const nameParts = formData.fullName.trim().split(' ');
+    let firstName = '', middleName = '', lastName = '';
+    
+    if (nameParts.length === 1) {
+      firstName = nameParts[0];
+    } else if (nameParts.length === 2) {
+      firstName = nameParts[0];
+      lastName = nameParts[1];
+    } else if (nameParts.length > 2) {
+      firstName = nameParts[0];
+      lastName = nameParts[nameParts.length - 1];
+      middleName = nameParts.slice(1, nameParts.length - 1).join(' ');
+    }
 
     const payload = {
       username: formData.username,
@@ -43,9 +61,9 @@ export default function UserInfoPage() {
       mobile: formData.mobile,
       country: formData.country,
       dob: formData.dob,
-      street: '',
-      city: '',
-      state: '',
+      street: formData.street || '',
+      city: formData.city || '',
+      state: formData.state || '',
       firstName,
       middleName,
       lastName
@@ -54,7 +72,6 @@ export default function UserInfoPage() {
     try {
       const res = await updateUserInfo(payload);
       if (res.code === 200) {
-  
         setUser(formData);
         setEditing(false);
         setSuccess(true);
@@ -101,64 +118,68 @@ export default function UserInfoPage() {
           <Sidebar />
         </aside>
 
-        {/* Main Form */}
+        {/* Main Content */}
         <main className="flex-grow-1">
-          <h3 className="text-center mb-4">Thông Tin Người Dùng</h3>
-
-         
-
-          <form className="row g-3 bg-white p-4 shadow rounded" onSubmit={e => e.preventDefault()}>
-            <div className="col-md-6">
-              <label className="form-label">Họ tên đầy đủ</label>
-              <input type="text" name="fullName" className="form-control" value={formData.fullName} onChange={handleChange} disabled={!editing} />
-            </div>
-            <div className="col-md-6">
-              <label className="form-label">Quốc gia</label>
-              <select
-                name="country"
-                className="form-select"
-                value={formData.country}
-                onChange={handleChange}
-                disabled={!editing}
-              >
-                <option value="">-- Chọn quốc gia --</option>
-                {countryOptions.map(option => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="col-md-6">
-              <label className="form-label">Ngày sinh</label>
-              <input type="date" name="dob" className="form-control" value={formData.dob} onChange={handleChange} disabled={!editing} />
-            </div>
-            <div className="col-md-6">
-              <label className="form-label">Điện thoại</label>
-              <input type="text" name="mobile" className="form-control" value={formData.mobile} onChange={handleChange} disabled={!editing} />
-            </div>
-            <div className="col-12">
-              <label className="form-label">Email</label>
-              <input type="email" name="email" className="form-control" value={formData.email} onChange={handleChange} disabled={!editing} />
-            </div>
-            <div className="col-12">
-              {editing ? (
-                <div className="d-flex flex-column flex-sm-row gap-2">
-                  <button type="button" className="btn btn-success w-100" onClick={handleSave}>
-                    Lưu thay đổi
-                  </button>
-                  <button type="button" className="btn btn-secondary w-100" onClick={() => setEditing(false)}>
-                    Hủy
-                  </button>
+          <Tabs activeKey={activeTab} onChange={setActiveTab}>
+            <TabPane tab="Thông tin cá nhân" key="profile">
+              <h3 className="text-center mb-4">Thông Tin Người Dùng</h3>
+              <form className="row g-3 bg-white p-4 shadow rounded" onSubmit={e => e.preventDefault()}>
+                <div className="col-md-6">
+                  <label className="form-label">Họ tên đầy đủ</label>
+                  <input type="text" name="fullName" className="form-control" value={formData.fullName} onChange={handleChange} disabled={!editing} />
                 </div>
-              ) : (
-                <button type="button" className="btn btn-primary w-100" onClick={() => setEditing(true)}>
-                  Chỉnh sửa
-                </button>
-              )}
-            </div>
-          </form>
+                <div className="col-md-6">
+                  <label className="form-label">Quốc gia</label>
+                  <select
+                    name="country"
+                    className="form-select"
+                    value={formData.country}
+                    onChange={handleChange}
+                    disabled={!editing}
+                  >
+                    <option value="">-- Chọn quốc gia --</option>
+                    {countryOptions.map(option => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="col-md-6">
+                  <label className="form-label">Ngày sinh</label>
+                  <input type="date" name="dob" className="form-control" value={formData.dob} onChange={handleChange} disabled={!editing} />
+                </div>
+                <div className="col-md-6">
+                  <label className="form-label">Điện thoại</label>
+                  <input type="text" name="mobile" className="form-control" value={formData.mobile} onChange={handleChange} disabled={!editing} />
+                </div>
+                <div className="col-12">
+                  <label className="form-label">Email</label>
+                  <input type="email" name="email" className="form-control" value={formData.email} onChange={handleChange} disabled={!editing} />
+                </div>
+                <div className="col-12">
+                  {editing ? (
+                    <div className="d-flex flex-column flex-sm-row gap-2">
+                      <button type="button" className="btn btn-success w-100" onClick={handleSave}>
+                        Lưu thay đổi
+                      </button>
+                      <button type="button" className="btn btn-secondary w-100" onClick={() => setEditing(false)}>
+                        Hủy
+                      </button>
+                    </div>
+                  ) : (
+                    <button type="button" className="btn btn-primary w-100" onClick={() => setEditing(true)}>
+                      Chỉnh sửa
+                    </button>
+                  )}
+                </div>
+              </form>
+            </TabPane>
+            <TabPane tab="Lịch sử đơn hàng" key="orders">
+              <OrderHistory />
+            </TabPane>
+          </Tabs>
         </main>
       </div>
     </div>

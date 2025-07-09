@@ -1,4 +1,5 @@
 // Common TypeScript type definitions
+import type { ReactNode } from 'react';
 
 export interface User {
   id: string;
@@ -16,6 +17,7 @@ export interface User {
   username: string;
   password?: string;
   role: 'admin' | 'user';
+  paymentInfo?: PaymentInfo;
 }
 export interface Rating {
   ratingId: number;
@@ -69,6 +71,7 @@ export interface ApiResponse<T> {
   data: T;
   message: string;
   success: boolean;
+  code?: number;
 }
 
 export interface LoginFormData {
@@ -98,3 +101,73 @@ export type MyJwtPayload = {
   iss: string;
   aud: string;
 };
+
+export type PaymentMethod = 'CREDIT_CARD' | 'CASH' | 'BANK_TRANSFER' | 'MOBILE_PAYMENT';
+export type OrderStatus = 'PENDING' | 'SHIPPED' | 'CONFIRMED' | 'CANCCELLED';
+export type PaymentStatus = 'PENDING' | 'COMPLETED';
+export type ItemType = 'TAX' | 'FEE' | 'DISCOUNT' | 'GIFT' | 'SHIPPING';
+export type PromotionType = 'PERCENT_DISCOUNT' | 'FIXED_DISCOUNT' | 'BUY_ONE_GET_ONE';
+
+export interface OrderItem {
+  productId: number;
+  productName: string;
+  price: number;
+  slug: string;
+  imageUrl: string;
+  quantity: number;
+  promotionId: number | null;
+  promotionType: PromotionType | null;
+  promotionDescription: string | null;
+  discountPercent: number | null;
+  discountAmount: number | null;
+  giftProductId: number | null;
+  giftProductName: string | null;
+  giftProductImg: string | null;
+  giftProductSlug: string | null;
+  minOrderValue: number | null;
+  minOrderQuantity: number | null;
+}
+
+export interface BillDetail {
+  itemType: ItemType;
+  amount: number;
+  description: string;
+}
+
+export interface Order {
+  billId: number;
+  orderId: number;
+  orderStatus: OrderStatus;
+  dateOfPurchase: string;
+  orderItems: OrderItem[];
+  orderAmount: number;
+  billAmount: number;
+  paymentMethod: PaymentMethod;
+  paymentStatus: PaymentStatus;
+  billDetails: BillDetail[];
+}
+
+export interface CustomerAddress {
+  fullName: string;
+  street: string;
+  city: string;
+  state: string;
+  country: string;
+  homePhone?: string;
+  mobilePhone: string;
+  postalCode?: string;
+  isDefault?: boolean;
+  id?: number;
+}
+
+export interface PaymentInfo {
+  cardNumber?: string;
+  cardHolder?: string;
+  expiryDate?: string;
+  cvv?: string;
+}
+
+// Layout
+export interface LayoutProps {
+  children: ReactNode;
+}

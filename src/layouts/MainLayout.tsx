@@ -1,23 +1,26 @@
 import React from 'react';
+import type { ReactNode } from 'react';
 import { Outlet } from 'react-router-dom';
 import Headers from '../components/Header';
 import Footer from '../components/Footer/Footer';
-const MainLayout: React.FC = () => {
+
+interface MainLayoutProps {
+  children?: ReactNode;
+}
+
+const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   return (
-    
     <div className="main-layout">
-  <div className='w-100'>
-          <Headers />
+      <div className='w-100'>
+        <Headers />
       </div>
       <main>   
-        <Outlet />
+        {children || <Outlet />}
       </main>
-       <div className='w-100'>
-          <Footer />
+      <div className='w-100'>
+        <Footer />
       </div>
-    
     </div>
-    
   );
 };
 

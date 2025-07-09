@@ -10,6 +10,7 @@ import Favorites from '../pages/Favorites'
 import ProtectedRoute from './ProtectedRoute'
 import UserInfoPage from '../pages/UserInfo'
 import CartPage from '../pages/Cart'
+import CheckoutPage from '../pages/Checkout'
 
 
 const routes = [
@@ -57,6 +58,10 @@ const routes = [
        {
         path : '/cart',
         element: <ProtectedRoute><CartPage /></ProtectedRoute>
+      },
+      {
+        path : '/checkout',
+        element: <ProtectedRoute><CheckoutPage /></ProtectedRoute>
       }
     ]
   },

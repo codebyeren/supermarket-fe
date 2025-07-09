@@ -1,5 +1,7 @@
 const API_URL = import.meta.env.VITE_API_URL;
 import axiosInstance from './axiosInstance';
+import type { CustomerAddress, PaymentInfo } from '../types';
+
 export interface UserInfo {
   customerId: number;
   username: string;
@@ -9,7 +11,13 @@ export interface UserInfo {
   mobile: string;
   country: string;
   dob: string;
+  street?: string;
+  city?: string;
+  state?: string;
+  homePhone?: string;
+  paymentInfo?: PaymentInfo;
 }
+
 export interface UpdateUserInfoInput {
   username: string;
   firstName: string;
@@ -22,7 +30,25 @@ export interface UpdateUserInfoInput {
   street?: string;
   city?: string;
   state?: string;
+  homePhone?: string;
 }
+
+export interface UpdateAddressInput {
+  street: string;
+  city: string;
+  state: string;
+  country: string;
+  homePhone?: string;
+  mobilePhone: string;
+}
+
+export interface UpdatePaymentInfoInput {
+  cardNumber: string;
+  cardHolder: string;
+  expiryDate: string;
+  cvv: string;
+}
+
 export interface ApiResponse {
   code: number;
   message: string;
@@ -55,6 +81,36 @@ export const updateUserInfo = async (
     return response.data as ApiResponse;
   } catch (error) {
     console.error('Lỗi khi gọi updateUserInfo:', error);
+    throw error;
+  }
+};
+
+/**
+ * Cập nhật thông tin địa chỉ của người dùng.
+ */
+export const updateUserAddress = async (
+  addressInfo: UpdateAddressInput
+): Promise<ApiResponse> => {
+  try {
+    const response = await axiosInstance.post('/auth/update-info', addressInfo);
+    return response.data as ApiResponse;
+  } catch (error) {
+    console.error('Lỗi khi cập nhật địa chỉ:', error);
+    throw error;
+  }
+};
+
+/**
+ * Cập nhật thông tin thanh toán của người dùng.
+ */
+export const updatePaymentInfo = async (
+  paymentInfo: UpdatePaymentInfoInput
+): Promise<ApiResponse> => {
+  try {
+    const response = await axiosInstance.post('/auth/update-payment-info', paymentInfo);
+    return response.data as ApiResponse;
+  } catch (error) {
+    console.error('Lỗi khi cập nhật thông tin thanh toán:', error);
     throw error;
   }
 };
