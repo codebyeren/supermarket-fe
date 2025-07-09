@@ -20,7 +20,7 @@ export interface User {
 export interface Rating {
   ratingId: number;
   customerId: string;
-  customerName : string;
+  customerName: string;
   productId: number;
   ratingScore: number;
   comment: string;
@@ -55,6 +55,11 @@ export interface Product {
   quantity: number;
   isFavorite: boolean;
   ratingScore: number;
+  promotionDescription: string;
+  giftProductName: string,
+  giftProductImg: string,
+  giftProductSlug: string,
+  giftProductPrice : number ,
   promotionType: string | null;
   discountPercent: number | null;
   discountAmount: number | null;
@@ -88,7 +93,7 @@ export interface RegisterFormData {
   username: string;
   password: string;
   confirmPassword?: string;
-} 
+}
 export type MyJwtPayload = {
   id: string;
   sub: string;

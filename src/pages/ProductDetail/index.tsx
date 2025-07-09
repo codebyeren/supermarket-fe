@@ -13,6 +13,9 @@ import CompareTable from '../../components/Compare/CompareTable';
 import ComparePopup from '../../components/Compare/CompareTable';
 import { useCartStore } from '../../stores/cartStore';
 import Notification from '../../components/Notification';
+import { FaHeart } from 'react-icons/fa';
+import { deleteFavorite, toggleFavorite } from '../../services/favoriteService';
+import { useAuthStore } from '../../stores/authStore';
 
 const ProductDetail = () => {
     const { slug } = useParams<{ slug: string }>();
@@ -20,7 +23,6 @@ const ProductDetail = () => {
     const [ratings, setRatings] = useState<Rating[]>([]);
     const [showRatingModal, setShowRatingModal] = useState(false);
     const [showRatingEditModal, setShowRatingEditModal] = useState(false);
-
     const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [hasUserRated, setHasUserRated] = useState(false);
@@ -29,8 +31,28 @@ const ProductDetail = () => {
     const [compareProducts, setCompareProducts] = useState<Product[]>([]);
     const [showNotification, setShowNotification] = useState(false);
     const [success, setSuccess] = useState(true)
+    const [isFavorite, setIsFavorite] = useState(false);
+
+    const { isAuthenticated } = useAuthStore();
 
     const addToCart = useCartStore(state => state.addToCart);
+
+    const handleToggleFavorite = async (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (!isAuthenticated || !product) return;
+
+        try {
+            if (isFavorite) {
+                await deleteFavorite(product.productId);
+                setIsFavorite(false);
+            } else {
+                await toggleFavorite(product.productId);
+                setIsFavorite(true);
+            }
+        } catch (err) {
+            console.error('Toggle favorite failed', err);
+        }
+    };
 
     useEffect(() => {
         const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
@@ -47,6 +69,7 @@ const ProductDetail = () => {
                 setProduct(data.productDto);
                 setRelatedProducts(data.relatedProducts);
                 setRatings(data.ratings);
+                setIsFavorite(data.productDto.isFavorite)
                 const mainCategorySlug = data.categories?.[0]?.slug;
 
 
@@ -111,7 +134,36 @@ const ProductDetail = () => {
                 </div>
 
                 <div className="col-md-7">
-                    <h4 className="fw-bold text-start">{product.productName}</h4>
+                    <h4 className="fw-bold text-start d-flex align-items-center gap-2 mb-1">
+                        <span
+                            className="badge px-2 py-1 text-white"
+                            style={{
+                                backgroundColor:
+                                    product.status === 'Hot Deal'
+                                        ? '#e53935'
+                                        : product.status === 'Best Seller'
+                                            ? '#fb8c00'
+                                            : product.status === 'New Arrival'
+                                                ? '#43a047'
+                                                : '#6c757d',
+                                fontSize: 12,
+                                borderRadius: 4,
+                                textTransform: 'uppercase'
+                            }}
+                        >
+                            {product.status}
+                        </span>
+                        <span style={{ fontSize: '1.1rem' }}>{product.productName}</span>
+                        <button
+                            onClick={handleToggleFavorite}
+                            className="btn btn-link p-0 ms-2"
+                            style={{ color: 'red', fontSize: '1.2rem' }}
+                            title={isFavorite ? 'Bỏ khỏi yêu thích' : 'Thêm vào yêu thích'}
+                        >
+                            <FaHeart color={isFavorite ? 'red' : 'gray'} />
+                        </button>
+                    </h4>
+
                     <PromotionDescription product={product} />
                     <p className="text-muted small mb-1 text-start">Thương hiệu: {product.brand}</p>
 
@@ -151,19 +203,6 @@ const ProductDetail = () => {
                                 So sánh sản phẩm
                             </button>
                         </div>
-
-                        {(localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken')) && (
-                            <div className="col-6">
-                                <button
-                                    className="btn btn-outline-primary btn-sm w-100"
-                                    onClick={() => {
-                                        hasUserRated ? setShowRatingEditModal(true) : setShowRatingModal(true);
-                                    }}
-                                >
-                                    Gửi đánh giá
-                                </button>
-                            </div>
-                        )}
                     </div>
 
                     {showRatingModal && (
@@ -244,7 +283,14 @@ const ProductDetail = () => {
             />
 
 
-            {ratings.length > 0 && <ProductRatings ratings={ratings} ratingScore={product.ratingScore} />}
+            {<ProductRatings
+                ratings={ratings}
+                ratingScore={product.ratingScore}
+                onWriteRating={() => {
+                    hasUserRated ? setShowRatingEditModal(true) : setShowRatingModal(true);
+                }}
+            />
+            }
             {showCompareModal && (
                 <ComparePopup
                     show={showCompareModal}

@@ -1,17 +1,26 @@
 import React, { useState } from 'react';
 import { postRating } from '../../services/productService';
+import { useEffect } from 'react';
 
 interface RatingModalProps {
   productId: number;
   onClose: () => void;
   onSuccess: () => void;
 }
-
 const RatingModal: React.FC<RatingModalProps> = ({ productId, onClose, onSuccess }) => {
   const [score, setScore] = useState(5);
+  const [hovered, setHovered] = useState<number | null>(null);
   const [comment, setComment] = useState('');
   const [showNotification, setShowNotification] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [loading, setLoading] = useState(false);
+
+useEffect(() => {
+  setScore(0);
+  setComment('');
+  setErrorMessage('');
+  setShowNotification(false);
+}, [productId]);
 
   const handleSubmit = async () => {
     if (!comment.trim()) {
@@ -20,6 +29,7 @@ const RatingModal: React.FC<RatingModalProps> = ({ productId, onClose, onSuccess
       return;
     }
 
+    setLoading(true);
     try {
       const data = await postRating({ productId, ratingScore: score, comment });
       console.log('✅ Đánh giá gửi thành công:', data);
@@ -29,16 +39,16 @@ const RatingModal: React.FC<RatingModalProps> = ({ productId, onClose, onSuccess
       onClose();
     } catch (err: any) {
       console.error('❌ Gửi đánh giá thất bại:', err);
-
       try {
-        const json = await err.json(); 
-        setErrorMessage(json.message || 'Gửi đánh giá thất bại');
+        const json = await err.json?.();
+        setErrorMessage(json?.message || 'Gửi đánh giá thất bại');
       } catch {
-        const fallbackText = await err.text?.(); 
+        const fallbackText = await err.text?.();
         setErrorMessage(fallbackText || err.message || 'Lỗi không xác định');
       }
-
       setShowNotification(true);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -47,18 +57,25 @@ const RatingModal: React.FC<RatingModalProps> = ({ productId, onClose, onSuccess
       <div className="bg-white p-4 rounded shadow" style={{ width: '400px' }}>
         <h5 className="mb-3">Gửi đánh giá sản phẩm</h5>
 
-        <label className="form-label">Số sao:</label>
-        <select
-          value={score}
-          onChange={(e) => setScore(Number(e.target.value))}
-          className="form-select mb-3"
-        >
-          {[5, 4, 3, 2, 1].map((s) => (
-            <option key={s} value={s}>
-              {s} sao
-            </option>
+     
+
+        <div className="mb-3">
+          {[1, 2, 3, 4, 5].map((s) => (
+            <span
+              key={s}
+              onMouseEnter={() => setHovered(s)}
+              onMouseLeave={() => setHovered(null)}
+              onClick={() => setScore(s)}
+              style={{
+                cursor: 'pointer',
+                fontSize: '1.8rem',
+                color: (hovered ?? score) >= s ? '#ffc107' : '#e4e5e9',
+              }}
+            >
+              ★
+            </span>
           ))}
-        </select>
+        </div>
 
         <label className="form-label">Bình luận:</label>
         <textarea
@@ -78,8 +95,8 @@ const RatingModal: React.FC<RatingModalProps> = ({ productId, onClose, onSuccess
           <button className="btn btn-secondary btn-sm" onClick={onClose}>
             Hủy
           </button>
-          <button className="btn btn-primary btn-sm" onClick={handleSubmit}>
-            Gửi
+          <button className="btn btn-primary btn-sm" onClick={handleSubmit} disabled={loading}>
+            {loading ? 'Đang gửi...' : 'Gửi'}
           </button>
         </div>
       </div>

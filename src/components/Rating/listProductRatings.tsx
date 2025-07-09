@@ -1,32 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import type { Rating } from '../../types';
-import Pagination from '../Pagination';
 
 interface Props {
   ratings: Rating[];
   ratingScore: number;
+  onWriteRating?: () => void;
 }
 
-const RATINGS_PER_PAGE = 5;
+const ProductRatings: React.FC<Props> = ({ ratings, ratingScore, onWriteRating }) => {
+  const [filterStar, setFilterStar] = useState<number | null>(null);
+  const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
 
-const ProductRatings: React.FC<Props> = ({ ratings, ratingScore }) => {
-  const [currentPage, setCurrentPage] = useState(1);
+  const filteredRatings = useMemo(() => {
+    let result = filterStar
+      ? ratings.filter((r) => r.ratingScore === filterStar)
+      : [...ratings];
 
-  const totalPages = Math.ceil(ratings.length / RATINGS_PER_PAGE);
-  const startIndex = (currentPage - 1) * RATINGS_PER_PAGE;
-  const paginatedRatings = ratings.slice(startIndex, startIndex + RATINGS_PER_PAGE);
+    result.sort((a, b) =>
+      sortOrder === 'newest'
+        ? new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        : new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    );
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
+    return result;
+  }, [ratings, filterStar, sortOrder]);
+
+  const countByStars = (star: number) =>
+    ratings.filter((r) => r.ratingScore === star).length;
 
   return (
     <div className="mt-5">
-      <h4 className="mb-3 text-start">Đánh Giá Sản Phẩm</h4>
+      <h4 className="fw-bold mb-3 text-start">Nhận Xét Và Đánh Giá</h4>
 
-      <div className="d-flex align-items-center mb-3">
+      {/* Tổng điểm và nút gửi */}
+      <div className="d-flex align-items-center mb-4">
         <div style={{ fontSize: '2.5rem', color: 'red', fontWeight: 'bold' }}>
-          {ratingScore.toFixed(1)}
+          {ratingScore.toFixed(1)}/5
         </div>
         <div className="ms-3">
           <div className="text-warning">
@@ -36,46 +45,78 @@ const ProductRatings: React.FC<Props> = ({ ratings, ratingScore }) => {
               </span>
             ))}
           </div>
-          <div className="text-muted small">{ratings.length} đánh giá</div>
+          <div className="text-muted small">{ratings.length} lượt đánh giá</div>
+        </div>
+        {onWriteRating && (
+          <div className="ms-auto">
+            <button className="btn btn-primary btn-sm" onClick={onWriteRating}>
+              Gửi đánh giá
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Bộ lọc + sắp xếp */}
+      <div className="mb-3 d-flex flex-wrap align-items-center gap-2">
+        <button
+          className={`btn btn-sm ${filterStar === null ? 'btn-danger' : 'btn-outline-secondary'}`}
+          onClick={() => setFilterStar(null)}
+        >
+          Tất cả
+        </button>
+        {[5, 4, 3, 2, 1].map((star) => (
+          <button
+            key={star}
+            className={`btn btn-sm ${filterStar === star ? 'btn-warning' : 'btn-outline-secondary'}`}
+            onClick={() => setFilterStar(star)}
+          >
+            {star} ★ ({countByStars(star)})
+          </button>
+        ))}
+
+        {/* Bộ sắp xếp */}
+        <div className="ms-auto">
+          <select
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value as 'newest' | 'oldest')}
+            className="form-select form-select-sm"
+            style={{ width: 160 }}
+          >
+            <option value="newest">Mới nhất</option>
+            <option value="oldest">Cũ nhất</option>
+          </select>
         </div>
       </div>
 
-      <div className="border rounded p-3 text-start" style={{ maxHeight: '400px', overflowY: 'auto' }}>
-        {ratings.length === 0 ? (
+      {/* Danh sách đánh giá */}
+      <div className="border rounded p-3 bg-light">
+        {filteredRatings.length === 0 ? (
           <p>Chưa có đánh giá nào.</p>
         ) : (
-          paginatedRatings.map((rating) => (
-            <div key={rating.ratingId} className="border-bottom py-3">
-              <div className="d-flex align-items-center mb-2">
+          filteredRatings.map((rating) => (
+            <div key={rating.ratingId} className="bg-white p-3 rounded shadow-sm mb-3">
+              <div className="d-flex justify-content-between">
                 <div>
-                  <div className="fw-semibold">{rating.customerName}</div>
-                  <small className="text-muted">{new Date(rating.createdAt).toLocaleString()}</small>
+                  <strong>{rating.customerName}</strong>
+                  <div className="text-warning small text-start">
+                    {[...Array(5)].map((_, i) => (
+                      <span key={i} className={i < rating.ratingScore ? 'text-warning' : 'text-muted'}>
+                        ★
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                <div className="text-end">
+                  <div className="text-muted small">
+                    {new Date(rating.createdAt).toLocaleString()}
+                  </div>
                 </div>
               </div>
-
-              <div className="text-warning mb-1">
-                {[...Array(5)].map((_, i) => (
-                  <span key={i} className={i < rating.ratingScore ? 'text-warning' : 'text-muted'}>
-                    ★
-                  </span>
-                ))}
-              </div>
-
-              <div className="mb-2">{rating.comment}</div>
+              <div className="mt-2 text-start">{rating.comment}</div>
             </div>
           ))
         )}
       </div>
-
-      {ratings.length > RATINGS_PER_PAGE && (
-        <div className="mt-3">
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-          />
-        </div>
-      )}
     </div>
   );
 };

@@ -6,6 +6,7 @@ import { useCartLogout } from '../../stores/cartStore';
 import { jwtDecode } from 'jwt-decode';
 import type { MyJwtPayload } from '../../types';
 import DropdownCart from '../DropdownCart';
+import Notification from '../Notification';
 const Header = () => {
     const navigate = useNavigate();
     const { isAuthenticated, user, logout, checkAuth } = useAuthStore();
@@ -13,22 +14,58 @@ const Header = () => {
     const [searchValue, setSearchValue] = useState("");
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
     const [showDropdownCart, setShowDropdownCart] = useState(false);
-    const [dropdownCartPos, setDropdownCartPos] = useState<{top: number, left: number}>({top: 0, left: 0});
+    const [dropdownCartPos, setDropdownCartPos] = useState<{ top: number, left: number }>({ top: 0, left: 0 });
     const cartIconRef = useRef<HTMLDivElement>(null);
     const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
     const decoded = token ? jwtDecode<MyJwtPayload>(token) : null;
+    const [cartCount, setCartCount] = useState(0);
+    const [showNotification, setShowNotification] = useState(false)
+
+
     React.useEffect(() => {
         checkAuth();
+
+        const updateCartCount = () => {
+            const storedItems = localStorage.getItem('cart_items_v2');
+            if (storedItems) {
+                try {
+                    const parsed = JSON.parse(storedItems);
+                    setCartCount(parsed.length || 0);
+                } catch (err) {
+                    console.error('Lỗi parse cart_items_v2:', err);
+                    setCartCount(0);
+                }
+            } else {
+                setCartCount(0);
+            }
+        };
+
+
+        updateCartCount();
+
+        const handleStorage = (e: StorageEvent) => {
+            if (e.key === 'cart_items_v2') {
+                updateCartCount();
+            }
+        };
+        window.addEventListener('storage', handleStorage);
+
         const handleResize = () => setWindowWidth(window.innerWidth);
-        window.addEventListener("resize", handleResize);
-        return () => window.removeEventListener("resize", handleResize);
+        window.addEventListener('resize', handleResize);
+
+        return () => {
+            window.removeEventListener('storage', handleStorage);
+            window.removeEventListener('resize', handleResize);
+        };
     }, []);
+
     const isMobile = windowWidth < 700;
 
     const handleLogout = async () => {
         await handleCartLogout();
         await logout();
         navigate('/auth/login');
+
     };
 
     const handleSearch = (e: React.FormEvent) => {
@@ -82,6 +119,52 @@ const Header = () => {
                         </form>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 10 : 18, justifyContent: isMobile ? 'center' : 'flex-end', fontSize: isMobile ? 20 : 18 }}>
+
+                        <Link to='/favorites' className='text-white text-decoration-none'>  <FaHeart role="button" style={{ fontSize: isMobile ? 22 : 20 }} />
+                        </Link>
+
+                        <div
+                            style={{ position: 'relative', display: 'inline-block' }}
+                            ref={cartIconRef}
+                            onMouseEnter={e => {
+                                setShowDropdownCart(true);
+                                if (cartIconRef.current) {
+                                    const rect = cartIconRef.current.getBoundingClientRect();
+                                    setDropdownCartPos({
+                                        top: rect.bottom + 4,
+                                        left: rect.right - 340 // width của popup
+                                    });
+                                }
+                            }}
+                            onMouseLeave={() => setShowDropdownCart(false)}
+                        ><div style={{ position: 'relative' }}>
+                                <FaShoppingCart
+                                    role="button"
+                                    style={{ fontSize: isMobile ? 22 : 20 }}
+                                    onClick={() => navigate('/cart')}
+                                />
+                                {cartCount > 0 && (
+                                    <span
+                                        style={{
+                                            position: 'absolute',
+                                            top: -6,
+                                            right: -10,
+                                            backgroundColor: 'red',
+                                            color: 'white',
+                                            borderRadius: '50%',
+                                            padding: '2px 6px',
+                                            fontSize: '12px',
+                                            fontWeight: 'bold',
+                                            lineHeight: 1
+                                        }}
+                                    >
+                                        {cartCount}
+                                    </span>
+                                )}
+                            </div>
+
+                            {showDropdownCart && <DropdownCart onClose={() => setShowDropdownCart(false)} position={dropdownCartPos} />}
+                        </div>
                         {isAuthenticated ? (
                             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                                 <Link to='user-info' className="fw-bold fs-5 text-white text-decoration-none">    <FaUser className="me-1" />
@@ -101,29 +184,6 @@ const Header = () => {
                                 </>
                             </div>
                         )}
-                        <Link to='/favorites' className='text-white text-decoration-none'>  <FaHeart role="button" style={{ fontSize: isMobile ? 22 : 20 }} />
-                        </Link>
-
-                        <div
-                          style={{ position: 'relative', display: 'inline-block' }}
-                          ref={cartIconRef}
-                          onMouseEnter={e => {
-                            setShowDropdownCart(true);
-                            if (cartIconRef.current) {
-                              const rect = cartIconRef.current.getBoundingClientRect();
-                              setDropdownCartPos({
-                                top: rect.bottom + 4,
-                                left: rect.right - 340 // width của popup
-                              });
-                            }
-                          }}
-                          onMouseLeave={() => setShowDropdownCart(false)}
-                        >
-                          <FaShoppingCart role="button" style={{ fontSize: isMobile ? 22 : 20 }}
-                            onClick={() => navigate('/cart')}
-                          />
-                          {showDropdownCart && <DropdownCart onClose={() => setShowDropdownCart(false)} position={dropdownCartPos} />}
-                        </div>
                     </div>
                 </div>
             </div>

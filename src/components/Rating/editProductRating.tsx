@@ -6,12 +6,24 @@ interface RatingModalEditProps {
   onClose: () => void;
   onSuccess: () => void;
 }
-
+import { useEffect } from 'react';
 const RatingEditModal: React.FC<RatingModalEditProps> = ({ ratingId, onClose, onSuccess }) => {
   const [score, setScore] = useState(5);
+  const [hovered, setHovered] = useState<number | null>(null);
   const [comment, setComment] = useState('');
   const [showNotification, setShowNotification] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+
+
+  useEffect(() => {
+
+    setScore(0);
+    setComment('');
+    setErrorMessage('');
+    setShowNotification(false);
+  }, [ratingId]);
+
+
 
   const handleSubmit = async () => {
     if (!comment.trim()) {
@@ -21,7 +33,7 @@ const RatingEditModal: React.FC<RatingModalEditProps> = ({ ratingId, onClose, on
     }
 
     try {
-      await putRating({ ratingScore: score, comment }, ratingId); 
+      await putRating({ ratingScore: score, comment }, ratingId);
 
       setErrorMessage('');
       setShowNotification(true);
@@ -46,19 +58,23 @@ const RatingEditModal: React.FC<RatingModalEditProps> = ({ ratingId, onClose, on
     <div className="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 d-flex align-items-center justify-content-center z-3">
       <div className="bg-white p-4 rounded shadow" style={{ width: '400px' }}>
         <h5 className="mb-3">Cập nhật đánh giá sản phẩm</h5>
-
-        <label className="form-label">Số sao:</label>
-        <select
-          value={score}
-          onChange={(e) => setScore(Number(e.target.value))}
-          className="form-select mb-3"
-        >
-          {[5, 4, 3, 2, 1].map((s) => (
-            <option key={s} value={s}>
-              {s} sao
-            </option>
+        <div className="mb-3">
+          {[1, 2, 3, 4, 5].map((s) => (
+            <span
+              key={s}
+              onMouseEnter={() => setHovered(s)}
+              onMouseLeave={() => setHovered(null)}
+              onClick={() => setScore(s)}
+              style={{
+                cursor: 'pointer',
+                fontSize: '1.8rem',
+                color: (hovered ?? score) >= s ? '#ffc107' : '#e4e5e9',
+              }}
+            >
+              ★
+            </span>
           ))}
-        </select>
+        </div>
 
         <label className="form-label">Bình luận:</label>
         <textarea

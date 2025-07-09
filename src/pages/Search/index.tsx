@@ -9,6 +9,7 @@ import '../../components/Pagination.css';
 import type { Product } from "../../types";
 import { fetchAllProducts } from '../../services/productService';
 import axiosInstance from '../../services/axiosInstance';
+import Notification from "../../components/Notification";
 
 const PAGE_SIZE = 8;
 const MIN_PRICE = 0;
@@ -19,7 +20,7 @@ function parseSortState(sortParam: string | null): SortState {
   const state: SortState = {};
   sortParam.split(',').forEach(pair => {
     const [key, value] = pair.split(':');
-    if (key && value && ['asc','desc'].includes(value)) {
+    if (key && value && ['asc', 'desc'].includes(value)) {
       (state as any)[key] = value;
     }
   });
@@ -40,6 +41,9 @@ const SearchPage: React.FC = () => {
   const [total, setTotal] = useState(0);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [currentPage, setCurrentPage] = React.useState(1);
+  const [showNotification, setShowNotification] = useState(false);
+  const [success, setSuccess] = useState(true)
+
   const productsPerPage = 8;
 
   // Responsive columns
@@ -131,7 +135,7 @@ const SearchPage: React.FC = () => {
     return sortProducts(products, sortState);
   }, [products, sortState]);
 
-  const paginatedProducts = sortedProducts.slice((currentPage-1)*productsPerPage, currentPage*productsPerPage);
+  const paginatedProducts = sortedProducts.slice((currentPage - 1) * productsPerPage, currentPage * productsPerPage);
 
   // Tính tổng số trang
   const totalPages = Math.ceil(sortedProducts.length / productsPerPage);
@@ -252,10 +256,25 @@ const SearchPage: React.FC = () => {
               justifyContent: 'center'
             }}>
               {paginatedProducts.map(product => (
-                <ProductCard key={product.productId} product={product} />
+                <ProductCard key={product.productId} product={product} onAddToCartSuccess={() => {
+                  setSuccess(true);
+                  setShowNotification(true);
+                }}
+                  onAddToCartFail={() => {
+                    setSuccess(false);
+                    setShowNotification(true);
+                  }} />
               ))}
             </div>
             <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+            {showNotification && (
+              <Notification
+                message={success ? 'Đã thêm vào giỏ hàng' : 'Thêm vào giỏ hàng thất bại'}
+                duration={2000}
+                borderColor={success ? 'green' : 'red'}
+                onClose={() => setShowNotification(false)}
+              />
+            )}
           </>
         )}
       </main>

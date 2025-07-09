@@ -10,6 +10,10 @@ import Favorites from '../pages/Favorites'
 import ProtectedRoute from './ProtectedRoute'
 import UserInfoPage from '../pages/UserInfo'
 import CartPage from '../pages/Cart'
+import ForgotPasswordPage from '../pages/ForgotPassword/ResetPass'
+import ForgotStep1_SendEmail from '../pages/ForgotPassword/ForgotPass'
+import ForgotStep2_VerifyCode from '../pages/ForgotPassword/VerifyCode'
+import ForgotStep3_ResetPassword from '../pages/ForgotPassword/ResetPass'
 
 
 const routes = [
@@ -27,16 +31,16 @@ const routes = [
         element: <Dashboard />
       },
       {
-        path : "/product/:slug",
-        element : <ProductDetail />
+        path: "/product/:slug",
+        element: <ProductDetail />
       },
-       {
-        path : "/about",
-        element : <About />
+      {
+        path: "/about",
+        element: <About />
       },
-       {
-        path : "/contact",
-        element : <Contact />
+      {
+        path: "/contact",
+        element: <Contact />
       },
       {
         path: '/category/:slug',
@@ -47,15 +51,15 @@ const routes = [
         element: <SearchPage />
       },
       {
-        path : '/favorites',
+        path: '/favorites',
         element: <ProtectedRoute><Favorites /></ProtectedRoute>
       },
-       {
-        path : '/user-info',
+      {
+        path: '/user-info',
         element: <ProtectedRoute><UserInfoPage /></ProtectedRoute>
       },
-       {
-        path : '/cart',
+      {
+        path: '/cart',
         element: <ProtectedRoute><CartPage /></ProtectedRoute>
       }
     ]
@@ -72,7 +76,21 @@ const routes = [
       {
         path: 'register',
         element: <Register />
-      }
+      },
+
+      {
+        path: 'forgot-password',
+        element: <ForgotStep1_SendEmail />
+      },
+      {
+        path: 'verify-code',
+        element: <ForgotStep2_VerifyCode />
+      },
+      {
+        path: 'reset-password',
+        element: <ForgotStep3_ResetPassword />
+      },
+
       // Add other auth pages like forgot-password here
     ]
   }

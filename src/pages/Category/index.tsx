@@ -11,13 +11,14 @@ import SortPanel from '../../components/SortPanel';
 import { sortProducts, sortGroups } from '../../utils/sortUtils';
 import type { SortState } from '../../utils/sortUtils';
 import '../../components/Pagination.css';
+import Notification from "../../components/Notification";
 
 function parseSortState(sortParam: string | null): SortState {
   if (!sortParam) return {};
   const state: SortState = {};
   sortParam.split(',').forEach(pair => {
     const [key, value] = pair.split(':');
-    if (key && value && ['asc','desc'].includes(value)) {
+    if (key && value && ['asc', 'desc'].includes(value)) {
       (state as any)[key] = value;
     }
   });
@@ -41,16 +42,19 @@ const CategoryPage: React.FC = () => {
   const currentBrand = searchParams.get('brand');
   const currentRating = searchParams.get('ratingScore');
   const sortState = useMemo(() => parseSortState(searchParams.get('sort')), [searchParams]);
-  
+  const [showNotification, setShowNotification] = useState(false);
+  const [success, setSuccess] = useState(true)
+
+
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 8;
-  
+
   // Sort products
   const sortedProducts = useMemo(() => {
     return sortProducts(products, sortState);
   }, [products, sortState]);
-  
-  const paginatedProducts = sortedProducts.slice((currentPage-1)*productsPerPage, currentPage*productsPerPage);
+
+  const paginatedProducts = sortedProducts.slice((currentPage - 1) * productsPerPage, currentPage * productsPerPage);
   const totalPages = Math.ceil(sortedProducts.length / productsPerPage);
 
   // Responsive columns
@@ -146,12 +150,28 @@ const CategoryPage: React.FC = () => {
               justifyContent: 'center'
             }}>
               {paginatedProducts.map((product) => (
-                <ProductCard key={product.productId} product={product} />
+                <ProductCard key={product.productId} product={product}
+                  onAddToCartSuccess={() => {
+                    setSuccess(true);
+                    setShowNotification(true);
+                  }}
+                  onAddToCartFail={() => {
+                    setSuccess(false);
+                    setShowNotification(true);
+                  }} />
               ))}
             </div>
           </>
         )}
         <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+        {showNotification && (
+          <Notification
+            message={success ? 'Đã thêm vào giỏ hàng' : 'Thêm vào giỏ hàng thất bại'}
+            duration={2000}
+            borderColor={success ? 'green' : 'red'}
+            onClose={() => setShowNotification(false)}
+          />
+        )}
       </main>
     </div>
   );

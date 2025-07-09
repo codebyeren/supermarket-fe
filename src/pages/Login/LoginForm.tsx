@@ -7,11 +7,13 @@ import type { LoginFormData } from '../../types/index';
 const LoginForm: React.FC = () => {
   const navigate = useNavigate();
   const { login, loading, error, clearError, isAuthenticated } = useAuthStore();
+
   const [formData, setFormData] = useState<LoginFormData>({
     username: '',
     password: '',
-    rememberMe: false
+    rememberMe: false,
   });
+
   const [submitted, setSubmitted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<Partial<LoginFormData>>({});
@@ -23,7 +25,7 @@ const LoginForm: React.FC = () => {
     }
     const savedUsername = localStorage.getItem('rememberedUsername');
     if (savedUsername) {
-      setFormData(prev => ({ ...prev, username: savedUsername, rememberMe: true }));
+      setFormData((prev) => ({ ...prev, username: savedUsername, rememberMe: true }));
     }
   }, [isAuthenticated, navigate]);
 
@@ -39,37 +41,31 @@ const LoginForm: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
- const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-  const { name, value, type } = e.target;
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value, type } = e.target;
+    const newValue =
+      type === 'checkbox' && 'checked' in e.target
+        ? (e.target as HTMLInputElement).checked
+        : value;
 
-  const newValue =
-    type === 'checkbox' && 'checked' in e.target
-      ? (e.target as HTMLInputElement).checked
-      : value;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
 
-  setFormData(prev => ({
-    ...prev,
-    [name]: newValue
-  }));
-
-  if (submitted) {
-    setErrors(prev => ({ ...prev, [name]: undefined }));
-  }
-  if (error) clearError();
-};
-
+    if (submitted) {
+      setErrors((prev) => ({ ...prev, [name]: undefined }));
+    }
+    if (error) clearError();
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitted(true);
     if (validateForm()) {
       const result = await login(formData.username, formData.password, formData.rememberMe);
-      if (result?.message) {
-        setMessage(result.message);
-      }
-      if (result?.success) {
-        navigate('/');
-      }
+      if (result?.message) setMessage(result.message);
+      if (result?.success) navigate('/');
     }
   };
 
@@ -81,38 +77,50 @@ const LoginForm: React.FC = () => {
         name="username"
         label="Tên Tài Khoản"
         value={formData.username}
-        onChange = {handleInputChange}
+        onChange={handleInputChange}
         error={errors.username}
       />
+
       <Input
         id="password"
         type={showPassword ? 'text' : 'password'}
         name="password"
         label="Mật Khẩu"
         value={formData.password}
-        onChange = {handleInputChange}
+        onChange={handleInputChange}
         error={errors.password}
       >
-        <span className="password-toggle" onClick={() => setShowPassword(!showPassword)}>
+        <span
+          className="password-toggle"
+          onClick={() => setShowPassword(!showPassword)}
+          style={{ cursor: 'pointer', marginLeft: '8px' }}
+        >
           <i className={`fa ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
         </span>
       </Input>
-      <div className="form-actions">
+
+      <div className="d-flex justify-content-between align-items-center mb-3">
         <div className="form-check">
-          <input 
-            type="checkbox" 
-            className="form-check-input" 
-            id="rememberMe" 
-            name="rememberMe" 
-            checked={formData.rememberMe} 
-            onChange={handleInputChange} 
+          <input
+            type="checkbox"
+            className="form-check-input"
+            id="rememberMe"
+            name="rememberMe"
+            checked={formData.rememberMe}
+            onChange={handleInputChange}
           />
-          <label className="form-check-label" htmlFor="rememberMe">Ghi nhớ đăng nhập</label>
+          <label className="form-check-label" htmlFor="rememberMe">
+            Ghi nhớ đăng nhập
+          </label>
         </div>
-        <Link to="/auth/forgot-password" className="forgot-password-link">Quên mật khẩu?</Link>
+        <Link to="/auth/forgot-password" className="text-muted small text-decoration-none">
+          Quên mật khẩu?
+        </Link>
       </div>
+
       {message && <div className="alert alert-danger">{message}</div>}
-      <Button type="submit" className="auth-submit-btn" disabled={loading}>
+
+      <Button type="submit" className="auth-submit-btn w-100" disabled={loading}>
         {loading ? (
           <>
             <LoadingSpinner size="small" color="#fff" className="me-2" />
@@ -126,4 +134,4 @@ const LoginForm: React.FC = () => {
   );
 };
 
-export default LoginForm; 
+export default LoginForm;

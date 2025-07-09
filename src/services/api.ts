@@ -1,4 +1,5 @@
 import type { LoginFormData, RegisterFormData } from '../types/index';
+import axiosInstance from './axiosInstance';
 
 // API service configuration
 const API_URL = import.meta.env.VITE_API_URL;
@@ -135,5 +136,15 @@ export const apiService = {
     }
   }
 };
+export const forgotPassword = (payload: { email: string }) => {
+  return axiosInstance.post('/auth/forgot-password', payload);
+};
 
+export const verifyCode = (payload: { email: string; code: string }) => {
+  return axiosInstance.post('/auth/verify-code', payload);
+};
+
+export const changePassword = (payload: { email: string; code: string; newPassword: string }) => {
+  return axiosInstance.post('/auth/change-password', payload);
+};
 export default apiService; 

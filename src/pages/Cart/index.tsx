@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { FaShoppingCart, FaTrashAlt, FaMinus, FaPlus, FaCreditCard, FaGift } from 'react-icons/fa';
 import type { CartItem } from '../../stores/cartStore';
 import './Cart.css';
+import PromotionDisplay from '../../components/Promotion/PromotionDescription';
 
 const CartPage: React.FC = () => {
   const { items, updateQuantity, removeFromCart, clearCart } = useCartStore();
