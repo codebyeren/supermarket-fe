@@ -1,5 +1,6 @@
 import axios from 'axios';
 import axiosInstance from './axiosInstance';
+import { data } from 'react-router-dom';
 
 export interface UserInfo {
   email: string;
@@ -19,7 +20,6 @@ export interface UserInfo {
 }
 
 export interface UpdateUserInfoInput {
-  username: string;
   firstName: string;
   middleName?: string;
   lastName: string;
@@ -89,6 +89,7 @@ export const updateUserInfo = async (
     return response.data as ApiResponse;
   } catch (error) {
     if (axios.isAxiosError(error)) {
+      console.log(userInfo)
       console.error('Lỗi Axios khi gọi updateUserInfo:', error.response?.data || error.message);
     } else {
       console.error('Lỗi không xác định khi gọi updateUserInfo:', error);
@@ -108,6 +109,7 @@ export const updateUserAddress = async (
     return response.data as ApiResponse;
   } catch (error) {
     if (axios.isAxiosError(error)) {
+      console.log(addressInfo)
       console.error('Lỗi Axios khi cập nhật địa chỉ:', error.response?.data || error.message);
     } else {
       console.error('Lỗi không xác định khi cập nhật địa chỉ:', error);

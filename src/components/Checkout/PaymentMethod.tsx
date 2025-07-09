@@ -201,7 +201,7 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
           <div className={styles.qrCodeImage}>
             {/* Đây là nơi sẽ hiển thị mã QR */}
             <div className={styles.mockQRCode}>
-              <span>Mã QR</span>
+              <img src="/img/qr_thanh_toan.png" alt="" />
             </div>
           </div>
           <p className={styles.bankInfo}>

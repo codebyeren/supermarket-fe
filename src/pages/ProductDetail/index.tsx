@@ -16,6 +16,7 @@ import Notification from '../../components/Notification';
 import { FaHeart } from 'react-icons/fa';
 import { deleteFavorite, toggleFavorite } from '../../services/favoriteService';
 import { useAuthStore } from '../../stores/authStore';
+import CompareTwoProductsView from '../../components/Compare/CompareTwoProductsView';
 
 const ProductDetail = () => {
     const { slug } = useParams<{ slug: string }>();
@@ -32,6 +33,8 @@ const ProductDetail = () => {
     const [showNotification, setShowNotification] = useState(false);
     const [success, setSuccess] = useState(true)
     const [isFavorite, setIsFavorite] = useState(false);
+    const [selectedCompareProduct, setSelectedCompareProduct] = useState<Product | null>(null);
+
 
     const { isAuthenticated } = useAuthStore();
 
@@ -296,8 +299,21 @@ const ProductDetail = () => {
                     show={showCompareModal}
                     onClose={() => setShowCompareModal(false)}
                     products={compareProducts}
+                    onCompare={(p) => {
+                        setSelectedCompareProduct(p);
+                        setShowCompareModal(false);
+                    }}
                 />
             )}
+            {selectedCompareProduct && product && (
+                <CompareTwoProductsView
+                    productA={product}
+                    productB={selectedCompareProduct}
+                    onClose={() => setSelectedCompareProduct(null)}
+                />
+            )}
+
+
 
             {showNotification && (
                 <Notification

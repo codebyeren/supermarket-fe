@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { FaHeart, FaShoppingCart, FaUser, FaMapMarkerAlt, FaBars, FaSignInAlt, FaSignOutAlt } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
@@ -22,42 +22,37 @@ const Header = () => {
     const [showNotification, setShowNotification] = useState(false)
 
 
-    React.useEffect(() => {
-        checkAuth();
 
-        const updateCartCount = () => {
-            const storedItems = localStorage.getItem('cart_items_v2');
-            if (storedItems) {
-                try {
-                    const parsed = JSON.parse(storedItems);
-                    setCartCount(parsed.length || 0);
-                } catch (err) {
-                    console.error('Lỗi parse cart_items_v2:', err);
-                    setCartCount(0);
-                }
-            } else {
+    const updateCartCount = () => {
+        const storedItems = localStorage.getItem('cart_items_v2');
+        if (storedItems) {
+            try {
+                const parsed = JSON.parse(storedItems);
+                setCartCount(parsed.length || 0);
+            } catch {
                 setCartCount(0);
             }
-        };
+        } else {
+            setCartCount(0);
+        }
+    };
 
-
+    React.useEffect(() => {
+        checkAuth();
         updateCartCount();
 
-        const handleStorage = (e: StorageEvent) => {
-            if (e.key === 'cart_items_v2') {
-                updateCartCount();
-            }
+        const handleUpdate = () => {
+            updateCartCount();
         };
-        window.addEventListener('storage', handleStorage);
 
-        const handleResize = () => setWindowWidth(window.innerWidth);
-        window.addEventListener('resize', handleResize);
-
+        window.addEventListener("storage", handleUpdate);
+        window.addEventListener("localstorage_updated", handleUpdate);
         return () => {
-            window.removeEventListener('storage', handleStorage);
-            window.removeEventListener('resize', handleResize);
+            window.removeEventListener("storage", handleUpdate);
+            window.removeEventListener("localstorage_updated", handleUpdate);
         };
     }, []);
+
 
     const isMobile = windowWidth < 700;
 

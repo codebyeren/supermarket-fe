@@ -1,5 +1,5 @@
 // src/pages/Auth/ForgotStep3_ResetPassword.tsx
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { changePassword } from '../../services/api';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -9,7 +9,9 @@ const ForgotStep3_ResetPassword = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
   const { email, code } = state || {};
-
+useEffect ( () => {
+console.log(code)
+})
   const handleChangePassword = async () => {
     try {
       await changePassword({ email, code, newPassword });

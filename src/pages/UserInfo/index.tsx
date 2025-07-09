@@ -68,8 +68,7 @@ export default function UserInfoPage() {
 
     try {
       const res = await updateUserInfo({
-        ...form,
-        username: user?.email || '', // Sử dụng email làm username nếu cần
+        ...form
       });
       
       if (res.code === 200) {

@@ -10,6 +10,8 @@ interface Props {
 const ProductRatings: React.FC<Props> = ({ ratings, ratingScore, onWriteRating }) => {
   const [filterStar, setFilterStar] = useState<number | null>(null);
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
+  const [visibleCount, setVisibleCount] = useState(4);
+
 
   const filteredRatings = useMemo(() => {
     let result = filterStar
@@ -87,36 +89,48 @@ const ProductRatings: React.FC<Props> = ({ ratings, ratingScore, onWriteRating }
           </select>
         </div>
       </div>
-
-      {/* Danh sách đánh giá */}
       <div className="border rounded p-3 bg-light">
         {filteredRatings.length === 0 ? (
           <p>Chưa có đánh giá nào.</p>
         ) : (
-          filteredRatings.map((rating) => (
-            <div key={rating.ratingId} className="bg-white p-3 rounded shadow-sm mb-3">
-              <div className="d-flex justify-content-between">
-                <div>
-                  <strong>{rating.customerName}</strong>
-                  <div className="text-warning small text-start">
-                    {[...Array(5)].map((_, i) => (
-                      <span key={i} className={i < rating.ratingScore ? 'text-warning' : 'text-muted'}>
-                        ★
-                      </span>
-                    ))}
+          <>
+            {filteredRatings.slice(0, visibleCount).map((rating) => (
+              <div key={rating.ratingId} className="bg-white p-3 rounded shadow-sm mb-3">
+                <div className="d-flex justify-content-between">
+                  <div>
+                    <strong>{rating.customerName}</strong>
+                    <div className="text-warning small text-start">
+                      {[...Array(5)].map((_, i) => (
+                        <span key={i} className={i < rating.ratingScore ? 'text-warning' : 'text-muted'}>
+                          ★
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="text-end">
+                    <div className="text-muted small">
+                      {new Date(rating.createdAt).toLocaleString()}
+                    </div>
                   </div>
                 </div>
-                <div className="text-end">
-                  <div className="text-muted small">
-                    {new Date(rating.createdAt).toLocaleString()}
-                  </div>
-                </div>
+                <div className="mt-2 text-start">{rating.comment}</div>
               </div>
-              <div className="mt-2 text-start">{rating.comment}</div>
-            </div>
-          ))
+            ))}
+
+            {visibleCount < filteredRatings.length && (
+              <div className="text-center mt-3">
+                <button
+                  className="btn btn-outline-primary btn-sm"
+                  onClick={() => setVisibleCount((prev) => prev + 4)}
+                >
+                  Xem thêm
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
+
     </div>
   );
 };
