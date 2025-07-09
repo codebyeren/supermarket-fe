@@ -10,6 +10,7 @@ import Favorites from '../pages/Favorites'
 import ProtectedRoute from './ProtectedRoute'
 import UserInfoPage from '../pages/UserInfo'
 import CartPage from '../pages/Cart'
+import CheckoutPage from '../pages/Checkout'
 import ForgotPasswordPage from '../pages/ForgotPassword/ResetPass'
 import ForgotStep1_SendEmail from '../pages/ForgotPassword/ForgotPass'
 import ForgotStep2_VerifyCode from '../pages/ForgotPassword/VerifyCode'
@@ -61,6 +62,10 @@ const routes = [
       {
         path: '/cart',
         element: <ProtectedRoute><CartPage /></ProtectedRoute>
+      },
+      {
+        path : '/checkout',
+        element: <ProtectedRoute><CheckoutPage /></ProtectedRoute>
       }
     ]
   },

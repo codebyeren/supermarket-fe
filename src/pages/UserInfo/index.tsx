@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import Sidebar from '../../components/SideBar';
 import Notification from '../../components/Notification';
+import OrderHistory from '../../components/OrderHistory';
+import { Tabs } from 'antd';
+
+const { TabPane } = Tabs;
 import { getUserInfo, updateUserInfo } from '../../services/user';
 
 export interface UserInfo {
@@ -26,6 +30,7 @@ export default function UserInfoPage() {
   const [editing, setEditing] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [activeTab, setActiveTab] = useState('profile');
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -50,11 +55,45 @@ export default function UserInfoPage() {
   };
 
   const handleSave = async () => {
+    if (!formData) return;
+
+    // Tách tên thành các phần
+    const nameParts = formData.fullName.trim().split(' ');
+    let firstName = '', middleName = '', lastName = '';
+    
+    if (nameParts.length === 1) {
+      firstName = nameParts[0];
+    } else if (nameParts.length === 2) {
+      firstName = nameParts[0];
+      lastName = nameParts[1];
+    } else if (nameParts.length > 2) {
+      firstName = nameParts[0];
+      lastName = nameParts[nameParts.length - 1];
+      middleName = nameParts.slice(1, nameParts.length - 1).join(' ');
+    }
+
+    const payload = {
+      username: formData.username,
+      email: formData.email,
+      mobile: formData.mobile,
+      country: formData.country,
+      dob: formData.dob,
+      street: formData.street || '',
+      city: formData.city || '',
+      state: formData.state || '',
+      firstName,
+      middleName,
+      lastName
+    };
+
+    try {
+      const res = await updateUserInfo(payload);
     if (!form) return;
 
     try {
       const res = await updateUserInfo(form);
       if (res.code === 200) {
+        setUser(formData);
         setUser(form);
         setEditing(false);
         setSuccess(true);
@@ -106,7 +145,33 @@ export default function UserInfoPage() {
           <Sidebar />
         </aside>
 
+        {/* Main Content */}
         <main className="flex-grow-1">
+          <Tabs activeKey={activeTab} onChange={setActiveTab}>
+            <TabPane tab="Thông tin cá nhân" key="profile">
+              <h3 className="text-center mb-4">Thông Tin Người Dùng</h3>
+              <form className="row g-3 bg-white p-4 shadow rounded" onSubmit={e => e.preventDefault()}>
+                <div className="col-md-6">
+                  <label className="form-label">Họ tên đầy đủ</label>
+                  <input type="text" name="fullName" className="form-control" value={formData.fullName} onChange={handleChange} disabled={!editing} />
+                </div>
+                <div className="col-md-6">
+                  <label className="form-label">Quốc gia</label>
+                  <select
+                    name="country"
+                    className="form-select"
+                    value={formData.country}
+                    onChange={handleChange}
+                    disabled={!editing}
+                  >
+                    <option value="">-- Chọn quốc gia --</option>
+                    {countryOptions.map(option => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
           <h3 className="text-center mb-4">Thông Tin Người Dùng</h3>
 
           <form className="row g-3 bg-white p-4 shadow rounded" onSubmit={e => e.preventDefault()}>
@@ -132,6 +197,40 @@ export default function UserInfoPage() {
               <input type="text" name="mobile" className="form-control" value={form.mobile} onChange={handleChange} disabled={!editing} />
             </div>
 
+                <div className="col-md-6">
+                  <label className="form-label">Ngày sinh</label>
+                  <input type="date" name="dob" className="form-control" value={formData.dob} onChange={handleChange} disabled={!editing} />
+                </div>
+                <div className="col-md-6">
+                  <label className="form-label">Điện thoại</label>
+                  <input type="text" name="mobile" className="form-control" value={formData.mobile} onChange={handleChange} disabled={!editing} />
+                </div>
+                <div className="col-12">
+                  <label className="form-label">Email</label>
+                  <input type="email" name="email" className="form-control" value={formData.email} onChange={handleChange} disabled={!editing} />
+                </div>
+                <div className="col-12">
+                  {editing ? (
+                    <div className="d-flex flex-column flex-sm-row gap-2">
+                      <button type="button" className="btn btn-success w-100" onClick={handleSave}>
+                        Lưu thay đổi
+                      </button>
+                      <button type="button" className="btn btn-secondary w-100" onClick={() => setEditing(false)}>
+                        Hủy
+                      </button>
+                    </div>
+                  ) : (
+                    <button type="button" className="btn btn-primary w-100" onClick={() => setEditing(true)}>
+                      Chỉnh sửa
+                    </button>
+                  )}
+                </div>
+              </form>
+            </TabPane>
+            <TabPane tab="Lịch sử đơn hàng" key="orders">
+              <OrderHistory />
+            </TabPane>
+          </Tabs>
             <div className="col-md-6">
               <label className="form-label">Ngày sinh</label>
               <input type="date" name="dob" className="form-control" value={form.dob} onChange={handleChange} disabled={!editing} />

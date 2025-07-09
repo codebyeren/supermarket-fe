@@ -25,6 +25,10 @@ const CartPage: React.FC = () => {
     return items.reduce((total, item) => total + getItemTotal(item), 0);
   }
 
+  const handleCheckout = () => {
+    navigate('/checkout');
+  };
+
   return (
     <div className="cart-container">
       <h2>Giỏ hàng của tôi</h2>
@@ -40,7 +44,7 @@ const CartPage: React.FC = () => {
             {items.map(item => (
               <div className="cart-item" key={item.productId}>
                 <div className="item-image">
-                  <img src={`/img/${item.imageUrl}`} alt={item.productName} />
+                  <img src={`/public/img/${item.imageUrl}`} alt={item.productName} />
                 </div>
                 <div className="item-details">
                   <h3>{item.productName}</h3>
@@ -95,7 +99,7 @@ const CartPage: React.FC = () => {
               <span>Tổng tiền:</span>
               <span className="total-price">{getTotalPrice().toLocaleString()}đ</span>
             </div>
-            <button className="checkout-button" onClick={() => { clearCart(); alert('Đặt hàng thành công!'); navigate('/'); }} disabled={items.length === 0}>
+            <button className="checkout-button" onClick={handleCheckout} disabled={items.length === 0}>
               <FaCreditCard /> <span>Thanh toán</span>
             </button>
           </div>

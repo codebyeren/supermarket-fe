@@ -1,0 +1,38 @@
+.bill-modal .ant-modal-body {
+  padding: 0;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.bill-container {
+  background-color: #fff;
+}
+
+/* Tinh chỉnh cho thanh cuộn */
+.bill-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.bill-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.bill-container::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.bill-container::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Nút in trong modal */
+.ant-btn-primary {
+  background-color: #1890ff;
+  border-color: #1890ff;
+}
+
+.ant-btn-primary:hover {
+  background-color: #40a9ff;
+  border-color: #40a9ff;
+} 
