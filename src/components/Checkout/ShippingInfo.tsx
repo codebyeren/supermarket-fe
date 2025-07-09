@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Button, Form, Input, Select } from 'antd';
-import { useNavigate } from 'react-router-dom';
 import { getUserInfo, updateUserAddress } from '../../services/user';
 import type { CustomerAddress } from '../../types';
 import styles from './Checkout.module.css';
@@ -15,8 +14,6 @@ interface ShippingInfoProps {
 
 const ShippingInfo: React.FC<ShippingInfoProps> = ({ onNext, onCancel }) => {
   const [form] = Form.useForm();
-  const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
   const loadingService = LoadingService.getInstance();
 
   useEffect(() => {
@@ -27,8 +24,9 @@ const ShippingInfo: React.FC<ShippingInfoProps> = ({ onNext, onCancel }) => {
     try {
       loadingService.showLoading();
       const userInfo = await getUserInfo();
+      const fullName = `${userInfo.firstName} ${userInfo.middleName ? userInfo.middleName + ' ' : ''}${userInfo.lastName}`;
       form.setFieldsValue({
-        fullName: userInfo.fullName,
+        fullName: fullName,
         street: userInfo.street || '',
         city: userInfo.city || '',
         state: userInfo.state || '',
@@ -36,7 +34,6 @@ const ShippingInfo: React.FC<ShippingInfoProps> = ({ onNext, onCancel }) => {
         homePhone: userInfo.homePhone || '',
         mobilePhone: userInfo.mobile || '',
       });
-      setLoading(false);
       loadingService.hideLoading();
     } catch (error) {
       console.error('Lỗi khi tải thông tin người dùng:', error);

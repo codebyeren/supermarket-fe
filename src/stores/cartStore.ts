@@ -131,25 +131,51 @@ export function useCartSync() {
   const { isAuthenticated } = useAuthStore();
   const cartStore = useCartStore();
 
+  // Tải giỏ hàng từ localStorage khi khởi động
   React.useEffect(() => {
     cartStore.loadCartFromStorage();
   }, []);
 
+  // Xử lý đồng bộ giỏ hàng khi trạng thái đăng nhập thay đổi
   React.useEffect(() => {
     let interval: any;
+    
     if (isAuthenticated) {
-      // Khi login: lấy cart từ BE, merge cart
-      cartStore.getCartFromAPI();
-      // Auto-save định kỳ
+      // Auto-save định kỳ mỗi 5 phút
       interval = setInterval(() => {
         cartStore.syncCartToAPI();
+        console.log('Đồng bộ giỏ hàng định kỳ mỗi 5 phút');
       }, 5 * 60 * 1000);
+    } else {
+      // Khi logout, xóa đánh dấu phiên
+      sessionStorage.removeItem('current_session');
     }
-    // Bỏ logic xóa cart khi chưa login - chỉ giữ cart trong localStorage
+    
     return () => {
       if (interval) clearInterval(interval);
     };
   }, [isAuthenticated]);
+  
+  // Đồng bộ giỏ hàng trước khi người dùng rời khỏi trang
+  React.useEffect(() => {
+    const handleBeforeUnload = async () => {
+      if (isAuthenticated && cartStore.items.length > 0) {
+        try {
+          // Sử dụng sendBeacon để đảm bảo request được gửi ngay cả khi trang đang đóng
+          const data = new Blob([JSON.stringify(cartStore.items)], { type: 'application/json' });
+          navigator.sendBeacon(`${API_URL}/carts`, data);
+        } catch (e) {
+          console.error('Lỗi khi đồng bộ giỏ hàng trước khi rời khỏi trang:', e);
+        }
+      }
+    };
+    
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [isAuthenticated, cartStore.items]);
 }
 
 // Hook riêng để xử lý logout
@@ -158,13 +184,17 @@ export function useCartLogout() {
   
   const handleLogout = async () => {
     try {
-      // Sync cart lên BE trước khi logout
+      // Đồng bộ giỏ hàng lên server ngay khi đăng xuất
       await cartStore.syncCartToAPI();
-    } catch (e) {
-      // Ignore error khi logout
-    } finally {
+      console.log('Đã đồng bộ giỏ hàng khi đăng xuất');
+      
       // Xóa cart khỏi localStorage
       cartStore.clearCart();
+      
+      // Xóa đánh dấu phiên
+      sessionStorage.removeItem('current_session');
+    } catch (e) {
+      console.error('Lỗi khi đồng bộ giỏ hàng khi đăng xuất:', e);
     }
   };
   

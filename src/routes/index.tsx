@@ -11,6 +11,7 @@ import ProtectedRoute from './ProtectedRoute'
 import UserInfoPage from '../pages/UserInfo'
 import CartPage from '../pages/Cart'
 import CheckoutPage from '../pages/Checkout'
+import OrderHistoryPage from '../pages/OrderHistory'
 import ForgotPasswordPage from '../pages/ForgotPassword/ResetPass'
 import ForgotStep1_SendEmail from '../pages/ForgotPassword/ForgotPass'
 import ForgotStep2_VerifyCode from '../pages/ForgotPassword/VerifyCode'
@@ -58,6 +59,10 @@ const routes = [
       {
         path: '/user-info',
         element: <ProtectedRoute><UserInfoPage /></ProtectedRoute>
+      },
+      {
+        path: '/order-history',
+        element: <ProtectedRoute><OrderHistoryPage /></ProtectedRoute>
       },
       {
         path: '/cart',

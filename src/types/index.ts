@@ -108,7 +108,7 @@ export type MyJwtPayload = {
 };
 
 export type PaymentMethod = 'CREDIT_CARD' | 'CASH' | 'BANK_TRANSFER' | 'MOBILE_PAYMENT';
-export type OrderStatus = 'PENDING' | 'SHIPPED' | 'CONFIRMED' | 'CANCCELLED';
+export type OrderStatus = 'PENDING' | 'SHIPPED' | 'CONFIRMED' | 'CANCELLED';
 export type PaymentStatus = 'PENDING' | 'COMPLETED';
 export type ItemType = 'TAX' | 'FEE' | 'DISCOUNT' | 'GIFT' | 'SHIPPING';
 export type PromotionType = 'PERCENT_DISCOUNT' | 'FIXED_DISCOUNT' | 'BUY_ONE_GET_ONE';

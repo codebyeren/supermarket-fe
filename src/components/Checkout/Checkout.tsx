@@ -42,13 +42,15 @@ const Checkout: React.FC<CheckoutProps> = ({ onCancel }) => {
   const loadUserInfo = async () => {
     try {
       const userInfo = await getUserInfo();
-      // Thiết lập thông tin thanh toán nếu có
-      setPaymentInfo({
-        cardNumber: userInfo.paymentInfo?.cardNumber,
-        cardHolder: userInfo.paymentInfo?.cardHolder,
-        expiryDate: userInfo.paymentInfo?.expiryDate,
-        cvv: userInfo.paymentInfo?.cvv,
-      });
+      // Thiết lập thông tin thanh toán từ các trường riêng lẻ
+      if (userInfo) {
+        setPaymentInfo({
+          cardNumber: userInfo.creditCardNumber || '',
+          cardHolder: `${userInfo.firstName} ${userInfo.lastName}`,
+          expiryDate: userInfo.creditCardExpiry || '',
+          cvv: '',
+        });
+      }
     } catch (error) {
       console.error('Lỗi khi tải thông tin người dùng:', error);
     }

@@ -62,6 +62,9 @@ class AuthStore {
     try {
       const response = await apiService.login({ username, password, rememberMe });
       if (response.success && response.data) {
+        // Đánh dấu phiên hiện tại khi đăng nhập thành công
+        sessionStorage.setItem('current_session', 'active');
+        
         this.setState({
           isAuthenticated: true,
           user: null,
@@ -101,11 +104,14 @@ class AuthStore {
     try {
       await apiService.logout();
       localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        localStorage.removeItem('userRole');
-        localStorage.removeItem('userData');
-        sessionStorage.removeItem('accessToken');
-        sessionStorage.removeItem('refreshToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('userRole');
+      localStorage.removeItem('userData');
+      sessionStorage.removeItem('accessToken');
+      sessionStorage.removeItem('refreshToken');
+      // Xóa đánh dấu phiên
+      sessionStorage.removeItem('current_session');
+      
       this.setState({
         isAuthenticated: false,
         user: null,
@@ -113,6 +119,15 @@ class AuthStore {
         error: null
       });
     } catch (error: any) {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('userRole');
+      localStorage.removeItem('userData');
+      sessionStorage.removeItem('accessToken');
+      sessionStorage.removeItem('refreshToken');
+      // Xóa đánh dấu phiên
+      sessionStorage.removeItem('current_session');
+      
       this.setState({
         isAuthenticated: false,
         user: null,
@@ -126,12 +141,16 @@ class AuthStore {
     const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
     if (!token) {
       this.setState({ isAuthenticated: false, user: null });
+      sessionStorage.removeItem('current_session');
       return false;
     }
     this.setState({ loading: true });
     try {
       const response = await apiService.checkAuth();
       if (response.success && response.data) {
+        // Đánh dấu phiên hiện tại khi xác thực thành công
+        sessionStorage.setItem('current_session', 'active');
+        
         this.setState({
           isAuthenticated: true,
           user: response.data,
@@ -147,6 +166,8 @@ class AuthStore {
         localStorage.removeItem('userData');
         sessionStorage.removeItem('accessToken');
         sessionStorage.removeItem('refreshToken');
+        sessionStorage.removeItem('current_session');
+        
         this.setState({
           isAuthenticated: false,
           user: null,
@@ -163,6 +184,8 @@ class AuthStore {
       sessionStorage.removeItem('accessToken');
       sessionStorage.removeItem('refreshToken');
       localStorage.removeItem('userData');
+      sessionStorage.removeItem('current_session');
+      
       this.setState({
         isAuthenticated: false,
         user: null,

@@ -1,43 +1,52 @@
 import React, { useEffect, useState } from 'react';
 import Sidebar from '../../components/SideBar';
 import Notification from '../../components/Notification';
-import OrderHistory from '../../components/OrderHistory';
-import { Tabs } from 'antd';
+import { getUserInfo, updateUserInfo, type UserInfo as UserInfoType } from '../../services/user';
 
-const { TabPane } = Tabs;
-import { getUserInfo, updateUserInfo } from '../../services/user';
-
-export interface UserInfo {
-  username: string;
+export interface UserFormData {
   email: string;
-  mobile: string;
-  country: string;
-  dob: string;
-  street?: string;
-  city?: string;
-  state?: string;
   firstName: string;
   middleName?: string;
   lastName: string;
-  creditCardNumber: string;
-  creditCardExpiry: string;
+  homePhone?: string;
+  creditCardNumber?: string | null;
+  creditCardExpiry?: string | null;
+  state?: string;
+  city?: string;
+  street?: string;
+  mobile: string;
+  country: string;
+  dob: string;
 }
 
 export default function UserInfoPage() {
-  const [user, setUser] = useState<UserInfo | null>(null);
-  const [form, setForm] = useState<UserInfo | null>(null);
+  const [user, setUser] = useState<UserInfoType | null>(null);
+  const [form, setForm] = useState<UserFormData | null>(null);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [activeTab, setActiveTab] = useState('profile');
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await getUserInfo();
-        setUser(res.data);
-        setForm(res.data);
+        const userInfo = await getUserInfo();
+        setUser(userInfo);
+        setForm({
+          email: userInfo.email,
+          firstName: userInfo.firstName,
+          middleName: userInfo.middleName,
+          lastName: userInfo.lastName,
+          homePhone: userInfo.homePhone || '',
+          creditCardNumber: userInfo.creditCardNumber || '',
+          creditCardExpiry: userInfo.creditCardExpiry || '',
+          state: userInfo.state || '',
+          city: userInfo.city || '',
+          street: userInfo.street || '',
+          mobile: userInfo.mobile,
+          country: userInfo.country,
+          dob: userInfo.dob,
+        });
       } catch (err) {
         console.error('Lỗi tải thông tin người dùng:', err);
       } finally {
@@ -55,46 +64,19 @@ export default function UserInfoPage() {
   };
 
   const handleSave = async () => {
-    if (!formData) return;
-
-    // Tách tên thành các phần
-    const nameParts = formData.fullName.trim().split(' ');
-    let firstName = '', middleName = '', lastName = '';
-    
-    if (nameParts.length === 1) {
-      firstName = nameParts[0];
-    } else if (nameParts.length === 2) {
-      firstName = nameParts[0];
-      lastName = nameParts[1];
-    } else if (nameParts.length > 2) {
-      firstName = nameParts[0];
-      lastName = nameParts[nameParts.length - 1];
-      middleName = nameParts.slice(1, nameParts.length - 1).join(' ');
-    }
-
-    const payload = {
-      username: formData.username,
-      email: formData.email,
-      mobile: formData.mobile,
-      country: formData.country,
-      dob: formData.dob,
-      street: formData.street || '',
-      city: formData.city || '',
-      state: formData.state || '',
-      firstName,
-      middleName,
-      lastName
-    };
-
-    try {
-      const res = await updateUserInfo(payload);
     if (!form) return;
 
     try {
-      const res = await updateUserInfo(form);
+      const res = await updateUserInfo({
+        ...form,
+        username: user?.email || '', // Sử dụng email làm username nếu cần
+      });
+      
       if (res.code === 200) {
-        setUser(formData);
-        setUser(form);
+        setUser({
+          ...user!,
+          ...form
+        });
         setEditing(false);
         setSuccess(true);
       }
@@ -129,6 +111,9 @@ export default function UserInfoPage() {
   if (loading) return <div className="p-4">Đang tải thông tin người dùng...</div>;
   if (!user || !form) return <div className="p-4 text-danger">Không tìm thấy thông tin người dùng.</div>;
 
+  // Tạo tên đầy đủ từ các thành phần
+  const fullName = `${user.firstName} ${user.middleName ? user.middleName + ' ' : ''}${user.lastName}`;
+
   return (
     <div className="container-fluid min-vh-100 bg-light">
       {showNotification && (
@@ -145,47 +130,20 @@ export default function UserInfoPage() {
           <Sidebar />
         </aside>
 
-        {/* Main Content */}
         <main className="flex-grow-1">
-          <Tabs activeKey={activeTab} onChange={setActiveTab}>
-            <TabPane tab="Thông tin cá nhân" key="profile">
-              <h3 className="text-center mb-4">Thông Tin Người Dùng</h3>
-              <form className="row g-3 bg-white p-4 shadow rounded" onSubmit={e => e.preventDefault()}>
-                <div className="col-md-6">
-                  <label className="form-label">Họ tên đầy đủ</label>
-                  <input type="text" name="fullName" className="form-control" value={formData.fullName} onChange={handleChange} disabled={!editing} />
-                </div>
-                <div className="col-md-6">
-                  <label className="form-label">Quốc gia</label>
-                  <select
-                    name="country"
-                    className="form-select"
-                    value={formData.country}
-                    onChange={handleChange}
-                    disabled={!editing}
-                  >
-                    <option value="">-- Chọn quốc gia --</option>
-                    {countryOptions.map(option => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
           <h3 className="text-center mb-4">Thông Tin Người Dùng</h3>
 
           <form className="row g-3 bg-white p-4 shadow rounded" onSubmit={e => e.preventDefault()}>
-            <div className="col-md-4">
-              <label className="form-label">Họ</label>
-              <input type="text" name="firstName" className="form-control" value={form.firstName} onChange={handleChange} disabled={!editing} />
-            </div>
-            <div className="col-md-4">
-              <label className="form-label">Tên đệm</label>
-              <input type="text" name="middleName" className="form-control" value={form.middleName ?? ''} onChange={handleChange} disabled={!editing} />
-            </div>
-            <div className="col-md-4">
-              <label className="form-label">Tên</label>
-              <input type="text" name="lastName" className="form-control" value={form.lastName} onChange={handleChange} disabled={!editing} />
+            {/* Hiển thị tên đầy đủ dạng chỉ đọc */}
+            <div className="col-12 mb-3">
+              <label className="form-label">Họ và tên</label>
+              <input 
+                type="text" 
+                className="form-control" 
+                value={fullName} 
+                disabled 
+                readOnly 
+              />
             </div>
 
             <div className="col-md-6">
@@ -193,44 +151,15 @@ export default function UserInfoPage() {
               <input type="email" name="email" className="form-control" value={form.email} onChange={handleChange} disabled={!editing} />
             </div>
             <div className="col-md-6">
-              <label className="form-label">Số điện thoại</label>
+              <label className="form-label">Số điện thoại di động</label>
               <input type="text" name="mobile" className="form-control" value={form.mobile} onChange={handleChange} disabled={!editing} />
             </div>
 
-                <div className="col-md-6">
-                  <label className="form-label">Ngày sinh</label>
-                  <input type="date" name="dob" className="form-control" value={formData.dob} onChange={handleChange} disabled={!editing} />
-                </div>
-                <div className="col-md-6">
-                  <label className="form-label">Điện thoại</label>
-                  <input type="text" name="mobile" className="form-control" value={formData.mobile} onChange={handleChange} disabled={!editing} />
-                </div>
-                <div className="col-12">
-                  <label className="form-label">Email</label>
-                  <input type="email" name="email" className="form-control" value={formData.email} onChange={handleChange} disabled={!editing} />
-                </div>
-                <div className="col-12">
-                  {editing ? (
-                    <div className="d-flex flex-column flex-sm-row gap-2">
-                      <button type="button" className="btn btn-success w-100" onClick={handleSave}>
-                        Lưu thay đổi
-                      </button>
-                      <button type="button" className="btn btn-secondary w-100" onClick={() => setEditing(false)}>
-                        Hủy
-                      </button>
-                    </div>
-                  ) : (
-                    <button type="button" className="btn btn-primary w-100" onClick={() => setEditing(true)}>
-                      Chỉnh sửa
-                    </button>
-                  )}
-                </div>
-              </form>
-            </TabPane>
-            <TabPane tab="Lịch sử đơn hàng" key="orders">
-              <OrderHistory />
-            </TabPane>
-          </Tabs>
+            <div className="col-md-6">
+              <label className="form-label">Điện thoại cố định</label>
+              <input type="text" name="homePhone" className="form-control" value={form.homePhone || ''} onChange={handleChange} disabled={!editing} />
+            </div>
+
             <div className="col-md-6">
               <label className="form-label">Ngày sinh</label>
               <input type="date" name="dob" className="form-control" value={form.dob} onChange={handleChange} disabled={!editing} />
@@ -241,29 +170,28 @@ export default function UserInfoPage() {
                 {countryOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
               </select>
             </div>
-            <div className="col-md-4">
-              <label className="form-label">Thành phố</label>
-              <input type="text" name="city" className="form-control" value={form.city ?? ''} onChange={handleChange} disabled={!editing} />
-            </div>
-            <div className="col-md-4">
+            <div className="col-md-6">
               <label className="form-label">Tỉnh / Bang</label>
-              <input type="text" name="state" className="form-control" value={form.state ?? ''} onChange={handleChange} disabled={!editing} />
+              <input type="text" name="state" className="form-control" value={form.state || ''} onChange={handleChange} disabled={!editing} />
             </div>
 
-            <div className="col-md-4">
+            <div className="col-md-6">
+              <label className="form-label">Thành phố</label>
+              <input type="text" name="city" className="form-control" value={form.city || ''} onChange={handleChange} disabled={!editing} />
+            </div>
+
+            <div className="col-md-6">
               <label className="form-label">Số nhà / Đường</label>
-              <input type="text" name="street" className="form-control" value={form.street ?? ''} onChange={handleChange} disabled={!editing} />
+              <input type="text" name="street" className="form-control" value={form.street || ''} onChange={handleChange} disabled={!editing} />
             </div>
-
-
 
             <div className="col-md-6">
               <label className="form-label">Số thẻ tín dụng</label>
-              <input type="text" name="creditCardNumber" className="form-control" value={form.creditCardNumber} onChange={handleChange} disabled={!editing} />
+              <input type="text" name="creditCardNumber" className="form-control" value={form.creditCardNumber || ''} onChange={handleChange} disabled={!editing} />
             </div>
             <div className="col-md-6">
               <label className="form-label">Ngày hết hạn thẻ</label>
-              <input type="text" name="creditCardExpiry" className="form-control" placeholder="MM/YY" value={form.creditCardExpiry} onChange={handleChange} disabled={!editing} />
+              <input type="text" name="creditCardExpiry" className="form-control" placeholder="MM/YY" value={form.creditCardExpiry || ''} onChange={handleChange} disabled={!editing} />
             </div>
 
             <div className="col-12">

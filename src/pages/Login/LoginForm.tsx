@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Button, Input, LoadingSpinner } from '../../components';
 import { useAuthStore } from '../../stores/authStore';
+import { useCartStore } from '../../stores/cartStore';
 import type { LoginFormData } from '../../types/index';
 
 const LoginForm: React.FC = () => {
   const navigate = useNavigate();
   const { login, loading, error, clearError, isAuthenticated } = useAuthStore();
+  const { getCartFromAPI } = useCartStore();
 
   const [formData, setFormData] = useState<LoginFormData>({
     username: '',
@@ -65,7 +67,14 @@ const LoginForm: React.FC = () => {
     if (validateForm()) {
       const result = await login(formData.username, formData.password, formData.rememberMe);
       if (result?.message) setMessage(result.message);
-      if (result?.success) navigate('/');
+      if (result?.success) {
+        // Đánh dấu phiên hiện tại
+        sessionStorage.setItem('current_session', 'active');
+        // Lấy giỏ hàng từ API khi đăng nhập thành công
+        await getCartFromAPI();
+        console.log('Đã lấy giỏ hàng từ API sau khi đăng nhập thành công');
+        navigate('/');
+      }
     }
   };
 
