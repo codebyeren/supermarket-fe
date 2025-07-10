@@ -247,7 +247,7 @@ const OrderHistory: React.FC = () => {
                     <div className="me-3">
                       {item.imageUrl && (
                         <img 
-                          src={item.imageUrl} 
+                          src={`/public/img/${item.imageUrl}`}
                           alt={item.productName} 
                           style={{ width: 80, height: 80, objectFit: 'cover' }} 
                         />

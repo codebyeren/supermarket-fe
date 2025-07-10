@@ -144,7 +144,7 @@ export const verifyCode = (payload: { email: string; code: string }) => {
   return axiosInstance.post('/auth/verify-code', payload);
 };
 
-export const changePassword = (payload: { email: string; code: string; newPassword: string }) => {
-  return axiosInstance.post('/auth/auth/reset-password', payload);
+export const changePassword = (payload: { email: string; newPassword: string }) => {
+  return axiosInstance.post('/auth/reset-password', payload);
 };
 export default apiService; 

@@ -14,7 +14,7 @@ console.log(code)
 })
   const handleChangePassword = async () => {
     try {
-      await changePassword({ email, code, newPassword });
+      await changePassword({ email, newPassword });
       navigate('/auth/login');
     } catch {
       setError('Không thể đổi mật khẩu. Vui lòng thử lại.');
