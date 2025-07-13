@@ -42,7 +42,7 @@ export default function AdminProducts() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('all');
   const [filterBrand, setFilterBrand] = useState('all');
-  const [filterStatus, setFilterStatus] = useState<'all' | 'Available' | 'Unavailable'>('all');
+  const [filterStatus, setFilterStatus] = useState('all');
 
   useEffect(() => {
     fetchData();
@@ -59,6 +59,8 @@ export default function AdminProducts() {
       setProducts(Array.isArray(productsData) ? productsData : []);
       setBrands(brandsData);
       setCategories(categoriesData);
+      console.log(categories, brands);
+
     } catch (err) {
       setError('Không thể tải dữ liệu');
       console.error('Error fetching data:', err);
@@ -134,12 +136,12 @@ export default function AdminProducts() {
 
   const filteredProducts = Array.isArray(products) ? products.filter(product => {
     const matchesSearch = product.productName.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = filterCategory === 'all' || 
+    const matchesCategory = filterCategory === 'all' ||
       categories.find(cat => cat.id === product.brandId)?.categoryName === filterCategory;
-    const matchesBrand = filterBrand === 'all' || 
+    const matchesBrand = filterBrand === 'all' ||
       brands.find(brand => brand.id === product.brandId)?.brandName === filterBrand;
     const matchesStatus = filterStatus === 'all' || product.status === filterStatus;
-    
+
     return matchesSearch && matchesCategory && matchesBrand && matchesStatus;
   }) : [];
 
@@ -177,43 +179,47 @@ export default function AdminProducts() {
             className="search-input"
           />
         </div>
-        
+
         <div className="filter-controls">
-          <select 
-            value={filterCategory} 
+          <select
+            value={filterCategory}
             onChange={(e) => setFilterCategory(e.target.value)}
-            className="filter-select"
+            className="form-select text-dark"
           >
             <option value="all">Tất cả danh mục</option>
-            {categories.map(category => (
+            {categories.map((category) => (
               <option key={category.id} value={category.categoryName}>
                 {category.categoryName}
+                
               </option>
             ))}
           </select>
-          
-          <select 
-            value={filterBrand} 
+
+          <select
+            value={filterBrand}
             onChange={(e) => setFilterBrand(e.target.value)}
-            className="filter-select"
+            className="form-select text-dark"
           >
             <option value="all">Tất cả thương hiệu</option>
-            {brands.map(brand => (
+            {brands.map((brand) => (
               <option key={brand.id} value={brand.brandName}>
                 {brand.brandName}
               </option>
             ))}
           </select>
-          
-          <select 
-            value={filterStatus} 
-            onChange={(e) => setFilterStatus(e.target.value as any)}
-            className="filter-select"
+
+
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            className="filter-select text-dark"
           >
             <option value="all">Tất cả trạng thái</option>
-            <option value="Available">Có sẵn</option>
-            <option value="Unavailable">Không có sẵn</option>
+      
+            <option value="active">Hoạt động</option>
+            <option value="inactive">Ngưng hoạt động</option>
           </select>
+
         </div>
       </div>
 
@@ -237,9 +243,26 @@ export default function AdminProducts() {
               <td>{product.productName}</td>
               <td>{formatPrice(product.price)}</td>
               <td>{product.quantity}</td>
-              <td>{brands.find(b => b.id === product.brandId)?.brandName || 'N/A'}</td>
-              <td>{product.status === 'Available' ? 'Có sẵn' : 'Không có sẵn'}</td>
-              <td><img src={product.imageUrl} alt={product.productName} style={{width: 48, height: 48, objectFit: 'cover', borderRadius: 4}} /></td>
+              <td>{product.brand}</td>
+              <td><span
+                className="badge px-2 py-1 text-white"
+                style={{
+                  backgroundColor:
+                    product.status === 'Hot Deal'
+                      ? '#e53935'
+                      : product.status === 'Best Seller'
+                        ? '#fb8c00'
+                        : product.status === 'New Arrival'
+                          ? '#43a047'
+                          : '#6c757d',
+                  fontSize: 12,
+                  borderRadius: 4,
+                  textTransform: 'uppercase'
+                }}
+              >
+                {product.status}
+              </span></td>
+              <td><img src={`/img/${product.imageUrl}`} alt={product.productName} style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 4 }} /></td>
               <td>
                 <button className="edit-btn" onClick={() => openEditModal(product)}>Sửa</button>
                 <button className="delete-btn" onClick={() => handleDeleteProduct(product.productId)}>Xóa</button>
@@ -273,7 +296,7 @@ export default function AdminProducts() {
                   required
                 />
               </div>
-              
+
               <div className="form-group">
                 <label>Giá:</label>
                 <input
@@ -283,7 +306,7 @@ export default function AdminProducts() {
                   required
                 />
               </div>
-              
+
               <div className="form-group">
                 <label>Slug:</label>
                 <input
@@ -293,7 +316,7 @@ export default function AdminProducts() {
                   required
                 />
               </div>
-              
+
               <div className="form-group">
                 <label>Số lượng:</label>
                 <input
@@ -303,7 +326,7 @@ export default function AdminProducts() {
                   required
                 />
               </div>
-              
+
               <div className="form-group">
                 <label>Giá vốn:</label>
                 <input
@@ -313,7 +336,7 @@ export default function AdminProducts() {
                   required
                 />
               </div>
-              
+
               <div className="form-group">
                 <label>Tổng tiền:</label>
                 <input
@@ -323,7 +346,7 @@ export default function AdminProducts() {
                   required
                 />
               </div>
-              
+
               <div className="form-group">
                 <label>Thương hiệu:</label>
                 <select
@@ -339,7 +362,7 @@ export default function AdminProducts() {
                   ))}
                 </select>
               </div>
-              
+
               <div className="form-group">
                 <label>URL hình ảnh:</label>
                 <input
@@ -349,7 +372,7 @@ export default function AdminProducts() {
                   required
                 />
               </div>
-              
+
               <div className="form-group">
                 <label>Trạng thái:</label>
                 <select
@@ -361,13 +384,13 @@ export default function AdminProducts() {
                   <option value="Unavailable">Không có sẵn</option>
                 </select>
               </div>
-              
+
               <div className="modal-actions">
                 <button type="submit" className="save-btn">
                   {editingProduct ? 'Cập nhật' : 'Thêm'}
                 </button>
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   className="cancel-btn"
                   onClick={() => {
                     setShowAddModal(false);

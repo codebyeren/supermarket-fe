@@ -1,0 +1,28 @@
+
+.rating-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: .25rem;
+  font-size: .85rem;
+}
+
+.rating-container .fa-star {
+  margin-right: 0.1rem;
+}
+
+/* Mobile nhỏ hơn 576px */
+@media (max-width: 575.98px) {
+  .rating-container {
+    font-size: .75rem;
+    margin-bottom: .2rem;
+  }
+  .rating-container .fa-star {
+    margin-right: 0.05rem;
+    width: .9rem;
+    height: .9rem;
+  }
+  .rating-container .rating-score {
+    margin-left: .25rem;
+    font-size: .75rem;
+  }
+}

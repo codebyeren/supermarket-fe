@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './Users.css';
 
 interface User {
@@ -33,6 +33,7 @@ export default function AdminUsers() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterRole, setFilterRole] = useState<'all' | 'admin' | 'user'>('all');
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'inactive'>('all');
+
 
   const filteredUsers = users.filter(user => {
     const matchesSearch = user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -79,7 +80,8 @@ export default function AdminUsers() {
           <select 
             value={filterRole} 
             onChange={(e) => setFilterRole(e.target.value as any)}
-            className="filter-select"
+            className="filter-select text-dark"
+
           >
             <option value="all">Tất cả vai trò</option>
             <option value="admin">Admin</option>
@@ -89,7 +91,7 @@ export default function AdminUsers() {
           <select 
             value={filterStatus} 
             onChange={(e) => setFilterStatus(e.target.value as any)}
-            className="filter-select"
+            className="filter-select text-dark"
           >
             <option value="all">Tất cả trạng thái</option>
             <option value="active">Hoạt động</option>
@@ -116,12 +118,14 @@ export default function AdminUsers() {
               <tr key={user.id}>
                 <td>{user.id}</td>
                 <td>{user.username}</td>
-                <td>{user.email}</td>
+                <td >{user.email}</td>
                 <td>
                   <select
                     value={user.role}
                     onChange={(e) => handleRoleChange(user.id, e.target.value as 'admin' | 'user')}
-                    className="role-select"
+                    className="role-select text-dark  "
+                    disabled={user.username === 'admin' }
+
                   >
                     <option value="user">User</option>
                     <option value="admin">Admin</option>
@@ -138,11 +142,12 @@ export default function AdminUsers() {
                     <button 
                       className="toggle-status-btn"
                       onClick={() => handleStatusToggle(user.id)}
+                        disabled={user.username === 'admin' }
                     >
                       {user.status === 'active' ? 'Vô hiệu hóa' : 'Kích hoạt'}
                     </button>
                     <button className="edit-btn">Sửa</button>
-                    <button className="delete-btn">Xóa</button>
+                    <button className="delete-btn"   disabled={user.username === 'admin' } >Xóa</button>
                   </div>
                 </td>
               </tr>

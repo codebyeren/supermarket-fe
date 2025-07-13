@@ -256,3 +256,8 @@
     width: 100%;
   }
 } 
+.status-select:disabled {
+  background-color: #e0e0e0; 
+  color: #555; 
+  cursor: not-allowed;
+}

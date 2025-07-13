@@ -20,6 +20,7 @@ const SortDropdown: React.FC<SortDropdownProps> = ({ currentSort, onSortChange, 
       marginBottom: 24,
       padding: '16px 20px',
       background: '#f8f9fa',
+      color :'black',
       borderRadius: 12,
       border: '1px solid #e9ecef'
     }}>

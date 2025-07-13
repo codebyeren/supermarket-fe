@@ -101,7 +101,7 @@ export default function AdminBills() {
           <select 
             value={filterStatus} 
             onChange={(e) => setFilterStatus(e.target.value as any)}
-            className="filter-select"
+            className="filter-select text-dark"
           >
             <option value="all">Tất cả trạng thái</option>
             <option value="pending">Chờ xác nhận</option>
@@ -140,6 +140,7 @@ export default function AdminBills() {
                     value={bill.status}
                     onChange={(e) => handleStatusChange(bill.id, e.target.value as Bill['status'])}
                     className={`status-select ${getStatusColor(bill.status)}`}
+                    disabled = {bill.status === "cancelled"}
                   >
                     <option value="pending">Chờ xác nhận</option>
                     <option value="confirmed">Đã xác nhận</option>
@@ -153,7 +154,7 @@ export default function AdminBills() {
                   <div className="action-buttons">
                     <button className="view-btn">Xem</button>
                     <button className="edit-btn">Sửa</button>
-                    <button className="delete-btn">Xóa</button>
+                    <button className="delete-btn" >Xóa</button>
                   </div>
                 </td>
               </tr>

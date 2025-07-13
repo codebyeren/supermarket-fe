@@ -17,6 +17,7 @@ import { FaHeart } from 'react-icons/fa';
 import { deleteFavorite, toggleFavorite } from '../../services/favoriteService';
 import { useAuthStore } from '../../stores/authStore';
 import CompareTwoProductsView from '../../components/Compare/CompareTwoProductsView';
+import './index.css'
 
 const ProductDetail = () => {
     const { slug } = useParams<{ slug: string }>();

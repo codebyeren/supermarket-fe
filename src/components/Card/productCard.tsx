@@ -6,6 +6,7 @@ import PromotionBadge from '../Promotion/PromotionBadge';
 import { useAuthStore } from '../../stores/authStore';
 import { deleteFavorite, toggleFavorite } from '../../services/favoriteService';
 import { useCartStore } from '../../stores/cartStore';
+import './productCard.css';
 
 
 interface Props {
@@ -14,7 +15,7 @@ interface Props {
   onAddToCartFail?: () => void;
 }
 
-const ProductCard = ({ product,onAddToCartSuccess ,onAddToCartFail}: Props) => {
+const ProductCard = ({ product, onAddToCartSuccess, onAddToCartFail }: Props) => {
   const hasDiscount = product.discountPercent && product.discountPercent > 0;
   const navigate = useNavigate();
   const [isFavorite, setIsFavorite] = useState(product.isFavorite);
@@ -86,14 +87,16 @@ const ProductCard = ({ product,onAddToCartSuccess ,onAddToCartFail}: Props) => {
       {/* Nội dung */}
       <div className="card-body d-flex flex-column justify-content-between p-2">
         {/* Rating */}
-        <div className="d-flex align-items-center mb-1" style={{ fontSize: '0.85rem' }}>
+        <div className="rating-container">
           {[...Array(5)].map((_, i) => (
             <FaStar
               key={i}
               className={i < Math.round(product.ratingScore) ? 'text-warning' : 'text-secondary'}
             />
           ))}
-          <span className="ms-1 text-muted small">{product.ratingScore.toFixed(1)}</span>
+          <span className="rating-score text-muted small">
+            {product.ratingScore.toFixed(1)}
+          </span>
         </div>
 
         {/* Tên sản phẩm */}
@@ -141,29 +144,29 @@ const ProductCard = ({ product,onAddToCartSuccess ,onAddToCartFail}: Props) => {
         onClick={(e) => {
           e.stopPropagation();
           try {
-  addToCart({
-            productId: product.productId,
-            productName: product.productName,
-            price: product.price,
-            slug: product.slug,
-            status: product.status,
-            brand: product.brand,
-            imageUrl: product.imageUrl,
-            stock: product.quantity,
-            quantity: 1,
-            promotionType: product.promotionType,
-            discountPercent: product.discountPercent,
-            discountAmount: product.discountAmount,
-            giftProductId: product.giftProductId,
-            minOrderValue: product.minOrderValue,
-            minOrderQuantity: product.minOrderQuantity,
-            startDate: product.startDate,
-            endDate: product.endDate,
-          });
-  onAddToCartSuccess?.(); 
-} catch (error) {
-  onAddToCartFail?.();    
-}
+            addToCart({
+              productId: product.productId,
+              productName: product.productName,
+              price: product.price,
+              slug: product.slug,
+              status: product.status,
+              brand: product.brand,
+              imageUrl: product.imageUrl,
+              stock: product.quantity,
+              quantity: 1,
+              promotionType: product.promotionType,
+              discountPercent: product.discountPercent,
+              discountAmount: product.discountAmount,
+              giftProductId: product.giftProductId,
+              minOrderValue: product.minOrderValue,
+              minOrderQuantity: product.minOrderQuantity,
+              startDate: product.startDate,
+              endDate: product.endDate,
+            });
+            onAddToCartSuccess?.();
+          } catch (error) {
+            onAddToCartFail?.();
+          }
         }}
       >
         <FaShoppingCart /> Thêm Giỏ Hàng

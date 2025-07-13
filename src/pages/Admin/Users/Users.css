@@ -238,3 +238,20 @@
     width: 100%;
   }
 } 
+.role-select:disabled {
+  background-color: #e0e0e0; 
+  color: #555; 
+  cursor: not-allowed;
+}
+
+.delete-btn:disabled {
+  background-color: #e0e0e0; 
+  color: #555; 
+  cursor: not-allowed;
+}
+
+.toggle-status-btn:disabled {
+  background-color: #e0e0e0; 
+  color: #555; 
+  cursor: not-allowed;
+}

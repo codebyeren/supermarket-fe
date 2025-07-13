@@ -112,7 +112,7 @@ export default function AdminPromotions() {
           <select 
             value={filterStatus} 
             onChange={(e) => setFilterStatus(e.target.value as any)}
-            className="filter-select"
+            className="filter-select text-dark"
           >
             <option value="all">Tất cả trạng thái</option>
             <option value="active">Đang hoạt động</option>
