@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Button, Input, LoadingSpinner } from '../../components';
+import { ModernInput, ModernButton } from '../../components';
 import { useAuthStore } from '../../stores/authStore';
 import { useCartStore } from '../../stores/cartStore';
+import { useLoginRedirect } from '../../hooks/useLoginRedirect';
+import RedirectNotification from '../../components/RedirectNotification';
 import type { LoginFormData } from '../../types/index';
 
 const LoginForm: React.FC = () => {
   const navigate = useNavigate();
   const { login, loading, error, clearError, isAuthenticated } = useAuthStore();
   const { getCartFromAPI } = useCartStore();
+  const { redirectAfterLogin } = useLoginRedirect();
 
   const [formData, setFormData] = useState<LoginFormData>({
     username: '',
@@ -20,16 +23,17 @@ const LoginForm: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<Partial<LoginFormData>>({});
   const [message, setMessage] = useState<string | null>(null);
+  const [showRedirectNotification, setShowRedirectNotification] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/');
+      redirectAfterLogin();
     }
     const savedUsername = localStorage.getItem('rememberedUsername');
     if (savedUsername) {
       setFormData((prev) => ({ ...prev, username: savedUsername, rememberMe: true }));
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, redirectAfterLogin]);
 
   useEffect(() => {
     return () => clearError();
@@ -73,73 +77,79 @@ const LoginForm: React.FC = () => {
         // Lấy giỏ hàng từ API khi đăng nhập thành công
         await getCartFromAPI();
         console.log('Đã lấy giỏ hàng từ API sau khi đăng nhập thành công');
-        navigate('/');
+        // Hiển thị thông báo chuyển hướng
+        setShowRedirectNotification(true);
+        // Redirect dựa trên role sau 3 giây
+        setTimeout(() => {
+          redirectAfterLogin();
+        }, 3000);
       }
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} noValidate>
-      <Input
-        id="username"
-        type="text"
-        name="username"
-        label="Tên Tài Khoản"
-        value={formData.username}
-        onChange={handleInputChange}
-        error={errors.username}
-      />
+    <>
+      <form onSubmit={handleSubmit} noValidate>
+        <ModernInput
+          id="username"
+          type="text"
+          name="username"
+          label="Tên Tài Khoản"
+          value={formData.username}
+          onChange={handleInputChange}
+          error={errors.username}
+          placeholder="Nhập tên tài khoản của bạn"
+        />
 
-      <Input
-        id="password"
-        type={showPassword ? 'text' : 'password'}
-        name="password"
-        label="Mật Khẩu"
-        value={formData.password}
-        onChange={handleInputChange}
-        error={errors.password}
-      >
-        <span
-          className="password-toggle"
-          onClick={() => setShowPassword(!showPassword)}
-          style={{ cursor: 'pointer', marginLeft: '8px' }}
-        >
-          <i className={`fa ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
-        </span>
-      </Input>
+        <ModernInput
+          id="password"
+          type="password"
+          name="password"
+          label="Mật Khẩu"
+          value={formData.password}
+          onChange={handleInputChange}
+          error={errors.password}
+          placeholder="Nhập mật khẩu của bạn"
+        />
 
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <div className="form-check">
-          <input
-            type="checkbox"
-            className="form-check-input"
-            id="rememberMe"
-            name="rememberMe"
-            checked={formData.rememberMe}
-            onChange={handleInputChange}
-          />
-          <label className="form-check-label" htmlFor="rememberMe">
-            Ghi nhớ đăng nhập
-          </label>
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <div className="form-check">
+            <input
+              type="checkbox"
+              className="form-check-input"
+              id="rememberMe"
+              name="rememberMe"
+              checked={formData.rememberMe}
+              onChange={handleInputChange}
+            />
+            <label className="form-check-label" htmlFor="rememberMe">
+              Ghi nhớ đăng nhập
+            </label>
+          </div>
+          <Link to="/auth/forgot-password" className="text-muted small text-decoration-none">
+            Quên mật khẩu?
+          </Link>
         </div>
-        <Link to="/auth/forgot-password" className="text-muted small text-decoration-none">
-          Quên mật khẩu?
-        </Link>
-      </div>
 
-      {message && <div className="alert alert-danger">{message}</div>}
+        {message && <div className="alert alert-danger">{message}</div>}
 
-      <Button type="submit" className="auth-submit-btn w-100" disabled={loading}>
-        {loading ? (
-          <>
-            <LoadingSpinner size="small" color="#fff" className="me-2" />
-            Đang xử lý...
-          </>
-        ) : (
-          'Đăng Nhập'
-        )}
-      </Button>
-    </form>
+        <ModernButton 
+          type="submit" 
+          variant="primary" 
+          size="lg" 
+          fullWidth 
+          loading={loading}
+          disabled={loading}
+        >
+          {loading ? 'Đang xử lý...' : 'Đăng Nhập'}
+        </ModernButton>
+      </form>
+      
+      <RedirectNotification 
+        isVisible={showRedirectNotification}
+        onClose={() => setShowRedirectNotification(false)}
+      />
+    </>
   );
 };
 

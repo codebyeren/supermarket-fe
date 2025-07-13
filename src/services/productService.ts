@@ -125,3 +125,46 @@ export async function putRating(payload: PostRatingPayload, ratingId: number) {
 
   return response.data;
 }
+
+// Admin APIs
+export const createProduct = async (productData: {
+  productName: string;
+  price: number;
+  slug: string;
+  status: string;
+  quantity: number;
+  unitCost: number;
+  totalAmount: number;
+  brandId: number;
+  imageUrl: string;
+}): Promise<Product> => {
+  const response = await axiosInstance.post('/products', productData);
+  return response.data;
+};
+
+export const updateProduct = async (productId: number, productData: Partial<{
+  productName: string;
+  price: number;
+  slug: string;
+  status: string;
+  quantity: number;
+  unitCost: number;
+  totalAmount: number;
+  brandId: number;
+  imageUrl: string;
+}>): Promise<Product> => {
+  const response = await axiosInstance.put(`/products/${productId}`, productData);
+  return response.data;
+};
+
+export const deleteProduct = async (productId: number): Promise<void> => {
+  await axiosInstance.delete(`/products/${productId}`);
+};
+
+export const getAllProductsForAdmin = async (): Promise<Product[]> => {
+  const response = await axiosInstance.get('/products');
+  // Đảm bảo luôn trả về array
+  if (Array.isArray(response.data)) return response.data;
+  if (Array.isArray(response.data?.data)) return response.data.data;
+  return [];
+};

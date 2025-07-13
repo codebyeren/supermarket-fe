@@ -1,6 +1,7 @@
 import React, { forwardRef } from 'react';
 import { Typography, Divider, Table } from 'antd';
 import type { OrderItem, BillDetail } from '../../types';
+import { multiplyDecimals, formatCurrency } from '../../utils/decimalUtils';
 import './BillInvoice.css';
 
 const { Title, Text } = Typography;
@@ -119,25 +120,25 @@ const BillInvoice = forwardRef<HTMLDivElement, BillInvoiceProps>(
             </thead>
             <tbody>
               {orderItems.map((item, index) => {
-                // Tính giá sau khuyến mãi
+                // Tính giá sau khuyến mãi với độ chính xác cao
                 let finalPrice = item.price;
                 if (item.discountPercent) {
-                  finalPrice = finalPrice * (1 - item.discountPercent / 100);
+                  finalPrice = multiplyDecimals(item.price, (100 - item.discountPercent) / 100, 2);
                 } else if (item.discountAmount) {
-                  finalPrice = finalPrice - item.discountAmount;
+                  finalPrice = item.price - item.discountAmount;
                 }
 
-                // Tính tổng tiền cho mỗi sản phẩm
-                const itemTotal = finalPrice * item.quantity;
+                // Tính tổng tiền cho mỗi sản phẩm với độ chính xác cao
+                const itemTotal = multiplyDecimals(finalPrice, item.quantity, 2);
 
                 return (
                   <tr key={item.productId}>
                     <td>{index + 1}</td>
                     <td>{item.productName}</td>
-                    <td>${item.price.toFixed(2)}</td>
+                    <td>{formatCurrency(item.price, 'USD', 2)}</td>
                     <td>{item.quantity}</td>
                     <td>{item.promotionDescription || '-'}</td>
-                    <td>${itemTotal.toFixed(2)}</td>
+                    <td>{formatCurrency(itemTotal, 'USD', 2)}</td>
                   </tr>
                 );
               })}
@@ -152,16 +153,16 @@ const BillInvoice = forwardRef<HTMLDivElement, BillInvoiceProps>(
             {billDetails.map((detail, index) => (
               <div key={index} className="detail-row">
                 <Text>{detail.description}</Text>
-                <Text>${detail.amount.toFixed(2)}</Text>
+                <Text>{formatCurrency(detail.amount, 'USD', 2)}</Text>
               </div>
             ))}
             <div className="detail-row">
               <Text strong>Tổng giá sản phẩm:</Text>
-              <Text>${orderAmount.toFixed(2)}</Text>
+              <Text>{formatCurrency(orderAmount, 'USD', 2)}</Text>
             </div>
             <div className="detail-row total">
               <Text strong>Tổng thanh toán:</Text>
-              <Text strong>${billAmount.toFixed(2)}</Text>
+              <Text strong>{formatCurrency(billAmount, 'USD', 2)}</Text>
             </div>
           </div>
         </div>

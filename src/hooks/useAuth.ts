@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
+import { isAdmin } from '../utils/authUtils';
 
 export const useAuth = () => {
   const navigate = useNavigate();
@@ -11,8 +12,8 @@ export const useAuth = () => {
     const checkAuth = async () => {
       const isAuthenticated = await authStore.checkAuth();
       if (isAuthenticated) {
-        const userRole = localStorage.getItem('userRole');
-        if (userRole === 'admin') {
+        // Kiểm tra role từ JWT token
+        if (isAdmin()) {
           navigate('/admin/dashboard');
         } else {
           navigate('/dashboard');

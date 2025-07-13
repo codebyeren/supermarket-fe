@@ -1,6 +1,8 @@
-import { Home, Login, Register, Dashboard } from '../pages'
+import { Home, Login, Register } from '../pages'
+import { Navigate } from 'react-router-dom'
 import MainLayout from '../layouts/MainLayout'
 import AuthLayout from '../layouts/AuthLayout'
+import AdminLayout from '../layouts/AdminLayout'
 import ProductDetail from '../pages/ProductDetail'
 import About from '../pages/About'
 import Contact from '../pages/Contact'
@@ -8,6 +10,7 @@ import CategoryPage from "../pages/Category";
 import SearchPage from "../pages/Search";
 import Favorites from '../pages/Favorites'
 import ProtectedRoute from './ProtectedRoute'
+import AdminProtectedRoute from './AdminProtectedRoute'
 import UserInfoPage from '../pages/UserInfo'
 import CartPage from '../pages/Cart'
 import CheckoutPage from '../pages/Checkout'
@@ -16,6 +19,15 @@ import ForgotPasswordPage from '../pages/ForgotPassword/ResetPass'
 import ForgotStep1_SendEmail from '../pages/ForgotPassword/ForgotPass'
 import ForgotStep2_VerifyCode from '../pages/ForgotPassword/VerifyCode'
 import ForgotStep3_ResetPassword from '../pages/ForgotPassword/ResetPass'
+
+// Admin pages
+// import AdminDashboard from '../pages/Admin/Dashboard'
+import AdminUsers from '../pages/Admin/Users'
+import AdminProducts from '../pages/Admin/Products'
+import AdminCategories from '../pages/Admin/Categories'
+import AdminBrands from '../pages/Admin/Brands'
+import AdminBills from '../pages/Admin/Bills'
+import AdminPromotions from '../pages/Admin/Promotions'
 
 
 const routes = [
@@ -28,10 +40,10 @@ const routes = [
         index: true,
         element: <Home />
       },
-      {
-        path: 'dashboard',
-        element: <Dashboard />
-      },
+      // {
+      //   path: 'dashboard',
+      //   element: <Dashboard />
+      // },
       {
         path: "/product/:slug",
         element: <ProductDetail />
@@ -102,6 +114,45 @@ const routes = [
       },
 
       // Add other auth pages like forgot-password here
+    ]
+  },
+  // Routes for admin layout
+  {
+    path: '/admin',
+    element: <AdminProtectedRoute><AdminLayout /></AdminProtectedRoute>,
+    children: [
+      {
+        index: true,
+        element: <Navigate to="/admin/users" replace />
+      },
+      // {
+      //   path: 'dashboard',
+      //   element: <AdminDashboard />
+      // },
+      {
+        path: 'users',
+        element: <AdminUsers />
+      },
+      {
+        path: 'products',
+        element: <AdminProducts />
+      },
+      {
+        path: 'categories',
+        element: <AdminCategories />
+      },
+      {
+        path: 'brands',
+        element: <AdminBrands />
+      },
+      {
+        path: 'bills',
+        element: <AdminBills />
+      },
+      {
+        path: 'promotions',
+        element: <AdminPromotions />
+      }
     ]
   }
 ]

@@ -1,170 +1,174 @@
-# Authentication System Improvements
+# Cải Tiến Giao Diện Đăng Nhập/Đăng Ký
 
-## Overview
-This document outlines the improvements made to the login and register functionality in the supermarket frontend application.
+## Tổng Quan
 
-## Key Improvements
+Đã thực hiện các cải tiến sau cho giao diện đăng nhập/đăng ký:
 
-### 1. **Enhanced API Service** (`src/services/api.ts`)
-- ✅ Proper TypeScript interfaces for API requests and responses
-- ✅ Comprehensive error handling with meaningful Vietnamese error messages
-- ✅ Support for authentication token management
-- ✅ Methods for login, register, logout, and auth checking
+### 1. Responsive Design
+- **ResponsiveAuth Component**: Component mới với thiết kế responsive hoàn toàn
+- **Mobile-First**: Tối ưu cho mọi kích thước màn hình
+- **Flexible Layout**: Tự động điều chỉnh layout theo thiết bị
 
-### 2. **Improved Auth Store** (`src/stores/authStore.ts`)
-- ✅ Custom state management without external dependencies
-- ✅ Proper TypeScript interfaces for User and AuthState
-- ✅ Centralized authentication logic
-- ✅ Token and user data persistence
-- ✅ Remember me functionality
-- ✅ Loading and error state management
+### 2. API Địa Chỉ Tích Hợp
+- **LocationService**: Service để gọi API public cho country, state, city
+- **Dynamic Loading**: Load dữ liệu địa chỉ theo thời gian thực
+- **Fallback Data**: Dữ liệu dự phòng khi API không khả dụng
+- **Cascading Selects**: Dropdown phụ thuộc (country → state → city)
 
-### 3. **Enhanced Login Component** (`src/pages/Login/index.tsx`)
-- ✅ Integration with auth store
-- ✅ Real-time form validation
-- ✅ Password visibility toggle
-- ✅ Remember me functionality
-- ✅ Loading states with spinner
-- ✅ Better error handling and display
-- ✅ Automatic redirection based on user role
+### 3. Thumbnail Động
+- **LazyImage Component**: Component lazy loading với thumbnail động
+- **Image Optimization**: Tối ưu ảnh theo kích thước và format
+- **Progressive Loading**: Load ảnh từ blur đến rõ nét
+- **Responsive Images**: Srcset và sizes tự động
 
-### 4. **Enhanced Register Component** (`src/pages/Register/index.tsx`)
-- ✅ Comprehensive form validation
-- ✅ Real-time field validation
-- ✅ Password strength requirements
-- ✅ Date of birth validation with age restrictions
-- ✅ Phone number format validation
-- ✅ Email format validation
-- ✅ Loading states with spinner
-- ✅ Success message and auto-redirect
+### 4. Sửa Bug Tính Tiền
+- **DecimalUtils**: Utility xử lý tính toán decimal chính xác
+- **Precise Calculations**: Tránh lỗi floating point precision
+- **Currency Formatting**: Format tiền tệ theo locale
+- **BillInvoice Update**: Cập nhật component hóa đơn
 
-### 5. **Improved Styling** (`src/pages/Auth.css`)
-- ✅ Modern gradient background
-- ✅ Enhanced form styling with better visual hierarchy
-- ✅ Improved button styling with hover effects
-- ✅ Better responsive design
-- ✅ Loading spinner integration
-- ✅ Enhanced accessibility
+## Cách Sử Dụng
 
-### 6. **New Components**
-- ✅ **LoadingSpinner** (`src/components/LoadingSpinner/`)
-  - Customizable size and color
-  - Smooth animation
-  - Integration with buttons
+### ResponsiveAuth Component
 
-### 7. **Utility Functions**
-- ✅ **Validation utilities** (`src/utils/validation.ts`)
-  - Comprehensive validation functions
-  - Vietnamese error messages
-  - Reusable validation logic
+```tsx
+import ResponsiveAuth from '../../components/ResponsiveAuth';
 
-- ✅ **Custom hooks** (`src/hooks/useAuth.ts`)
-  - Authentication hook
-  - Form validation hook
-  - Reusable form logic
-
-## Features
-
-### Login Features
-- ✅ Username/password authentication
-- ✅ Remember me functionality
-- ✅ Password visibility toggle
-- ✅ Form validation
-- ✅ Loading states
-- ✅ Error handling
-- ✅ Role-based redirection (admin/user)
-
-### Register Features
-- ✅ Complete user registration form
-- ✅ Real-time validation
-- ✅ Password strength requirements
-- ✅ Age verification (minimum 10 years)
-- ✅ Phone number validation
-- ✅ Email validation
-- ✅ Username format validation
-- ✅ Success feedback and auto-redirect
-
-### Security Features
-- ✅ Token-based authentication
-- ✅ Secure password requirements
-- ✅ Input sanitization
-- ✅ CSRF protection ready
-- ✅ Session management
-
-### User Experience
-- ✅ Responsive design
-- ✅ Loading indicators
-- ✅ Clear error messages
-- ✅ Success feedback
-- ✅ Smooth animations
-- ✅ Accessibility improvements
-
-## API Endpoints Expected
-
-The system expects the following API endpoints:
-
-```
-POST /api/auth/login
-POST /api/auth/register
-GET /api/auth/me
-POST /api/auth/logout
+<ResponsiveAuth
+  type="login"
+  title="Đăng Nhập"
+  subtitle="Chào mừng bạn quay trở lại!"
+  switchText="Chưa có tài khoản?"
+  switchLink="/auth/register"
+  switchLinkText="Đăng ký ngay"
+>
+  <LoginForm />
+</ResponsiveAuth>
 ```
 
-## Environment Variables
+### LazyImage Component
 
-Add to your `.env` file:
+```tsx
+import { LazyImage } from '../../components';
+
+<LazyImage
+  src="/path/to/image.jpg"
+  alt="Description"
+  size={{ width: 300, height: 200 }}
+  quality={85}
+  format="webp"
+  fallbackCategory="product"
+/>
 ```
-VITE_API_URL=http://localhost:3000/api
+
+### LocationService
+
+```tsx
+import { locationService } from '../../services/locationService';
+
+// Load countries
+const countries = await locationService.getCountries();
+
+// Load states
+const states = await locationService.getStates('VN');
+
+// Load cities
+const cities = await locationService.getCities('VN', 'HCM');
 ```
 
-## Usage
+### DecimalUtils
 
-### Login
+```tsx
+import { 
+  roundDecimal, 
+  addDecimals, 
+  multiplyDecimals, 
+  formatCurrency 
+} from '../../utils/decimalUtils';
+
+// Tính toán chính xác
+const total = multiplyDecimals(price, quantity, 2);
+const formatted = formatCurrency(total, 'VND', 0);
+```
+
+## API Keys
+
+Để sử dụng API địa chỉ, cần thay thế `YOUR_API_KEY_HERE` trong `locationService.ts`:
+
 ```typescript
-import { useAuthStore } from '../stores/authStore';
-
-const { login, loading, error } = useAuthStore();
-const success = await login(username, password, rememberMe);
+// Trong src/services/locationService.ts
+headers: {
+  'X-CSCAPI-KEY': 'your_actual_api_key_here'
+}
 ```
 
-### Register
-```typescript
-import { useAuthStore } from '../stores/authStore';
+## Responsive Breakpoints
 
-const { register, loading, error } = useAuthStore();
-const success = await register(userData);
-```
-
-## Future Enhancements
-
-1. **Password Reset**: Implement forgot password functionality
-2. **Email Verification**: Add email verification for new accounts
-3. **Social Login**: Integrate Google, Facebook login
-4. **Two-Factor Authentication**: Add 2FA support
-5. **Session Management**: Implement session timeout and refresh tokens
-6. **Rate Limiting**: Add rate limiting for login attempts
-7. **Audit Logging**: Track login/logout events
-
-## Testing
-
-The components are ready for testing with:
-- Form validation
-- API integration
-- Error scenarios
-- Loading states
-- Responsive design
+- **Desktop**: > 1024px - Layout 2 cột
+- **Tablet**: 768px - 1024px - Layout 1 cột với background
+- **Mobile**: < 768px - Layout tối ưu cho mobile
 
 ## Browser Support
 
-- ✅ Chrome (latest)
-- ✅ Firefox (latest)
-- ✅ Safari (latest)
-- ✅ Edge (latest)
-- ✅ Mobile browsers
+- **Modern Browsers**: Chrome, Firefox, Safari, Edge
+- **WebP Support**: Tự động fallback về JPEG nếu không hỗ trợ
+- **Intersection Observer**: Fallback cho lazy loading
 
-## Performance
+## Performance Optimizations
 
-- ✅ Optimized bundle size
-- ✅ Efficient state management
-- ✅ Minimal re-renders
-- ✅ Lazy loading ready 
+1. **Image Optimization**: WebP format, responsive sizes
+2. **Lazy Loading**: Intersection Observer API
+3. **Debounced API Calls**: Tránh gọi API quá nhiều
+4. **Cached Data**: Lưu cache dữ liệu địa chỉ
+5. **Bundle Splitting**: Code splitting cho components
+
+## Accessibility
+
+- **ARIA Labels**: Đầy đủ labels cho screen readers
+- **Keyboard Navigation**: Hỗ trợ điều hướng bằng bàn phím
+- **Focus Management**: Quản lý focus hợp lý
+- **Color Contrast**: Độ tương phản màu sắc tốt
+
+## Testing
+
+### Manual Testing Checklist
+
+- [ ] Responsive trên các thiết bị khác nhau
+- [ ] API địa chỉ hoạt động đúng
+- [ ] Lazy loading ảnh
+- [ ] Tính toán decimal chính xác
+- [ ] Form validation
+- [ ] Error handling
+- [ ] Loading states
+
+### Browser Testing
+
+- [ ] Chrome (Desktop & Mobile)
+- [ ] Firefox (Desktop & Mobile)
+- [ ] Safari (Desktop & Mobile)
+- [ ] Edge (Desktop)
+
+## Troubleshooting
+
+### API Location không hoạt động
+- Kiểm tra API key
+- Kiểm tra network connection
+- Fallback data sẽ được sử dụng
+
+### Ảnh không load
+- Kiểm tra đường dẫn ảnh
+- Fallback image sẽ hiển thị
+- Kiểm tra CORS policy
+
+### Tính toán sai
+- Sử dụng DecimalUtils thay vì toán tử JavaScript
+- Kiểm tra precision settings
+- Verify input data types
+
+## Future Improvements
+
+1. **Offline Support**: Service Worker cho offline mode
+2. **Progressive Web App**: PWA features
+3. **Internationalization**: i18n support
+4. **Advanced Validation**: Real-time validation
+5. **Biometric Auth**: Fingerprint/Face ID support 

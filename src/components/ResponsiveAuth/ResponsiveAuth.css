@@ -1,0 +1,311 @@
+.responsive-auth-container {
+  display: flex;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Left Panel - Image */
+.responsive-auth-left-panel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+}
+
+.responsive-auth-image-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.responsive-auth-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0 20px 20px 0;
+}
+
+.responsive-auth-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(74, 144, 226, 0.8) 0%,
+    rgba(118, 75, 162, 0.8) 100%
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+  border-radius: 0 20px 20px 0;
+}
+
+.responsive-auth-overlay.loaded {
+  opacity: 1;
+}
+
+.responsive-auth-brand {
+  text-align: center;
+  color: white;
+  padding: 2rem;
+}
+
+.responsive-auth-brand h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.responsive-auth-brand p {
+  font-size: 1.2rem;
+  opacity: 0.9;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Right Panel - Form */
+.responsive-auth-right-panel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  position: relative;
+  z-index: 3;
+}
+
+.responsive-auth-form-container {
+  width: 100%;
+  max-width: 450px;
+  padding: 3rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.responsive-auth-logo {
+  margin-bottom: 2rem;
+}
+
+.responsive-auth-logo-image {
+  width: 120px;
+  height: 60px;
+  object-fit: contain;
+}
+
+.responsive-auth-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.responsive-auth-header h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.responsive-auth-header p {
+  font-size: 1.1rem;
+  color: #666;
+}
+
+.responsive-auth-form {
+  width: 100%;
+  margin-bottom: 2rem;
+}
+
+.responsive-auth-switch {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.responsive-auth-switch p {
+  font-size: 0.95rem;
+  color: #666;
+}
+
+.responsive-auth-switch-link {
+  color: #4a90e2;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.responsive-auth-switch-link:hover {
+  color: #357abd;
+  text-decoration: underline;
+}
+
+.responsive-auth-footer {
+  text-align: center;
+  margin-top: auto;
+}
+
+.responsive-auth-footer p {
+  font-size: 0.85rem;
+  color: #999;
+}
+
+/* Mobile Background */
+.responsive-auth-mobile-bg {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+}
+
+.responsive-auth-mobile-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .responsive-auth-container {
+    flex-direction: column;
+  }
+
+  .responsive-auth-left-panel {
+    display: none;
+  }
+
+  .responsive-auth-mobile-bg {
+    display: block;
+  }
+
+  .responsive-auth-right-panel {
+    background: rgba(255, 255, 255, 0.98);
+    min-height: 100vh;
+  }
+
+  .responsive-auth-form-container {
+    padding: 2rem 1.5rem;
+  }
+
+  .responsive-auth-header h2 {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .responsive-auth-form-container {
+    padding: 1.5rem 1rem;
+  }
+
+  .responsive-auth-header h2 {
+    font-size: 1.8rem;
+  }
+
+  .responsive-auth-header p {
+    font-size: 1rem;
+  }
+
+  .responsive-auth-brand h1 {
+    font-size: 2.5rem;
+  }
+
+  .responsive-auth-brand p {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .responsive-auth-form-container {
+    padding: 1rem 0.5rem;
+  }
+
+  .responsive-auth-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .responsive-auth-logo-image {
+    width: 100px;
+    height: 50px;
+  }
+
+  .responsive-auth-brand h1 {
+    font-size: 2rem;
+  }
+
+  .responsive-auth-brand p {
+    font-size: 0.9rem;
+  }
+}
+
+/* Animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.responsive-auth-form-container {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+/* Form improvements */
+.responsive-auth-form .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.responsive-auth-form .form-control {
+  border-radius: 8px;
+  border: 2px solid #e1e5e9;
+  padding: 0.875rem 1rem;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.responsive-auth-form .form-control:focus {
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+.responsive-auth-form .auth-submit-btn {
+  border-radius: 8px;
+  padding: 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.responsive-auth-form .auth-submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(74, 144, 226, 0.3);
+}
+
+/* Loading states */
+.responsive-auth-form .form-control:disabled {
+  background-color: #f8f9fa;
+  cursor: not-allowed;
+}
+
+.responsive-auth-form .auth-submit-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+} 

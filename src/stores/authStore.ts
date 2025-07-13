@@ -1,5 +1,6 @@
 import React from 'react';
 import { apiService } from '../services/api';
+import { clearAuthData } from '../utils/authUtils';
 import type { LoginFormData, RegisterFormData } from '../types';
 
 interface User {
@@ -103,14 +104,7 @@ class AuthStore {
     this.setState({ loading: true });
     try {
       await apiService.logout();
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-      localStorage.removeItem('userRole');
-      localStorage.removeItem('userData');
-      sessionStorage.removeItem('accessToken');
-      sessionStorage.removeItem('refreshToken');
-      // Xóa đánh dấu phiên
-      sessionStorage.removeItem('current_session');
+      clearAuthData();
       
       this.setState({
         isAuthenticated: false,
@@ -119,14 +113,7 @@ class AuthStore {
         error: null
       });
     } catch (error: any) {
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-      localStorage.removeItem('userRole');
-      localStorage.removeItem('userData');
-      sessionStorage.removeItem('accessToken');
-      sessionStorage.removeItem('refreshToken');
-      // Xóa đánh dấu phiên
-      sessionStorage.removeItem('current_session');
+      clearAuthData();
       
       this.setState({
         isAuthenticated: false,
@@ -160,13 +147,7 @@ class AuthStore {
         return true;
       } else {
         // Token is invalid, clear storage
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        localStorage.removeItem('userRole');
-        localStorage.removeItem('userData');
-        sessionStorage.removeItem('accessToken');
-        sessionStorage.removeItem('refreshToken');
-        sessionStorage.removeItem('current_session');
+        clearAuthData();
         
         this.setState({
           isAuthenticated: false,
@@ -178,13 +159,7 @@ class AuthStore {
       }
     } catch (error: any) {
       // Clear storage on error
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-      localStorage.removeItem('userRole');
-      sessionStorage.removeItem('accessToken');
-      sessionStorage.removeItem('refreshToken');
-      localStorage.removeItem('userData');
-      sessionStorage.removeItem('current_session');
+      clearAuthData();
       
       this.setState({
         isAuthenticated: false,

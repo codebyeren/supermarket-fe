@@ -53,8 +53,11 @@ export interface Product {
   slug: string;
   status: string;
   brand: string;
+  brandId?: number; // Thêm brandId cho admin
   imageUrl: string;
   quantity: number;
+  unitCost?: number; // Thêm unitCost cho admin
+  totalAmount?: number; // Thêm totalAmount cho admin
   isFavorite: boolean;
   ratingScore: number;
   promotionDescription: string;
@@ -90,6 +93,8 @@ export interface RegisterFormData {
   middleName?: string;
   lastName: string;
   country: string;
+  state?: string;
+  city?: string;
   mobile: string;
   email?: string;
   dob?: string;

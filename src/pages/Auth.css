@@ -85,8 +85,12 @@ body {
 /* Form Grid for Register Page */
 .form-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 1.5rem;
+}
+
+.form-grid.form-grid-2col {
+  grid-template-columns: 1fr 1fr;
 }
 
 /* Floating Label Input Styles */
@@ -305,6 +309,11 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     position: static;
     margin-top: 4px;
     font-size: 0.85rem;
+  }
+
+  .form-grid.form-grid-2col {
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
 }
 
