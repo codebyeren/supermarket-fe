@@ -13,7 +13,7 @@ const OrderHistoryPage: React.FC = () => {
 
         {/* Main content */}
         <main className="flex-grow-1 bg-white shadow-sm rounded p-4">
-          <h4 className="mb-4">Lịch Sử Đơn Hàng</h4>
+          <h4 className="mb-4">Orders History</h4>
           <OrderHistory />
         </main>
       </div>

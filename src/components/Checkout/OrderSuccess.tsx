@@ -31,8 +31,8 @@ const OrderSuccess: React.FC<OrderSuccessProps> = ({
   paymentMethod = 'CASH',
   paymentStatus = 'PENDING',
   customerInfo = {
-    fullName: 'Nguyễn Văn A',
-    address: '123 Đường Lê Lợi, Quận 1, TP. Hồ Chí Minh',
+    fullName: 'John Doe',
+    address: '123 Le Loi Street, District 1, Ho Chi Minh City',
     phone: '0987654321'
   }
 }) => {
@@ -49,15 +49,15 @@ const OrderSuccess: React.FC<OrderSuccessProps> = ({
   return (
     <div className={styles.orderSuccessContainer}>
       <div className={styles.successIcon}>✅</div>
-      <h2 className={styles.successTitle}>Đặt hàng thành công!</h2>
+      <h2 className={styles.successTitle}>Order placed successfully!</h2>
       <p className={styles.successMessage}>
-        Cảm ơn bạn đã đặt hàng tại Supermarket. Chúng tôi sẽ xử lý đơn hàng của bạn trong thời gian sớm nhất.
+        Thank you for your order at Supermarket. We will process your order as soon as possible.
       </p>
       <div className={styles.orderNumber}>
-        Mã đơn hàng: <strong>#{orderId}</strong>
+        Order ID: <strong>#{orderId}</strong>
       </div>
       <p>
-        Bạn sẽ nhận được email xác nhận đơn hàng trong vài phút tới. Vui lòng kiểm tra hộp thư của bạn.
+        You will receive an order confirmation email within a few minutes. Please check your inbox.
       </p>
       
       <Space direction="vertical" size="middle" className={styles.actionButtons}>
@@ -67,7 +67,7 @@ const OrderSuccess: React.FC<OrderSuccessProps> = ({
           size="large"
           className={styles.billButton}
         >
-          Xem hóa đơn
+          View Invoice
         </Button>
         
         <Button
@@ -76,11 +76,10 @@ const OrderSuccess: React.FC<OrderSuccessProps> = ({
           size="large"
           className={styles.buttonContinue}
         >
-          Tiếp tục mua sắm
+          Continue Shopping
         </Button>
       </Space>
 
-      {/* Modal hiển thị hóa đơn */}
       <BillModal 
         visible={billModalVisible}
         onClose={handleCloseBillModal}
@@ -98,4 +97,4 @@ const OrderSuccess: React.FC<OrderSuccessProps> = ({
   );
 };
 
-export default OrderSuccess; 
+export default OrderSuccess;

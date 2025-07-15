@@ -6,15 +6,15 @@ const Login: React.FC = () => {
   return (
     <ModernAuth
       type="login"
-      title="Đăng Nhập"
-      subtitle="Chào mừng bạn quay trở lại!"
-      switchText="Chưa có tài khoản?"
+      title="Login"
+      subtitle="Welcome back!"
+      switchText="Don't have an account?"
       switchLink="/auth/register"
-      switchLinkText="Đăng ký ngay"
+      switchLinkText="Register now"
     >
       <LoginForm />
     </ModernAuth>
   );
 };
 
-export default Login; 
+export default Login;

@@ -33,7 +33,6 @@ const Checkout: React.FC<CheckoutProps> = ({ onCancel }) => {
   const loadingService = LoadingService.getInstance();
   const { items: cartItems, clearCart } = useCartStore();
 
-  // Lấy dữ liệu giỏ hàng và chuyển đổi thành OrderItem
   useEffect(() => {
     loadUserInfo();
     prepareOrderData();
@@ -42,7 +41,6 @@ const Checkout: React.FC<CheckoutProps> = ({ onCancel }) => {
   const loadUserInfo = async () => {
     try {
       const userInfo = await getUserInfo();
-      // Thiết lập thông tin thanh toán từ các trường riêng lẻ
       if (userInfo) {
         setPaymentInfo({
           cardNumber: userInfo.creditCardNumber || '',
@@ -52,12 +50,11 @@ const Checkout: React.FC<CheckoutProps> = ({ onCancel }) => {
         });
       }
     } catch (error) {
-      console.error('Lỗi khi tải thông tin người dùng:', error);
+      console.error('Error loading user information:', error);
     }
   };
 
   const prepareOrderData = () => {
-    // Chuyển đổi từ giỏ hàng sang OrderItem
     const items: OrderItem[] = cartItems.map(item => ({
       productId: item.productId,
       productName: item.productName,
@@ -77,10 +74,9 @@ const Checkout: React.FC<CheckoutProps> = ({ onCancel }) => {
       minOrderValue: item.minOrderValue || null,
       minOrderQuantity: item.minOrderQuantity || null,
     }));
-    
+
     setOrderItems(items);
-    
-    // Tính tổng giá sản phẩm
+
     const total = cartItems.reduce((sum: number, item) => {
       let price = item.price;
       if (item.discountPercent) {
@@ -90,196 +86,115 @@ const Checkout: React.FC<CheckoutProps> = ({ onCancel }) => {
       }
       return sum + price * item.quantity;
     }, 0);
-    
+
     setOrderAmount(total);
-    
-    // Thêm phí và thuế
-    const tax = total * 0.08; // 8% thuế
-    const fee = 1; // $1 phí dịch vụ
-    
+
+    const tax = total * 0.08;
+    const fee = 1;
+
     const details: BillDetail[] = [
       {
         itemType: 'TAX',
         amount: tax,
-        description: 'Thuế VAT 8%',
+        description: 'VAT Tax 8%',
       },
       {
         itemType: 'FEE',
         amount: fee,
-        description: 'Phí dịch vụ $1',
+        description: 'Service fee $1',
       },
     ];
-    
+
     setBillDetails(details);
     setBillAmount(total + tax + fee);
   };
 
   const getPromotionDescription = (product: any): string | null => {
     if (!product.promotionType) return null;
-    
     if (product.promotionType === 'PERCENT_DISCOUNT' && product.discountPercent) {
-      return `Giảm ${product.discountPercent}%`;
+      return `Discount ${product.discountPercent}%`;
     } else if (product.promotionType === 'FIXED_DISCOUNT' && product.discountAmount) {
-      return `Giảm $${product.discountAmount.toFixed(2)}`;
+      return `Discount $${product.discountAmount.toFixed(2)}`;
     } else if (product.promotionType === 'BUY_ONE_GET_ONE') {
-      return 'Mua 1 tặng 1';
+      return 'Buy one get one free';
     }
-    
     return null;
   };
 
-  // Xử lý khi hoàn thành bước 1
   const handleShippingComplete = (address: CustomerAddress) => {
     setShippingInfo(address);
     setCurrentStep('summary');
   };
 
-  // Xử lý khi chuyển từ bước 2 sang bước 3
   const handleSummaryComplete = () => {
     setCurrentStep('payment');
   };
 
-  // Xử lý khi hoàn tất thanh toán
   const handlePaymentComplete = async (paymentMethod: PaymentMethodType, isPay: boolean) => {
     try {
       loadingService.showLoading();
-      
-      // Lưu phương thức thanh toán đã chọn
       setSelectedPaymentMethod(paymentMethod);
       setPaymentStatus(isPay ? 'COMPLETED' : 'PENDING');
-      
-      // Chuẩn bị dữ liệu đơn hàng theo định dạng request body mới
       const orderData = {
         items: orderItems,
         paymentMethod,
         isPay,
       };
-      
-      // Gọi API tạo đơn hàng
       const response = await orderService.createOrder(orderData);
-      
       if (response.code === 200) {
-        // Xóa giỏ hàng
         clearCart();
-        
-        // Đặt hàng thành công
         setCurrentStep('success');
-        setOrderId(Math.floor(Math.random() * 1000) + 1); // Giả định ID đơn hàng vì API chỉ trả về boolean
-        
-        message.success('Đặt hàng thành công!');
+        setOrderId(Math.floor(Math.random() * 1000) + 1);
+        message.success('Order placed successfully!');
       } else {
-        message.error('Có lỗi xảy ra khi đặt hàng: ' + response.message);
+        message.error('An error occurred while placing the order: ' + response.message);
       }
-      
       loadingService.hideLoading();
     } catch (error) {
-      console.error('Lỗi khi tạo đơn hàng:', error);
-      message.error('Có lỗi xảy ra khi đặt hàng. Vui lòng thử lại sau.');
+      console.error('Error creating order:', error);
+      message.error('An error occurred while placing the order. Please try again later.');
       loadingService.hideLoading();
     }
   };
 
-  // Xử lý khi hoàn tất quá trình đặt hàng
   const handleOrderSuccess = () => {
     navigate('/');
   };
 
   const steps = [
-    {
-      title: 'Thông tin giao hàng',
-      key: 'shipping',
-    },
-    {
-      title: 'Thông tin đơn hàng',
-      key: 'summary',
-    },
-    {
-      title: 'Thanh toán',
-      key: 'payment',
-    },
+    { title: 'Shipping Information', key: 'shipping' },
+    { title: 'Order Summary', key: 'summary' },
+    { title: 'Payment', key: 'payment' },
   ];
 
-  const renderStepIndicator = () => {
-    return (
-      <div className={styles.stepIndicator}>
-        {steps.map((step, index) => {
-          const isActive = currentStep === step.key;
-          const isCompleted = 
-            (step.key === 'shipping' && currentStep !== 'shipping') ||
-            (step.key === 'summary' && (currentStep === 'payment' || currentStep === 'success')) ||
-            (step.key === 'payment' && currentStep === 'success');
-          
-          return (
-            <div key={step.key} className={styles.step}>
-              <div 
-                className={`${styles.stepCircle} ${isActive ? styles.active : ''} ${isCompleted ? styles.completed : ''}`}
-              >
-                {isCompleted ? '✓' : index + 1}
-              </div>
-              <div 
-                className={`${styles.stepTitle} ${isActive ? styles.active : ''} ${isCompleted ? styles.completed : ''}`}
-              >
-                {step.title}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    );
-  };
+  const renderStepIndicator = () => (
+    <div className={styles.stepIndicator}>
+      {steps.map((step, index) => {
+        const isActive = currentStep === step.key;
+        const isCompleted =
+          (step.key === 'shipping' && currentStep !== 'shipping') ||
+          (step.key === 'summary' && (currentStep === 'payment' || currentStep === 'success')) ||
+          (step.key === 'payment' && currentStep === 'success');
+        return (
+          <div key={step.key} className={styles.step}>
+            <div className={`${styles.stepCircle} ${isActive ? styles.active : ''} ${isCompleted ? styles.completed : ''}`}>{isCompleted ? '✓' : index + 1}</div>
+            <div className={`${styles.stepTitle} ${isActive ? styles.active : ''} ${isCompleted ? styles.completed : ''}`}>{step.title}</div>
+          </div>
+        );
+      })}
+    </div>
+  );
 
   const renderStepContent = () => {
     switch (currentStep) {
       case 'shipping':
-        return (
-          <ShippingInfo
-            onNext={handleShippingComplete}
-            onCancel={onCancel}
-          />
-        );
+        return <ShippingInfo onNext={handleShippingComplete} onCancel={onCancel} />;
       case 'summary':
-        return (
-          <OrderSummary
-            orderItems={orderItems}
-            billDetails={billDetails}
-            orderAmount={orderAmount}
-            billAmount={billAmount}
-            onNext={handleSummaryComplete}
-            onBack={() => setCurrentStep('shipping')}
-            onCancel={onCancel}
-          />
-        );
+        return <OrderSummary orderItems={orderItems} billDetails={billDetails} orderAmount={orderAmount} billAmount={billAmount} onNext={handleSummaryComplete} onBack={() => setCurrentStep('shipping')} onCancel={onCancel} />;
       case 'payment':
-        return (
-          <PaymentMethod
-            onComplete={handlePaymentComplete}
-            onBack={() => setCurrentStep('summary')}
-            onCancel={onCancel}
-            paymentInfo={paymentInfo}
-          />
-        );
+        return <PaymentMethod onComplete={handlePaymentComplete} onBack={() => setCurrentStep('summary')} onCancel={onCancel} paymentInfo={paymentInfo} />;
       case 'success':
-        return (
-          <OrderSuccess
-            orderId={orderId || 0}
-            onComplete={handleOrderSuccess}
-            orderItems={orderItems}
-            billDetails={billDetails}
-            orderAmount={orderAmount}
-            billAmount={billAmount}
-            paymentMethod={selectedPaymentMethod}
-            paymentStatus={paymentStatus}
-            customerInfo={shippingInfo ? {
-              fullName: shippingInfo.fullName,
-              address: `${shippingInfo.street}, ${shippingInfo.city}, ${shippingInfo.state}, ${shippingInfo.country}`,
-              phone: shippingInfo.mobilePhone
-            } : {
-              fullName: 'Nguyễn Văn A',
-              address: '123 Đường Lê Lợi, Quận 1, TP. Hồ Chí Minh',
-              phone: '0987654321'
-            }}
-          />
-        );
+        return <OrderSuccess orderId={orderId || 0} onComplete={handleOrderSuccess} orderItems={orderItems} billDetails={billDetails} orderAmount={orderAmount} billAmount={billAmount} paymentMethod={selectedPaymentMethod} paymentStatus={paymentStatus} customerInfo={shippingInfo ? { fullName: shippingInfo.fullName, address: `${shippingInfo.street}, ${shippingInfo.city}, ${shippingInfo.state}, ${shippingInfo.country}`, phone: shippingInfo.mobilePhone } : { fullName: 'John Doe', address: '123 Le Loi Street, District 1, Ho Chi Minh City', phone: '0987654321' }} />;
       default:
         return null;
     }
@@ -293,4 +208,4 @@ const Checkout: React.FC<CheckoutProps> = ({ onCancel }) => {
   );
 };
 
-export default Checkout; 
+export default Checkout;

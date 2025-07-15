@@ -36,7 +36,7 @@ const ShippingInfo: React.FC<ShippingInfoProps> = ({ onNext, onCancel }) => {
       });
       loadingService.hideLoading();
     } catch (error) {
-      console.error('Lỗi khi tải thông tin người dùng:', error);
+      console.error('Error loading user information:', error);
       loadingService.hideLoading();
     }
   };
@@ -44,8 +44,6 @@ const ShippingInfo: React.FC<ShippingInfoProps> = ({ onNext, onCancel }) => {
   const handleFinish = async (values: any) => {
     try {
       loadingService.showLoading();
-      
-      // Cập nhật thông tin địa chỉ nếu cần
       await updateUserAddress({
         street: values.street,
         city: values.city,
@@ -54,7 +52,7 @@ const ShippingInfo: React.FC<ShippingInfoProps> = ({ onNext, onCancel }) => {
         homePhone: values.homePhone,
         mobilePhone: values.mobilePhone,
       });
-      
+
       const shippingInfo: CustomerAddress = {
         fullName: values.fullName,
         street: values.street,
@@ -64,88 +62,83 @@ const ShippingInfo: React.FC<ShippingInfoProps> = ({ onNext, onCancel }) => {
         homePhone: values.homePhone,
         mobilePhone: values.mobilePhone,
       };
-      
+
       loadingService.hideLoading();
       onNext(shippingInfo);
     } catch (error) {
-      console.error('Lỗi khi cập nhật thông tin giao hàng:', error);
+      console.error('Error updating shipping information:', error);
       loadingService.hideLoading();
     }
   };
 
   return (
     <div className={styles.shippingContainer}>
-      <h2 className={styles.sectionTitle}>Thông tin giao hàng</h2>
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={handleFinish}
-        className={styles.form}
-      >
+      <h2 className={styles.sectionTitle}>Shipping Information</h2>
+      <Form form={form} layout="vertical" onFinish={handleFinish} className={styles.form}>
         <Form.Item
           name="fullName"
-          label="Họ và tên"
-          rules={[{ required: true, message: 'Vui lòng nhập họ và tên' }]}
+          label="Full Name"
+          rules={[{ required: true, message: 'Please enter your full name' }]}
         >
-          <Input placeholder="Họ và tên người nhận" />
+          <Input placeholder="Recipient's full name" />
         </Form.Item>
 
         <Form.Item
           name="street"
-          label="Địa chỉ"
-          rules={[{ required: true, message: 'Vui lòng nhập địa chỉ' }]}
+          label="Address"
+          rules={[{ required: true, message: 'Please enter your address' }]}
         >
-          <Input placeholder="Số nhà, tên đường" />
+          <Input placeholder="Street address" />
         </Form.Item>
 
         <Form.Item
           name="city"
-          label="Thành phố"
-          rules={[{ required: true, message: 'Vui lòng nhập thành phố' }]}
+          label="City"
+          rules={[{ required: true, message: 'Please enter your city' }]}
         >
-          <Input placeholder="Thành phố" />
+          <Input placeholder="City" />
         </Form.Item>
 
         <Form.Item
           name="state"
-          label="Tỉnh/Thành"
-          rules={[{ required: true, message: 'Vui lòng nhập tỉnh/thành' }]}
+          label="State/Province"
+          rules={[{ required: true, message: 'Please enter your state/province' }]}
         >
-          <Input placeholder="Tỉnh/Thành" />
+          <Input placeholder="State/Province" />
         </Form.Item>
 
         <Form.Item
           name="country"
-          label="Quốc gia"
-          rules={[{ required: true, message: 'Vui lòng chọn quốc gia' }]}
+          label="Country"
+          rules={[{ required: true, message: 'Please select your country' }]}
         >
-          <Select placeholder="Chọn quốc gia">
-            <Option value="Vietnam">Việt Nam</Option>
-            <Option value="USA">Hoa Kỳ</Option>
-            <Option value="China">Trung Quốc</Option>
-            <Option value="Japan">Nhật Bản</Option>
-            <Option value="Korea">Hàn Quốc</Option>
+          <Select placeholder="Select country">
+            <Option value="Vietnam">Vietnam</Option>
+            <Option value="USA">USA</Option>
+            <Option value="China">China</Option>
+            <Option value="Japan">Japan</Option>
+            <Option value="Korea">Korea</Option>
           </Select>
         </Form.Item>
 
-        <Form.Item name="homePhone" label="Số điện thoại nhà">
-          <Input placeholder="Số điện thoại nhà (không bắt buộc)" />
+        <Form.Item name="homePhone" label="Home Phone">
+          <Input placeholder="Home phone (optional)" />
         </Form.Item>
 
         <Form.Item
           name="mobilePhone"
-          label="Số điện thoại di động"
-          rules={[{ required: true, message: 'Vui lòng nhập số điện thoại di động' }]}
+          label="Mobile Phone"
+          rules={[{ required: true, message: 'Please enter your mobile phone number' }]}
         >
-          <Input placeholder="Số điện thoại di động" />
+          <Input placeholder="Mobile phone number" />
         </Form.Item>
 
         <div className={styles.buttonGroup}>
           <Button onClick={onCancel} className={styles.cancelButton}>
-            Hủy
+            Cancel
           </Button>
           <Button type="primary" htmlType="submit" className={styles.continueButton}>
-            Tiếp tục
+            Continue
           </Button>
         </div>
       </Form>
@@ -153,4 +146,4 @@ const ShippingInfo: React.FC<ShippingInfoProps> = ({ onNext, onCancel }) => {
   );
 };
 
-export default ShippingInfo; 
+export default ShippingInfo;

@@ -53,6 +53,7 @@ export interface Product {
   slug: string;
   status: string;
   brand: string;
+  categoryId?: string;
   brandId?: number; // Thêm brandId cho admin
   imageUrl: string;
   quantity: number;
@@ -181,3 +182,9 @@ export interface PaymentInfo {
 export interface LayoutProps {
   children: ReactNode;
 }
+export type DashboardData = {
+  totalIncome: number;
+  totalOrder: number;
+  topProductByParentCategory: Record<string, Product[]>;
+  revenueChart: { date: string; total: number }[];
+};

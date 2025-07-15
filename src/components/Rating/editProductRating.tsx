@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { putRating } from '../../services/productService';
 
 interface RatingModalEditProps {
@@ -6,7 +6,7 @@ interface RatingModalEditProps {
   onClose: () => void;
   onSuccess: () => void;
 }
-import { useEffect } from 'react';
+
 const RatingEditModal: React.FC<RatingModalEditProps> = ({ ratingId, onClose, onSuccess }) => {
   const [score, setScore] = useState(5);
   const [hovered, setHovered] = useState<number | null>(null);
@@ -14,20 +14,16 @@ const RatingEditModal: React.FC<RatingModalEditProps> = ({ ratingId, onClose, on
   const [showNotification, setShowNotification] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-
   useEffect(() => {
-
     setScore(0);
     setComment('');
     setErrorMessage('');
     setShowNotification(false);
   }, [ratingId]);
 
-
-
   const handleSubmit = async () => {
     if (!comment.trim()) {
-      setErrorMessage('Bình luận không được để trống!');
+      setErrorMessage('Comment cannot be empty!');
       setShowNotification(true);
       return;
     }
@@ -40,14 +36,14 @@ const RatingEditModal: React.FC<RatingModalEditProps> = ({ ratingId, onClose, on
       onSuccess();
       onClose();
     } catch (err: any) {
-      console.error('❌ Gửi đánh giá thất bại:', err);
+      console.error('❌ Failed to submit rating:', err);
 
       try {
         const json = await err.json?.();
-        setErrorMessage(json?.message || 'Gửi đánh giá thất bại');
+        setErrorMessage(json?.message || 'Failed to update rating');
       } catch {
         const fallbackText = await err.text?.();
-        setErrorMessage(fallbackText || err.message || 'Lỗi không xác định');
+        setErrorMessage(fallbackText || err.message || 'Unknown error');
       }
 
       setShowNotification(true);
@@ -57,7 +53,7 @@ const RatingEditModal: React.FC<RatingModalEditProps> = ({ ratingId, onClose, on
   return (
     <div className="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 d-flex align-items-center justify-content-center z-3">
       <div className="bg-white p-4 rounded shadow" style={{ width: '400px' }}>
-        <h5 className="mb-3">Cập nhật đánh giá sản phẩm</h5>
+        <h5 className="mb-3">Update Product Rating</h5>
         <div className="mb-3">
           {[1, 2, 3, 4, 5].map((s) => (
             <span
@@ -76,7 +72,7 @@ const RatingEditModal: React.FC<RatingModalEditProps> = ({ ratingId, onClose, on
           ))}
         </div>
 
-        <label className="form-label">Bình luận:</label>
+        <label className="form-label">Comment:</label>
         <textarea
           value={comment}
           onChange={(e) => setComment(e.target.value)}
@@ -86,16 +82,16 @@ const RatingEditModal: React.FC<RatingModalEditProps> = ({ ratingId, onClose, on
 
         {showNotification && (
           <div className={`alert ${errorMessage ? 'alert-danger' : 'alert-success'} py-1`}>
-            {errorMessage || 'Đánh giá đã được cập nhật thành công!'}
+            {errorMessage || 'Rating updated successfully!'}
           </div>
         )}
 
         <div className="d-flex justify-content-end gap-2">
           <button className="btn btn-secondary btn-sm" onClick={onClose}>
-            Hủy
+            Cancel
           </button>
           <button className="btn btn-primary btn-sm" onClick={handleSubmit}>
-            Gửi
+            Submit
           </button>
         </div>
       </div>

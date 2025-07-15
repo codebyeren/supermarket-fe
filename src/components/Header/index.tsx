@@ -89,7 +89,7 @@ const Header = () => {
                         {!isMobile && (
                             <div className="d-flex align-items-center" style={{ fontSize: 15 }}>
                                 <FaMapMarkerAlt className="me-1" />
-                                <span style={{ fontSize: '0.95rem' }}>Giao hàng</span>
+                                <span style={{ fontSize: '0.95rem' }}>Delivery</span>
                             </div>
                         )}
                     </div>
@@ -99,7 +99,7 @@ const Header = () => {
                             <input
                                 type="text"
                                 className="form-control rounded-pill px-3"
-                                placeholder="Tìm sản phẩm..."
+                                placeholder="Search for products.."
                                 value={searchValue}
                                 onChange={e => setSearchValue(e.target.value)}
                                 style={{
@@ -164,18 +164,18 @@ const Header = () => {
                             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                                 <Link to='user-info' className="fw-bold fs-5 text-white text-decoration-none">    <FaUser className="me-1" />
                                     <span style={{ fontSize: isMobile ? 14 : '0.9rem' }}>
-                                        {decoded?.fullName || user?.username || 'Người dùng'}
+                                        {decoded?.fullName || user?.username || 'User'}
                                     </span></Link>
                                 <button onClick={handleLogout} className="btn btn-link text-white p-0 ms-2" style={{ textDecoration: 'none', fontSize: isMobile ? 14 : 16 }}>
-                                    <FaSignOutAlt className="me-1" /> Đăng xuất
+                                    <FaSignOutAlt className="me-1" /> Logout
                                 </button>
                             </div>
                         ) : (
                             <div style={{ display: 'flex', alignItems: 'center', gap: 4 }} role="button">
                                 <FaSignInAlt className="me-1" />
                                 <>
-                                    <Link to="/auth/login" className="text-white me-2 text-decoration-none" style={{ fontSize: isMobile ? 14 : 16 }}>Đăng nhập /</Link>
-                                    <Link to="/auth/register" className="text-white text-decoration-none" style={{ fontSize: isMobile ? 14 : 16 }}>Đăng ký</Link>
+                                    <Link to="/auth/login" className="text-white me-2 text-decoration-none" style={{ fontSize: isMobile ? 14 : 16 }}>Login /</Link>
+                                    <Link to="/auth/register" className="text-white text-decoration-none" style={{ fontSize: isMobile ? 14 : 16 }}>Register</Link>
                                 </>
                             </div>
                         )}
@@ -189,7 +189,7 @@ const Header = () => {
                         <div className="d-flex align-items-center gap-2">
                             <FaBars />
                             <button className="btn btn-link text-black p-0 ms-2" style={{ textDecoration: 'none', fontSize: isMobile ? 14 : 16 }}>
-                                <Link to="/category/all" className="text-black text-decoration-none" style={{ fontSize: isMobile ? 14 : 16 }} >Danh Mục</Link>
+                                <Link to="/category/all" className="text-black text-decoration-none" style={{ fontSize: isMobile ? 14 : 16 }} >Categories</Link>
                             </button>
                         </div>
                     </div>

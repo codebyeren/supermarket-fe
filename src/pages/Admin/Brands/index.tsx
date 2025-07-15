@@ -31,7 +31,7 @@ export default function AdminBrands() {
       const brandsData = await getAllBrandsForAdmin();
       setBrands(brandsData);
     } catch (err) {
-      setError('Không thể tải dữ liệu thương hiệu');
+      setError('Unable to load brand data');
       console.error('Error fetching brands:', err);
     } finally {
       setLoading(false);
@@ -42,12 +42,12 @@ export default function AdminBrands() {
     try {
       const response = await createBrand(formData);
       if (response.code === 201) {
-        await fetchBrands(); // Refresh data
+        await fetchBrands();
         setShowAddModal(false);
         resetForm();
       }
     } catch (err) {
-      setError('Không thể thêm thương hiệu');
+      setError('Unable to add brand');
       console.error('Error adding brand:', err);
     }
   };
@@ -57,23 +57,23 @@ export default function AdminBrands() {
     try {
       const response = await updateBrand(editingBrand.id, formData);
       if (response.code === 200) {
-        await fetchBrands(); // Refresh data
+        await fetchBrands();
         setEditingBrand(null);
         resetForm();
       }
     } catch (err) {
-      setError('Không thể cập nhật thương hiệu');
+      setError('Unable to update brand');
       console.error('Error updating brand:', err);
     }
   };
 
   const handleDeleteBrand = async (brandId: number) => {
-    if (!confirm('Bạn có chắc chắn muốn xóa thương hiệu này?')) return;
+    if (!confirm('Are you sure you want to delete this brand?')) return;
     try {
       await deleteBrand(brandId);
       setBrands(prev => prev.filter(brand => brand.id !== brandId));
     } catch (err) {
-      setError('Không thể xóa thương hiệu');
+      setError('Unable to delete brand');
       console.error('Error deleting brand:', err);
     }
   };
@@ -100,7 +100,7 @@ export default function AdminBrands() {
   });
 
   if (loading) {
-    return <div className="loading">Đang tải...</div>;
+    return <div className="loading">Loading...</div>;
   }
 
   if (error) {
@@ -110,9 +110,9 @@ export default function AdminBrands() {
   return (
     <div className="admin-brands">
       <div className="brands-header">
-        <h1>Quản lý thương hiệu</h1>
+        <h1>Brand Management</h1>
         <button className="add-brand-btn" onClick={() => setShowAddModal(true)}>
-          + Thêm thương hiệu
+          + Add Brand
         </button>
       </div>
 
@@ -120,7 +120,7 @@ export default function AdminBrands() {
         <div className="search-box">
           <input
             type="text"
-            placeholder="Tìm kiếm thương hiệu..."
+            placeholder="Search brands..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="search-input"
@@ -132,9 +132,9 @@ export default function AdminBrands() {
         <thead>
           <tr>
             <th>ID</th>
-            <th>Tên thương hiệu</th>
+            <th>Brand Name</th>
             <th>Slug</th>
-            <th>Thao tác</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -144,8 +144,8 @@ export default function AdminBrands() {
               <td>{brand.brandName}</td>
               <td>{brand.slug}</td>
               <td>
-                <button className="edit-btn" onClick={() => openEditModal(brand)}>Sửa</button>
-                <button className="delete-btn" onClick={() => handleDeleteBrand(brand.id)}>Xóa</button>
+                <button className="edit-btn" onClick={() => openEditModal(brand)}>Edit</button>
+                <button className="delete-btn" onClick={() => handleDeleteBrand(brand.id)}>Delete</button>
               </td>
             </tr>
           ))}
@@ -154,21 +154,20 @@ export default function AdminBrands() {
 
       {filteredBrands.length === 0 && (
         <div className="no-brands">
-          <p>Không tìm thấy thương hiệu nào</p>
+          <p>No brands found</p>
         </div>
       )}
 
-      {/* Add/Edit Modal */}
       {(showAddModal || editingBrand) && (
         <div className="modal-overlay">
           <div className="modal">
-            <h2>{editingBrand ? 'Sửa thương hiệu' : 'Thêm thương hiệu mới'}</h2>
+            <h2>{editingBrand ? 'Edit Brand' : 'Add New Brand'}</h2>
             <form onSubmit={(e) => {
               e.preventDefault();
               editingBrand ? handleUpdateBrand() : handleAddBrand();
             }}>
               <div className="form-group">
-                <label>Tên thương hiệu:</label>
+                <label>Brand Name:</label>
                 <input
                   type="text"
                   value={formData.brandName}
@@ -189,7 +188,7 @@ export default function AdminBrands() {
               
               <div className="modal-actions">
                 <button type="submit" className="save-btn">
-                  {editingBrand ? 'Cập nhật' : 'Thêm'}
+                  {editingBrand ? 'Update' : 'Add'}
                 </button>
                 <button 
                   type="button" 
@@ -200,7 +199,7 @@ export default function AdminBrands() {
                     resetForm();
                   }}
                 >
-                  Hủy
+                  Cancel
                 </button>
               </div>
             </form>
@@ -209,4 +208,4 @@ export default function AdminBrands() {
       )}
     </div>
   );
-} 
+}

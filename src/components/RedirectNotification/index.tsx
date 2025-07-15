@@ -14,7 +14,7 @@ export default function RedirectNotification({ isVisible, onClose }: RedirectNot
     if (isVisible) {
       const userRole = isAdmin() ? 'ADMIN' : 'USER';
       setRole(userRole);
-      
+
       const timer = setInterval(() => {
         setCountdown((prev) => {
           if (prev <= 1) {
@@ -51,23 +51,23 @@ export default function RedirectNotification({ isVisible, onClose }: RedirectNot
           {role === 'ADMIN' ? '👑' : '👤'}
         </span>
         <h4 style={{ margin: 0, fontSize: '18px' }}>
-          Đăng nhập thành công!
+          Login successful!
         </h4>
       </div>
-      
+
       <p style={{ margin: '10px 0', fontSize: '14px' }}>
-        Chào mừng {role === 'ADMIN' ? 'Admin' : 'User'}! 
-        Đang chuyển hướng đến {role === 'ADMIN' ? 'Admin Panel' : 'Dashboard'}...
+        Welcome {role === 'ADMIN' ? 'Admin' : 'User'}!
+        Redirecting to {role === 'ADMIN' ? 'Admin Panel' : 'Dashboard'}...
       </p>
-      
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
+
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
         alignItems: 'center',
         marginTop: '15px'
       }}>
         <span style={{ fontSize: '12px', opacity: 0.8 }}>
-          Tự động chuyển hướng sau {countdown}s
+          Auto-redirect in {countdown}s
         </span>
         <button
           onClick={onClose}
@@ -81,11 +81,9 @@ export default function RedirectNotification({ isVisible, onClose }: RedirectNot
             fontSize: '12px'
           }}
         >
-          Đóng
+          Close
         </button>
       </div>
-      
-
     </div>
   );
-} 
+}

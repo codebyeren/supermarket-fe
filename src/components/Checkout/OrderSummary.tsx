@@ -26,7 +26,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
 }) => {
   const columns = [
     {
-      title: 'Sản phẩm',
+      title: 'Product',
       dataIndex: 'productName',
       key: 'productName',
       render: (text: string, record: OrderItem) => (
@@ -46,21 +46,20 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
       ),
     },
     {
-      title: 'Giá',
+      title: 'Price',
       dataIndex: 'price',
       key: 'price',
       render: (price: number) => `$${price.toFixed(2)}`,
     },
     {
-      title: 'Số lượng',
+      title: 'Quantity',
       dataIndex: 'quantity',
       key: 'quantity',
     },
     {
-      title: 'Tổng',
+      title: 'Total',
       key: 'total',
       render: (record: OrderItem) => {
-        // Tính toán giá sau khuyến mãi nếu có
         let finalPrice = record.price;
         if (record.discountPercent) {
           finalPrice = record.price * (1 - record.discountPercent / 100);
@@ -82,7 +81,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
   return (
     <div className={styles.orderSummaryContainer}>
       <Title level={2} className={styles.sectionTitle}>
-        Thông tin đơn hàng
+        Order Summary
       </Title>
 
       <Table
@@ -95,14 +94,14 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
 
       <div className={styles.billSummary}>
         <div className={styles.billDetailSection}>
-          <Title level={4}>Chi tiết thanh toán</Title>
+          <Title level={4}>Payment Details</Title>
           {billDetailItems}
           <div className={styles.subtotalRow}>
-            <Text>Tổng giá sản phẩm:</Text>
+            <Text>Subtotal:</Text>
             <Text strong>${orderAmount.toFixed(2)}</Text>
           </div>
           <div className={styles.totalRow}>
-            <Text strong>Tổng thanh toán:</Text>
+            <Text strong>Total Payment:</Text>
             <Text strong className={styles.totalAmount}>${billAmount.toFixed(2)}</Text>
           </div>
         </div>
@@ -110,17 +109,17 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
 
       <div className={styles.buttonGroup}>
         <Button onClick={onCancel} className={styles.cancelButton}>
-          Hủy
+          Cancel
         </Button>
         <Button onClick={onBack} className={styles.backButton}>
-          Quay lại
+          Back
         </Button>
         <Button type="primary" onClick={onNext} className={styles.continueButton}>
-          Tiếp tục
+          Continue
         </Button>
       </div>
     </div>
   );
 };
 
-export default OrderSummary; 
+export default OrderSummary;

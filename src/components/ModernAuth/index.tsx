@@ -28,7 +28,6 @@ const ModernAuth: React.FC<ModernAuthProps> = ({
 
   return (
     <div className="modern-auth-container">
-      {/* Background Animation */}
       <div className="modern-auth-bg">
         <div className="modern-auth-bg-animation">
           <div className="floating-shape shape-1"></div>
@@ -38,9 +37,7 @@ const ModernAuth: React.FC<ModernAuthProps> = ({
         </div>
       </div>
 
-      {/* Main Content */}
       <div className={`modern-auth-content${hideBrand ? ' no-brand' : ''}`}>
-        {/* Left Side - Brand */}
         {!hideBrand && (
           <div className="modern-auth-brand-side">
             <div className="modern-auth-brand-content">
@@ -54,46 +51,42 @@ const ModernAuth: React.FC<ModernAuthProps> = ({
                 </div>
                 <h1>SUPERMARKET</h1>
               </div>
-              
+
               <div className="modern-auth-hero">
-                <h2>Chào mừng đến với</h2>
-                <h3>Hệ thống quản lý siêu thị</h3>
-                <p>Nơi mua sắm tiện lợi, chất lượng và giá cả hợp lý</p>
+                <h2>Welcome to</h2>
+                <h3>Supermarket Management System</h3>
+                <p>Where shopping is convenient, quality is guaranteed, and prices are reasonable</p>
               </div>
 
               <div className="modern-auth-features">
                 <div className="feature-item">
                   <div className="feature-icon">🛒</div>
-                  <span>Mua sắm dễ dàng</span>
+                  <span>Easy Shopping</span>
                 </div>
                 <div className="feature-item">
                   <div className="feature-icon">🚚</div>
-                  <span>Giao hàng nhanh chóng</span>
+                  <span>Fast Delivery</span>
                 </div>
                 <div className="feature-item">
                   <div className="feature-icon">💰</div>
-                  <span>Giá cả cạnh tranh</span>
+                  <span>Competitive Prices</span>
                 </div>
               </div>
             </div>
           </div>
         )}
 
-        {/* Right Side - Form */}
         <div className={`modern-auth-form-side${hideBrand ? ' full' : ''}`}>
           <div className="modern-auth-form-container">
-            {/* Form Header */}
             <div className="modern-auth-form-header">
               <h2>{title}</h2>
               <p>{subtitle}</p>
             </div>
 
-            {/* Form Content */}
             <div className="modern-auth-form-content">
               {children}
             </div>
 
-            {/* Form Footer */}
             <div className="modern-auth-form-footer">
               <div className="modern-auth-switch">
                 <span>{switchText}</span>
@@ -101,9 +94,9 @@ const ModernAuth: React.FC<ModernAuthProps> = ({
                   {switchLinkText}
                 </Link>
               </div>
-              
+
               <div className="modern-auth-divider">
-                <span>hoặc</span>
+                <span>or</span>
               </div>
 
               <div className="modern-auth-social">
@@ -114,14 +107,14 @@ const ModernAuth: React.FC<ModernAuthProps> = ({
                     <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
                     <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
                   </svg>
-                  Tiếp tục với Google
+                  Continue with Google
                 </button>
-                
+
                 <button className="social-btn facebook-btn">
                   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" fill="#1877F2"/>
                   </svg>
-                  Tiếp tục với Facebook
+                  Continue with Facebook
                 </button>
               </div>
             </div>
@@ -132,4 +125,4 @@ const ModernAuth: React.FC<ModernAuthProps> = ({
   );
 };
 
-export default ModernAuth; 
+export default ModernAuth;

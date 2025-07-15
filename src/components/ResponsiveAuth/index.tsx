@@ -41,7 +41,7 @@ const ResponsiveAuth: React.FC<ResponsiveAuthProps> = ({
           <div className={`responsive-auth-overlay ${isImageLoaded ? 'loaded' : ''}`}>
             <div className="responsive-auth-brand">
               <h1>SUPERMARKET</h1>
-              <p>Chất lượng - Uy tín - Giá tốt</p>
+              <p>Quality - Prestige - Best Price</p>
             </div>
           </div>
         </div>
@@ -84,7 +84,7 @@ const ResponsiveAuth: React.FC<ResponsiveAuthProps> = ({
 
           {/* Footer */}
           <div className="responsive-auth-footer">
-            <p>&copy; 2024 Supermarket. Tất cả quyền được bảo lưu.</p>
+            <p>&copy; 2024 Supermarket. All rights reserved.</p>
           </div>
         </div>
       </div>
@@ -103,4 +103,4 @@ const ResponsiveAuth: React.FC<ResponsiveAuthProps> = ({
   );
 };
 
-export default ResponsiveAuth; 
+export default ResponsiveAuth;

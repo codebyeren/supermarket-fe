@@ -60,7 +60,7 @@ const HomePage = () => {
 
       {isMobile ? (
         <div className="container mx-auto px-2 sm:px-4">
-          <h4 className="text-start px-2">Sản Phẩm Nổi Bật</h4>
+          <h4 className="text-start px-2">Featured Products</h4>
           <div className="row gx-2 gy-3 px-2">
             {topRatedProducts.map(product => (
               <div className="col-6" key={product.productId}>
@@ -81,7 +81,7 @@ const HomePage = () => {
         </div>
       ) : (
         <CarouselComponent
-          title="Sản Phẩm Nổi Bật"
+          title="Featured Products"
           products={topRatedProducts}
           itemsPerView={{ desktop: 5, tablet: 3, mobile: 2 }}
           onAddToCartSuccess={() => {

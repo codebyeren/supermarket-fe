@@ -15,19 +15,19 @@ export default function AdminBills() {
   const [bills, setBills] = useState<Bill[]>([
     {
       id: 'BILL001',
-      customerName: 'Nguyễn Văn A',
+      customerName: 'Nguyen Van A',
       totalAmount: 150000,
       status: 'confirmed',
-      paymentMethod: 'Tiền mặt',
+      paymentMethod: 'Cash',
       createdAt: '2024-01-15',
       items: 3
     },
     {
       id: 'BILL002',
-      customerName: 'Trần Thị B',
+      customerName: 'Tran Thi B',
       totalAmount: 250000,
       status: 'delivered',
-      paymentMethod: 'Chuyển khoản',
+      paymentMethod: 'Bank Transfer',
       createdAt: '2024-01-14',
       items: 5
     }
@@ -51,9 +51,9 @@ export default function AdminBills() {
   };
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('vi-VN', {
+    return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'VND'
+      currency: 'USD'
     }).format(price);
   };
 
@@ -70,11 +70,11 @@ export default function AdminBills() {
 
   const getStatusText = (status: Bill['status']) => {
     switch (status) {
-      case 'pending': return 'Chờ xác nhận';
-      case 'confirmed': return 'Đã xác nhận';
-      case 'shipped': return 'Đang giao';
-      case 'delivered': return 'Đã giao';
-      case 'cancelled': return 'Đã hủy';
+      case 'pending': return 'Pending';
+      case 'confirmed': return 'Confirmed';
+      case 'shipped': return 'Shipped';
+      case 'delivered': return 'Delivered';
+      case 'cancelled': return 'Cancelled';
       default: return status;
     }
   };
@@ -82,15 +82,15 @@ export default function AdminBills() {
   return (
     <div className="admin-bills">
       <div className="bills-header">
-        <h1>Quản lý hóa đơn</h1>
-        <button className="add-bill-btn">+ Tạo hóa đơn</button>
+        <h1>Manage Bills</h1>
+        <button className="add-bill-btn">+ Create Bill</button>
       </div>
 
       <div className="bills-filters">
         <div className="search-box">
           <input
             type="text"
-            placeholder="Tìm kiếm theo mã hóa đơn hoặc tên khách hàng..."
+            placeholder="Search by bill ID or customer name..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="search-input"
@@ -103,12 +103,12 @@ export default function AdminBills() {
             onChange={(e) => setFilterStatus(e.target.value as any)}
             className="filter-select text-dark"
           >
-            <option value="all">Tất cả trạng thái</option>
-            <option value="pending">Chờ xác nhận</option>
-            <option value="confirmed">Đã xác nhận</option>
-            <option value="shipped">Đang giao</option>
-            <option value="delivered">Đã giao</option>
-            <option value="cancelled">Đã hủy</option>
+            <option value="all">All Statuses</option>
+            <option value="pending">Pending</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="shipped">Shipped</option>
+            <option value="delivered">Delivered</option>
+            <option value="cancelled">Cancelled</option>
           </select>
         </div>
       </div>
@@ -117,14 +117,14 @@ export default function AdminBills() {
         <table className="bills-table">
           <thead>
             <tr>
-              <th>Mã hóa đơn</th>
-              <th>Khách hàng</th>
-              <th>Tổng tiền</th>
-              <th>Số sản phẩm</th>
-              <th>Phương thức thanh toán</th>
-              <th>Trạng thái</th>
-              <th>Ngày tạo</th>
-              <th>Thao tác</th>
+              <th>Bill ID</th>
+              <th>Customer</th>
+              <th>Total Amount</th>
+              <th>Items</th>
+              <th>Payment Method</th>
+              <th>Status</th>
+              <th>Created At</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -140,21 +140,21 @@ export default function AdminBills() {
                     value={bill.status}
                     onChange={(e) => handleStatusChange(bill.id, e.target.value as Bill['status'])}
                     className={`status-select ${getStatusColor(bill.status)}`}
-                    disabled = {bill.status === "cancelled"}
+                    disabled={bill.status === "cancelled"}
                   >
-                    <option value="pending">Chờ xác nhận</option>
-                    <option value="confirmed">Đã xác nhận</option>
-                    <option value="shipped">Đang giao</option>
-                    <option value="delivered">Đã giao</option>
-                    <option value="cancelled">Đã hủy</option>
+                    <option value="pending">Pending</option>
+                    <option value="confirmed">Confirmed</option>
+                    <option value="shipped">Shipped</option>
+                    <option value="delivered">Delivered</option>
+                    <option value="cancelled">Cancelled</option>
                   </select>
                 </td>
                 <td>{bill.createdAt}</td>
                 <td>
                   <div className="action-buttons">
-                    <button className="view-btn">Xem</button>
-                    <button className="edit-btn">Sửa</button>
-                    <button className="delete-btn" >Xóa</button>
+                    <button className="view-btn">View</button>
+                    <button className="edit-btn">Edit</button>
+                    <button className="delete-btn">Delete</button>
                   </div>
                 </td>
               </tr>
@@ -165,9 +165,9 @@ export default function AdminBills() {
 
       {filteredBills.length === 0 && (
         <div className="no-bills">
-          <p>Không tìm thấy hóa đơn nào</p>
+          <p>No bills found</p>
         </div>
       )}
     </div>
   );
-} 
+}

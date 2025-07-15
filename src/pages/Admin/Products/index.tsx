@@ -9,6 +9,7 @@ import './Products.css';
 
 interface ProductFormData {
   productName: string;
+
   price: number;
   slug: string;
   status: string;
@@ -42,7 +43,7 @@ export default function AdminProducts() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('all');
   const [filterBrand, setFilterBrand] = useState('all');
-  const [filterStatus, setFilterStatus] = useState('all');
+  const [filterStatus, setFilterStatus] = useState<'all' | 'Available' | 'Unavailable'>('all');
 
   useEffect(() => {
     fetchData();
@@ -59,8 +60,6 @@ export default function AdminProducts() {
       setProducts(Array.isArray(productsData) ? productsData : []);
       setBrands(brandsData);
       setCategories(categoriesData);
-      console.log(categories, brands);
-
     } catch (err) {
       setError('Không thể tải dữ liệu');
       console.error('Error fetching data:', err);
@@ -184,13 +183,12 @@ export default function AdminProducts() {
           <select
             value={filterCategory}
             onChange={(e) => setFilterCategory(e.target.value)}
-            className="form-select text-dark"
+            className="filter-select text-dark"
           >
             <option value="all">Tất cả danh mục</option>
-            {categories.map((category) => (
-              <option key={category.id} value={category.categoryName}>
+            {categories.map(category => (
+              <option key={category.id} value={category.id}>
                 {category.categoryName}
-                
               </option>
             ))}
           </select>
@@ -198,28 +196,25 @@ export default function AdminProducts() {
           <select
             value={filterBrand}
             onChange={(e) => setFilterBrand(e.target.value)}
-            className="form-select text-dark"
+            className="filter-select text-dark"
           >
             <option value="all">Tất cả thương hiệu</option>
-            {brands.map((brand) => (
+            {brands.map(brand => (
               <option key={brand.id} value={brand.brandName}>
                 {brand.brandName}
               </option>
             ))}
           </select>
 
-
           <select
             value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
+            onChange={(e) => setFilterStatus(e.target.value as any)}
             className="filter-select text-dark"
           >
             <option value="all">Tất cả trạng thái</option>
-      
-            <option value="active">Hoạt động</option>
-            <option value="inactive">Ngưng hoạt động</option>
+            <option value="Available">Có sẵn</option>
+            <option value="Unavailable">Không có sẵn</option>
           </select>
-
         </div>
       </div>
 
@@ -243,7 +238,7 @@ export default function AdminProducts() {
               <td>{product.productName}</td>
               <td>{formatPrice(product.price)}</td>
               <td>{product.quantity}</td>
-              <td>{product.brand}</td>
+              <td>{product.brand || 'N/A'}</td>
               <td><span
                 className="badge px-2 py-1 text-white"
                 style={{

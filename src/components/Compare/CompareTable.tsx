@@ -6,7 +6,7 @@ type ComparePopupProps = {
   show: boolean;
   onClose: () => void;
   products: Product[];
-  onCompare: (product: Product) => void; // ✅ Callback khi chọn sản phẩm để so sánh
+  onCompare: (product: Product) => void;
 };
 
 const ComparePopup: React.FC<ComparePopupProps> = ({ show, onClose, products, onCompare }) => {
@@ -25,27 +25,25 @@ const ComparePopup: React.FC<ComparePopupProps> = ({ show, onClose, products, on
           maxHeight: '80vh',
         }}
       >
-        {/* Header */}
         <div className="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
-          <h5 className="mb-0">So sánh sản phẩm cùng danh mục</h5>
+          <h5 className="mb-0">Compare products in the same category</h5>
           <button className="btn btn-sm btn-outline-secondary" onClick={onClose}>
-            Đóng
+            Close
           </button>
         </div>
 
-        {/* Danh sách sản phẩm */}
         <div style={{ maxHeight: '60vh', overflowY: 'auto' }}>
           {products.length ? (
             <div className="table-responsive">
               <table className="table table-bordered align-middle text-center">
                 <thead className="table-light">
                   <tr>
-                    <th>Sản phẩm</th>
-                    <th>Giá</th>
-                    <th>Thương hiệu</th>
-                    <th>Khuyến mãi</th>
-                    <th>Đánh giá</th>
-                    <th>Hành động</th>
+                    <th>Product</th>
+                    <th>Price</th>
+                    <th>Brand</th>
+                    <th>Promotion</th>
+                    <th>Rating</th>
+                    <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -68,15 +66,16 @@ const ComparePopup: React.FC<ComparePopupProps> = ({ show, onClose, products, on
                           ? `${item.discountPercent}%`
                           : item.discountAmount
                           ? `${item.discountAmount.toLocaleString()} ₫`
-                          : 'Không có'}
+                          : 'No promotion'}
                       </td>
-                      <td>{item.ratingScore} ★</td>
+                      <td>{item.ratingScore.toFixed(1)} ★</td>
+
                       <td>
                         <button
                           className="btn btn-sm btn-primary"
                           onClick={() => onCompare(item)}
                         >
-                          So sánh
+                          Compare
                         </button>
                       </td>
                     </tr>
@@ -85,7 +84,7 @@ const ComparePopup: React.FC<ComparePopupProps> = ({ show, onClose, products, on
               </table>
             </div>
           ) : (
-            <div className="text-muted text-center py-4">Không có sản phẩm để so sánh.</div>
+            <div className="text-muted text-center py-4">No products to compare.</div>
           )}
         </div>
       </div>

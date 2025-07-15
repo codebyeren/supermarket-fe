@@ -48,15 +48,15 @@ const BillModal: React.FC<BillModalProps> = ({
   
 
   return (
-    <Modal
+   <Modal
       open={visible}
-      title="Hóa đơn mua hàng"
+      title="Purchase Invoice"
       onCancel={onClose}
       width={800}
       centered
       footer={[
         <Button key="close" onClick={onClose}>
-          Đóng
+          Close
         </Button>,
         <Button
           key="print"
@@ -64,7 +64,7 @@ const BillModal: React.FC<BillModalProps> = ({
           icon={<PrinterOutlined />}
           onClick={handlePrint}
         >
-          In hóa đơn
+          Print Invoice
         </Button>,
       ]}
       className="bill-modal"

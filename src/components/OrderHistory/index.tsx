@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Badge, Button, Modal, message, Space, Popconfirm, Card, Row, Col, Tag, Tooltip } from 'antd';
+import { Badge, Button, Modal, message, Space, Popconfirm, Card, Row, Col, Tag } from 'antd';
 import type { Order, OrderItem } from '../../types';
 import orderService from '../../services/orderService';
 import { LoadingService } from '../../services/LoadingService';
@@ -25,7 +25,7 @@ const OrderHistory: React.FC = () => {
         setOrders(response.data);
       }
     } catch (error) {
-      console.error('Lỗi khi tải danh sách đơn hàng:', error);
+      console.error('Error fetching orders:', error);
     } finally {
       setLoading(false);
       loadingService.hideLoading();
@@ -41,153 +41,113 @@ const OrderHistory: React.FC = () => {
     try {
       setCancellingOrder(true);
       loadingService.showLoading();
-      
+
       const response = await orderService.updateOrder({
         orderId,
-        orderStatus: 'CANCELLED'
+        orderStatus: 'CANCELLED',
       });
-      
+
       if (response.code === 200) {
-        message.success('Đã hủy đơn hàng thành công');
-        
-        // Cập nhật trạng thái đơn hàng trong danh sách
-        setOrders(prevOrders => 
-          prevOrders.map(order => 
-            order.orderId === orderId 
-              ? { ...order, orderStatus: 'CANCELLED' } 
-              : order
-          )
-        );
-        
-        // Cập nhật trạng thái đơn hàng đang xem chi tiết (nếu có)
+        message.success('Order cancelled successfully');
+        setOrders(prev => prev.map(order => order.orderId === orderId ? { ...order, orderStatus: 'CANCELLED' } : order));
         if (selectedOrder && selectedOrder.orderId === orderId) {
           setSelectedOrder({ ...selectedOrder, orderStatus: 'CANCELLED' });
         }
       } else {
-        message.error(response.message || 'Không thể hủy đơn hàng');
+        message.error(response.message || 'Unable to cancel order');
       }
     } catch (error) {
-      console.error('Lỗi khi hủy đơn hàng:', error);
-      message.error('Có lỗi xảy ra khi hủy đơn hàng');
+      console.error('Error cancelling order:', error);
+      message.error('An error occurred while cancelling the order');
     } finally {
       setCancellingOrder(false);
       loadingService.hideLoading();
     }
   };
 
-  const canCancelOrder = (order: Order) => {
-    return order.orderStatus === 'PENDING';
-  };
+  const canCancelOrder = (order: Order) => order.orderStatus === 'PENDING';
 
   const getStatusTag = (status: string) => {
     switch (status) {
-      case 'PENDING':
-        return <Tag color="warning">Đang xử lý</Tag>;
-      case 'SHIPPED':
-        return <Tag color="processing">Đang giao hàng</Tag>;
-      case 'CONFIRMED':
-        return <Tag color="success">Đã xác nhận</Tag>;
-      case 'CANCELLED':
-        return <Tag color="error">Đã hủy</Tag>;
-      default:
-        return <Tag>{status}</Tag>;
+      case 'PENDING': return <Tag color="warning">Processing</Tag>;
+      case 'SHIPPED': return <Tag color="processing">Shipping</Tag>;
+      case 'CONFIRMED': return <Tag color="success">Confirmed</Tag>;
+      case 'CANCELLED': return <Tag color="error">Cancelled</Tag>;
+      default: return <Tag>{status}</Tag>;
     }
   };
 
   const getPaymentStatusTag = (status: string) => {
     switch (status) {
-      case 'PENDING':
-        return <Tag color="warning">Chưa thanh toán</Tag>;
-      case 'COMPLETED':
-        return <Tag color="success">Đã thanh toán</Tag>;
-      default:
-        return <Tag>{status}</Tag>;
+      case 'PENDING': return <Tag color="warning">Unpaid</Tag>;
+      case 'COMPLETED': return <Tag color="success">Paid</Tag>;
+      default: return <Tag>{status}</Tag>;
     }
   };
 
   const getPaymentMethodText = (method: string) => {
     switch (method) {
-      case 'CASH':
-        return 'Tiền mặt';
-      case 'CREDIT_CARD':
-        return 'Thẻ tín dụng';
-      case 'BANK_TRANSFER':
-        return 'Chuyển khoản';
-      case 'MOBILE_PAYMENT':
-        return 'Ví điện tử';
-      default:
-        return method;
+      case 'CASH': return 'Cash';
+      case 'CREDIT_CARD': return 'Credit Card';
+      case 'BANK_TRANSFER': return 'Bank Transfer';
+      case 'MOBILE_PAYMENT': return 'Mobile Payment';
+      default: return method;
     }
   };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('vi-VN', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    return date.toLocaleString('en-US');
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('vi-VN', {
+    return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'VND'
+      currency: 'USD',
     }).format(amount);
   };
 
   const renderOrderCards = () => {
-    if (loading) {
-      return <p>Đang tải...</p>;
-    }
+    if (loading) return <p>Loading...</p>;
 
     if (orders.length === 0) {
-      return (
-        <div className="text-center text-muted py-5">
-          <p className="fs-5">Bạn chưa có đơn hàng nào.</p>
-        </div>
-      );
+      return <div className="text-center text-muted py-5"><p className="fs-5">You have no orders yet.</p></div>;
     }
 
     return (
       <Row gutter={[16, 16]}>
         {orders.map(order => (
           <Col xs={24} sm={12} md={8} lg={6} key={order.orderId}>
-            <Card 
+            <Card
               hoverable
-              className="order-card"
-              title={`Đơn hàng #${order.orderId}`}
+              className="order-card text-start"
+              title={`Order #${order.orderId}`}
               extra={getStatusTag(order.orderStatus)}
               onClick={() => showOrderDetail(order)}
             >
-              <p><strong>Ngày đặt:</strong> {formatDate(order.dateOfPurchase)}</p>
-              <p><strong>Tổng tiền:</strong> {formatCurrency(order.billAmount)}</p>
-              <p><strong>Thanh toán:</strong> {getPaymentMethodText(order.paymentMethod)} {getPaymentStatusTag(order.paymentStatus)}</p>
-              <p><strong>Số sản phẩm:</strong> {order.orderItems.length}</p>
-              
+              <p><strong>Order Date:</strong> {formatDate(order.dateOfPurchase)}</p>
+              <p><strong>Total Amount:</strong> {formatCurrency(order.billAmount)}</p>
+              <p><strong>Payment:</strong> {getPaymentMethodText(order.paymentMethod)} {getPaymentStatusTag(order.paymentStatus)}</p>
+              <p><strong>Items:</strong> {order.orderItems.length}</p>
+
               {canCancelOrder(order) && (
                 <div className="mt-2 text-end">
                   <Popconfirm
-                    title="Hủy đơn hàng"
-                    description="Bạn có chắc chắn muốn hủy đơn hàng này không?"
-                    onConfirm={(e) => {
-                      e?.stopPropagation();
-                      handleCancelOrder(order.orderId);
-                    }}
-                    okText="Có"
-                    cancelText="Không"
+                    title="Cancel Order"
+                    description="Are you sure you want to cancel this order?"
+                    onConfirm={(e) => { e?.stopPropagation(); handleCancelOrder(order.orderId); }}
+                    okText="Yes"
+                    cancelText="No"
                     onCancel={(e) => e?.stopPropagation()}
                   >
-                    <Button 
-                      type="primary" 
-                      danger 
+                    <Button
+                      type="primary"
+                      danger
                       size="small"
                       loading={cancellingOrder}
                       onClick={(e) => e.stopPropagation()}
                     >
-                      Hủy đơn
+                      Cancel Order
                     </Button>
                   </Popconfirm>
                 </div>
@@ -200,65 +160,65 @@ const OrderHistory: React.FC = () => {
   };
 
   return (
-    <div className="order-history-container">
+    <div className="order-history-container text-start">
       {renderOrderCards()}
 
       {selectedOrder && (
         <Modal
-          title={`Chi tiết đơn hàng #${selectedOrder.orderId}`}
+          title={`Order Details #${selectedOrder.orderId}`}
           open={isModalVisible}
           onCancel={() => setIsModalVisible(false)}
           footer={[
             canCancelOrder(selectedOrder) && (
               <Popconfirm
                 key="cancel"
-                title="Hủy đơn hàng"
-                description="Bạn có chắc chắn muốn hủy đơn hàng này không?"
+                title="Cancel Order"
+                description="Are you sure you want to cancel this order?"
                 onConfirm={() => handleCancelOrder(selectedOrder.orderId)}
-                okText="Có"
-                cancelText="Không"
+                okText="Yes"
+                cancelText="No"
               >
                 <Button type="primary" danger loading={cancellingOrder}>
-                  Hủy đơn hàng
+                  Cancel Order
                 </Button>
               </Popconfirm>
             ),
             <Button key="back" onClick={() => setIsModalVisible(false)}>
-              Đóng
+              Close
             </Button>,
           ].filter(Boolean)}
           width={800}
         >
-          <div className="order-detail">
+          <div className="order-detail text-start">
             <div className="order-info">
-              <p><strong>Ngày đặt hàng:</strong> {formatDate(selectedOrder.dateOfPurchase)}</p>
-              <p><strong>Trạng thái đơn hàng:</strong> {getStatusTag(selectedOrder.orderStatus)}</p>
-              <p><strong>Phương thức thanh toán:</strong> {getPaymentMethodText(selectedOrder.paymentMethod)}</p>
-              <p><strong>Trạng thái thanh toán:</strong> {getPaymentStatusTag(selectedOrder.paymentStatus)}</p>
-              <p><strong>Tổng tiền sản phẩm:</strong> {formatCurrency(selectedOrder.orderAmount)}</p>
-              <p><strong>Tổng thanh toán:</strong> {formatCurrency(selectedOrder.billAmount)}</p>
+              <p><strong>Order Date:</strong> {formatDate(selectedOrder.dateOfPurchase)}</p>
+              <p><strong>Order Status:</strong> {getStatusTag(selectedOrder.orderStatus)}</p>
+              <p><strong>Payment Method:</strong> {getPaymentMethodText(selectedOrder.paymentMethod)}</p>
+              <p><strong>Payment Status:</strong> {getPaymentStatusTag(selectedOrder.paymentStatus)}</p>
+              <p><strong>Subtotal:</strong> {formatCurrency(selectedOrder.orderAmount)}</p>
+              <p><strong>Total:</strong> {formatCurrency(selectedOrder.billAmount)}</p>
             </div>
 
-            <h4>Sản phẩm</h4>
+            <h4>Products</h4>
             <div className="order-items">
               {selectedOrder.orderItems.map(item => (
-                <Card key={item.productId} className="mb-2">
+                <Card key={item.productId} className="mb-2 text-start">
                   <div className="d-flex">
                     <div className="me-3">
                       {item.imageUrl && (
-                        <img 
+                        <img
                           src={`/public/img/${item.imageUrl}`}
-                          alt={item.productName} 
-                          style={{ width: 80, height: 80, objectFit: 'cover' }} 
+                          alt={item.productName}
+                          style={{ width: 80, height: 80, objectFit: 'cover' }}
                         />
                       )}
                     </div>
                     <div>
                       <h5>{item.productName}</h5>
-                      <p>Giá: {formatCurrency(item.price)}</p>
-                      <p>Số lượng: {item.quantity}</p>
+                      <p>Price: {formatCurrency(item.price)}</p>
+                      <p>Quantity: {item.quantity}</p>
                       {item.promotionDescription && (
-                        <p>Khuyến mãi: {item.promotionDescription}</p>
+                        <p>Promotion: {item.promotionDescription}</p>
                       )}
                     </div>
                   </div>
@@ -266,9 +226,9 @@ const OrderHistory: React.FC = () => {
               ))}
             </div>
 
-            {selectedOrder.billDetails && selectedOrder.billDetails.length > 0 && (
+            {selectedOrder.billDetails?.length > 0 && (
               <>
-                <h4>Chi tiết hóa đơn</h4>
+                <h4>Bill Details</h4>
                 <div className="bill-details">
                   {selectedOrder.billDetails.map((detail, index) => (
                     <div key={index} className="d-flex justify-content-between">
@@ -277,7 +237,7 @@ const OrderHistory: React.FC = () => {
                     </div>
                   ))}
                   <div className="d-flex justify-content-between mt-2 fw-bold">
-                    <span>Tổng cộng</span>
+                    <span>Total</span>
                     <span>{formatCurrency(selectedOrder.billAmount)}</span>
                   </div>
                 </div>
@@ -290,4 +250,4 @@ const OrderHistory: React.FC = () => {
   );
 };
 
-export default OrderHistory; 
+export default OrderHistory;

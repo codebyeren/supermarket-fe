@@ -4,8 +4,6 @@ import { clearAuthData, debugToken } from '../../utils/authUtils';
 import { useAuthState } from '../../hooks/useAuthState';
 import './AdminSidebar.css';
 
-
-
 interface MenuItem {
   id: string;
   label: string;
@@ -15,55 +13,13 @@ interface MenuItem {
 }
 
 const menuItems: MenuItem[] = [
-  {
-    id: 'dashboard',
-    label: 'Dashboard',
-    path: '/admin/dashboard',
-    icon: '📊',
-    requiredRole: 'admin'
-  },
-  {
-    id: 'users',
-    label: 'Quản lý người dùng',
-    path: '/admin/users',
-    icon: '👥',
-    requiredRole: 'admin'
-  },
-  {
-    id: 'products',
-    label: 'Quản lý sản phẩm',
-    path: '/admin/products',
-    icon: '📦',
-    requiredRole: 'admin'
-  },
-  {
-    id: 'categories',
-    label: 'Quản lý danh mục',
-    path: '/admin/categories',
-    icon: '📂',
-    requiredRole: 'admin'
-  },
-  {
-    id: 'brands',
-    label: 'Quản lý thương hiệu',
-    path: '/admin/brands',
-    icon: '🏷️',
-    requiredRole: 'admin'
-  },
-  {
-    id: 'bills',
-    label: 'Quản lý hóa đơn',
-    path: '/admin/bills',
-    icon: '🧾',
-    requiredRole: 'admin'
-  },
-  {
-    id: 'promotions',
-    label: 'Quản lý khuyến mãi',
-    path: '/admin/promotions',
-    icon: '🎉',
-    requiredRole: 'admin'
-  }
+  { id: 'dashboard', label: 'Dashboard', path: '/admin/dashboard', icon: '📊', requiredRole: 'admin' },
+  { id: 'users', label: 'User Management', path: '/admin/users', icon: '👥', requiredRole: 'admin' },
+  { id: 'products', label: 'Product Management', path: '/admin/products', icon: '📦', requiredRole: 'admin' },
+  { id: 'categories', label: 'Category Management', path: '/admin/categories', icon: '📂', requiredRole: 'admin' },
+  { id: 'brands', label: 'Brand Management', path: '/admin/brands', icon: '🏷️', requiredRole: 'admin' },
+  { id: 'bills', label: 'Invoice Management', path: '/admin/bills', icon: '🧾', requiredRole: 'admin' },
+  { id: 'promotions', label: 'Promotion Management', path: '/admin/promotions', icon: '🎉', requiredRole: 'admin' },
 ];
 
 export default function AdminSidebar() {
@@ -74,7 +30,6 @@ export default function AdminSidebar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    // Debug token khi component mount
     debugToken();
   }, []);
 
@@ -107,7 +62,6 @@ export default function AdminSidebar() {
 
   return (
     <>
-      {/* Mobile Menu Toggle */}
       <div className="admin-mobile-toggle">
         <button 
           className="admin-mobile-toggle-btn"
@@ -122,12 +76,10 @@ export default function AdminSidebar() {
         </button>
       </div>
 
-      {/* Mobile Overlay */}
       {isMobileMenuOpen && (
         <div className="admin-mobile-overlay" onClick={closeMobileMenu}></div>
       )}
 
-      {/* Sidebar */}
       <aside className={`admin-sidebar ${isCollapsed ? 'collapsed' : ''} ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
         <div className="admin-sidebar-header">
           <div className="admin-sidebar-toggle" onClick={toggleSidebar}>
@@ -166,10 +118,10 @@ export default function AdminSidebar() {
             onClick={handleLogout}
           >
             <span className="logout-icon">🚪</span>
-            {!isCollapsed && <span>Đăng xuất</span>}
+            {!isCollapsed && <span>Logout</span>}
           </button>
         </div>
       </aside>
     </>
   );
-} 
+}

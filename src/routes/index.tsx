@@ -28,6 +28,7 @@ import AdminCategories from '../pages/Admin/Categories'
 import AdminBrands from '../pages/Admin/Brands'
 import AdminBills from '../pages/Admin/Bills'
 import AdminPromotions from '../pages/Admin/Promotions'
+import DashboardPage from '../pages/Admin/Dashboard'
 
 
 const routes = [
@@ -125,10 +126,10 @@ const routes = [
         index: true,
         element: <Navigate to="/admin/users" replace />
       },
-      // {
-      //   path: 'dashboard',
-      //   element: <AdminDashboard />
-      // },
+      {
+        path: 'dashboard',
+        element: <DashboardPage />
+      },
       {
         path: 'users',
         element: <AdminUsers />

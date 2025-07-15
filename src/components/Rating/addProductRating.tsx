@@ -15,12 +15,12 @@ const RatingModal: React.FC<RatingModalProps> = ({ productId, onClose, onSuccess
   const [errorMessage, setErrorMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
-useEffect(() => {
-  setScore(0);
-  setComment('');
-  setErrorMessage('');
-  setShowNotification(false);
-}, [productId]);
+  useEffect(() => {
+    setScore(0);
+    setComment('');
+    setErrorMessage('');
+    setShowNotification(false);
+  }, [productId]);
 
   const handleSubmit = async () => {
     if (!comment.trim()) {
@@ -55,9 +55,9 @@ useEffect(() => {
   return (
     <div className="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 d-flex align-items-center justify-content-center z-3">
       <div className="bg-white p-4 rounded shadow" style={{ width: '400px' }}>
-        <h5 className="mb-3">Gửi đánh giá sản phẩm</h5>
+        <h5 className="mb-3">Send product review</h5>
 
-     
+
 
         <div className="mb-3">
           {[1, 2, 3, 4, 5].map((s) => (
@@ -77,7 +77,7 @@ useEffect(() => {
           ))}
         </div>
 
-        <label className="form-label">Bình luận:</label>
+        <label className="form-label">Comment</label>
         <textarea
           value={comment}
           onChange={(e) => setComment(e.target.value)}
@@ -87,20 +87,22 @@ useEffect(() => {
 
         {showNotification && (
           <div className={`alert ${errorMessage ? 'alert-danger' : 'alert-success'} py-1`}>
-            {errorMessage || 'Đánh giá đã được gửi thành công!'}
+            {errorMessage || 'Your review has been submitted successfully!'}
           </div>
         )}
 
         <div className="d-flex justify-content-end gap-2">
-          <button className="btn btn-secondary btn-sm" onClick={onClose}>
-            Hủy
+          <button className="btn btn-secondary btn-sm"  onClick={onClose}>
+            Cancel
           </button>
           <button className="btn btn-primary btn-sm" onClick={handleSubmit} disabled={loading}>
-            {loading ? 'Đang gửi...' : 'Gửi'}
+            {loading ? 'Submitting...' : 'Submit'}
           </button>
         </div>
+
       </div>
     </div>
+
   );
 };
 

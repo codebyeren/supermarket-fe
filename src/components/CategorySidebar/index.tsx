@@ -195,7 +195,7 @@ const CategorySidebar: React.FC<Props> = ({ categories, brands }) => {
       {/* Rating Section */}
       <div style={{ marginTop: 40, borderTop: "1px solid #eee", paddingTop: 30 }}>
         <h3 style={{ margin: "0 0 20px 0", fontSize: 24, fontWeight: "bold", color: "#2e7d32" }}>
-          Đánh giá
+          Rating
         </h3>
         <div
           style={{
@@ -276,7 +276,7 @@ const CategorySidebar: React.FC<Props> = ({ categories, brands }) => {
               minWidth: 0
             }}
           >
-            Tất cả
+            All
           </button>
         </div>
       </div>

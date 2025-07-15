@@ -30,7 +30,7 @@ const SortDropdown: React.FC<SortDropdownProps> = ({ currentSort, onSortChange, 
         fontSize: 14,
         whiteSpace: 'nowrap'
       }}>
-        Sắp xếp theo:
+        Sort By : 
       </label>
       <select
         value={currentSort}

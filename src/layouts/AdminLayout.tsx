@@ -13,7 +13,7 @@ export default function AdminLayout() {
           <Outlet />
         </div>
       </main>
-      <TokenDebugger />
+      {/* <TokenDebugger /> */}
     </div>
   );
 } 

@@ -1,14 +1,13 @@
 import React from 'react';
 import { useCartStore } from '../../stores/cartStore';
 import { useNavigate } from 'react-router-dom';
-import { FaShoppingCart, FaTrashAlt, FaMinus, FaPlus, FaCreditCard, FaGift } from 'react-icons/fa';
+import { FaShoppingCart, FaTrashAlt, FaCreditCard, FaGift } from 'react-icons/fa';
 import type { CartItem } from '../../stores/cartStore';
 import './Cart.css';
-import PromotionDisplay from '../../components/Promotion/PromotionDescription';
-import { calculateDiscountedPrice, multiplyDecimals, sumDecimals, formatCurrency } from '../../utils/decimalUtils';
+import { calculateDiscountedPrice, formatCurrency } from '../../utils/decimalUtils';
 
 const CartPage: React.FC = () => {
-  const { items, updateQuantity, removeFromCart, clearCart } = useCartStore();
+  const { items, updateQuantity, removeFromCart } = useCartStore();
   const navigate = useNavigate();
 
   function getDiscountedPrice(item: CartItem) {
@@ -19,12 +18,10 @@ const CartPage: React.FC = () => {
   }
 
   function getItemTotal(item: CartItem) {
-    // Không làm tròn ở đây, chỉ trả về số thực
     return getDiscountedPrice(item) * item.quantity;
   }
 
   function getTotalPrice() {
-    // Tính tổng, chỉ làm tròn tổng cuối cùng
     const total = items.reduce((sum, item) => sum + getItemTotal(item), 0);
     return Math.round(total * 100) / 100;
   }
@@ -35,12 +32,12 @@ const CartPage: React.FC = () => {
 
   return (
     <div className="cart-container">
-      <h2>Giỏ hàng của tôi</h2>
+      <h2>My Cart</h2>
       {items.length === 0 ? (
         <div className="empty-cart-message">
           <FaShoppingCart />
-          <p>Giỏ hàng của bạn đang trống.</p>
-          <button className="continue-shopping" onClick={() => navigate('/')}>Tiếp tục mua sắm</button>
+          <p>Your cart is currently empty.</p>
+          <button className="continue-shopping" onClick={() => navigate('/')}>Continue Shopping</button>
         </div>
       ) : (
         <>
@@ -55,24 +52,24 @@ const CartPage: React.FC = () => {
                   <div className="cart-item-price">
                     {item.discountPercent ? (
                       <>
-                        <span className="original-price">{formatCurrency(item.price, 'VND', 2)}</span>
+                        <span className="original-price">{formatCurrency(item.price, 'USD', 2)}</span>
                         <span className="discounted-price">
-                          {formatCurrency(getDiscountedPrice(item), 'VND', 2)}
+                          {formatCurrency(getDiscountedPrice(item), 'USD', 2)}
                           <span className="discount-badge">-{item.discountPercent}%</span>
                         </span>
                       </>
                     ) : (
-                      <span className="price">{formatCurrency(item.price, 'VND', 2)}</span>
+                      <span className="price">{formatCurrency(item.price, 'USD', 2)}</span>
                     )}
                   </div>
                   <div className="item-info">
                     <div className="info-row">
-                      <span className="label">Số lượng:</span>
-                      <span className="value">{item.stock} sản phẩm</span>
+                      <span className="label">Stock:</span>
+                      <span className="value">{item.stock} items</span>
                     </div>
                     {item.promotionType && (
                       <div className="info-row">
-                        <span className="label">Khuyến mãi:</span>
+                        <span className="label">Promotion:</span>
                         <span className="value">
                           <FaGift style={{ color: '#e53935', marginRight: 4 }} />
                           {item.promotionType}
@@ -90,11 +87,11 @@ const CartPage: React.FC = () => {
                     </button>
                   </div>
                   <div className="item-total">
-                    <span>Tổng:</span>
-                    <span className="total-price">{formatCurrency(getItemTotal(item), 'VND', 2)}</span>
+                    <span>Total:</span>
+                    <span className="total-price">{formatCurrency(getItemTotal(item), 'USD', 2)}</span>
                   </div>
                   <button className="remove-button" onClick={() => removeFromCart(item.productId)}>
-                    <FaTrashAlt /> <span>Xóa</span>
+                    <FaTrashAlt /> <span>Remove</span>
                   </button>
                 </div>
               </div>
@@ -102,15 +99,15 @@ const CartPage: React.FC = () => {
           </div>
           <div className="cart-summary">
             <div className="summary-row">
-              <span>Tổng số sản phẩm:</span>
+              <span>Total Products:</span>
               <span>{items.length}</span>
             </div>
             <div className="summary-row total">
-              <span>Tổng tiền:</span>
-              <span className="total-price">{formatCurrency(getTotalPrice(), 'VND', 2)}</span>
+              <span>Total Amount:</span>
+              <span className="total-price">{formatCurrency(getTotalPrice(), 'USD', 2)}</span>
             </div>
             <button className="checkout-button" onClick={handleCheckout} disabled={items.length === 0}>
-              <FaCreditCard /> <span>Thanh toán</span>
+              <FaCreditCard /> <span>Proceed to Checkout</span>
             </button>
           </div>
         </>
@@ -119,4 +116,4 @@ const CartPage: React.FC = () => {
   );
 };
 
-export default CartPage; 
+export default CartPage;

@@ -48,7 +48,7 @@ export default function UserInfoPage() {
           dob: userInfo.dob,
         });
       } catch (err) {
-        console.error('Lỗi tải thông tin người dùng:', err);
+        console.error('Failed to load user info:', err);
       } finally {
         setLoading(false);
       }
@@ -67,20 +67,15 @@ export default function UserInfoPage() {
     if (!form) return;
 
     try {
-      const res = await updateUserInfo({
-        ...form
-      });
-      
+      const res = await updateUserInfo({ ...form });
+
       if (res.code === 200) {
-        setUser({
-          ...user!,
-          ...form
-        });
+        setUser({ ...user!, ...form });
         setEditing(false);
         setSuccess(true);
       }
     } catch (err) {
-      console.error('Lỗi cập nhật:', err);
+      console.error('Update error:', err);
       setSuccess(false);
     } finally {
       setShowNotification(true);
@@ -89,35 +84,34 @@ export default function UserInfoPage() {
   };
 
   const countryOptions = [
-    { value: '', label: 'Chọn quốc gia...' },
-    { value: 'VN', label: 'Việt Nam' },
-    { value: 'US', label: 'Hoa Kỳ' },
-    { value: 'JP', label: 'Nhật Bản' },
-    { value: 'KR', label: 'Hàn Quốc' },
-    { value: 'CN', label: 'Trung Quốc' },
-    { value: 'FR', label: 'Pháp' },
-    { value: 'DE', label: 'Đức' },
-    { value: 'GB', label: 'Anh' },
+    { value: '', label: 'Select country...' },
+    { value: 'VN', label: 'Vietnam' },
+    { value: 'US', label: 'United States' },
+    { value: 'JP', label: 'Japan' },
+    { value: 'KR', label: 'South Korea' },
+    { value: 'CN', label: 'China' },
+    { value: 'FR', label: 'France' },
+    { value: 'DE', label: 'Germany' },
+    { value: 'GB', label: 'United Kingdom' },
     { value: 'SG', label: 'Singapore' },
-    { value: 'TH', label: 'Thái Lan' },
-    { value: 'AU', label: 'Úc' },
+    { value: 'TH', label: 'Thailand' },
+    { value: 'AU', label: 'Australia' },
     { value: 'CA', label: 'Canada' },
     { value: 'MY', label: 'Malaysia' },
     { value: 'ID', label: 'Indonesia' },
-    { value: 'PH', label: 'Philippines' }
+    { value: 'PH', label: 'Philippines' },
   ];
 
-  if (loading) return <div className="p-4">Đang tải thông tin người dùng...</div>;
-  if (!user || !form) return <div className="p-4 text-danger">Không tìm thấy thông tin người dùng.</div>;
+  if (loading) return <div className="p-4">Loading user information...</div>;
+  if (!user || !form) return <div className="p-4 text-danger">User information not found.</div>;
 
-  // Tạo tên đầy đủ từ các thành phần
   const fullName = `${user.firstName} ${user.middleName ? user.middleName + ' ' : ''}${user.lastName}`;
 
   return (
     <div className="container-fluid min-vh-100 bg-light">
       {showNotification && (
         <Notification
-          message={success ? 'Cập nhật thành công' : 'Cập nhật thất bại'}
+          message={success ? 'Update successful' : 'Update failed'}
           duration={3000}
           borderColor={success ? 'green' : 'red'}
           onClose={() => setShowNotification(false)}
@@ -130,19 +124,12 @@ export default function UserInfoPage() {
         </aside>
 
         <main className="flex-grow-1">
-          <h3 className="text-center mb-4">Thông Tin Người Dùng</h3>
+          <h3 className="text-center mb-4">User Information</h3>
 
           <form className="row g-3 bg-white p-4 shadow rounded" onSubmit={e => e.preventDefault()}>
-            {/* Hiển thị tên đầy đủ dạng chỉ đọc */}
             <div className="col-12 mb-3">
-              <label className="form-label">Họ và tên</label>
-              <input 
-                type="text" 
-                className="form-control" 
-                value={fullName} 
-                disabled 
-                readOnly 
-              />
+              <label className="form-label">Full Name</label>
+              <input type="text" className="form-control" value={fullName} disabled readOnly />
             </div>
 
             <div className="col-md-6">
@@ -150,57 +137,62 @@ export default function UserInfoPage() {
               <input type="email" name="email" className="form-control" value={form.email} onChange={handleChange} disabled={!editing} />
             </div>
             <div className="col-md-6">
-              <label className="form-label">Số điện thoại di động</label>
+              <label className="form-label">Mobile Phone</label>
               <input type="text" name="mobile" className="form-control" value={form.mobile} onChange={handleChange} disabled={!editing} />
             </div>
 
             <div className="col-md-6">
-              <label className="form-label">Điện thoại cố định</label>
+              <label className="form-label">Home Phone</label>
               <input type="text" name="homePhone" className="form-control" value={form.homePhone || ''} onChange={handleChange} disabled={!editing} />
             </div>
 
             <div className="col-md-6">
-              <label className="form-label">Ngày sinh</label>
+              <label className="form-label">Date of Birth</label>
               <input type="date" name="dob" className="form-control" value={form.dob} onChange={handleChange} disabled={!editing} />
             </div>
+
             <div className="col-md-6">
-              <label className="form-label">Quốc gia</label>
+              <label className="form-label">Country</label>
               <select name="country" className="form-select" value={form.country} onChange={handleChange} disabled={!editing}>
-                {countryOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                {countryOptions.map(opt => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
               </select>
             </div>
+
             <div className="col-md-6">
-              <label className="form-label">Tỉnh / Bang</label>
+              <label className="form-label">State / Province</label>
               <input type="text" name="state" className="form-control" value={form.state || ''} onChange={handleChange} disabled={!editing} />
             </div>
 
             <div className="col-md-6">
-              <label className="form-label">Thành phố</label>
+              <label className="form-label">City</label>
               <input type="text" name="city" className="form-control" value={form.city || ''} onChange={handleChange} disabled={!editing} />
             </div>
 
             <div className="col-md-6">
-              <label className="form-label">Số nhà / Đường</label>
+              <label className="form-label">Street</label>
               <input type="text" name="street" className="form-control" value={form.street || ''} onChange={handleChange} disabled={!editing} />
             </div>
 
             <div className="col-md-6">
-              <label className="form-label">Số thẻ tín dụng</label>
+              <label className="form-label">Credit Card Number</label>
               <input type="text" name="creditCardNumber" className="form-control" value={form.creditCardNumber || ''} onChange={handleChange} disabled={!editing} />
             </div>
+
             <div className="col-md-6">
-              <label className="form-label">Ngày hết hạn thẻ</label>
+              <label className="form-label">Credit Card Expiry</label>
               <input type="text" name="creditCardExpiry" className="form-control" placeholder="MM/YY" value={form.creditCardExpiry || ''} onChange={handleChange} disabled={!editing} />
             </div>
 
             <div className="col-12">
               {editing ? (
                 <div className="d-flex flex-column flex-sm-row gap-2">
-                  <button type="button" className="btn btn-success w-100" onClick={handleSave}>Lưu thay đổi</button>
-                  <button type="button" className="btn btn-secondary w-100" onClick={() => setEditing(false)}>Hủy</button>
+                  <button type="button" className="btn btn-success w-100" onClick={handleSave}>Save Changes</button>
+                  <button type="button" className="btn btn-secondary w-100" onClick={() => setEditing(false)}>Cancel</button>
                 </div>
               ) : (
-                <button type="button" className="btn btn-primary w-100" onClick={() => setEditing(true)}>Chỉnh sửa</button>
+                <button type="button" className="btn btn-primary w-100" onClick={() => setEditing(true)}>Edit</button>
               )}
             </div>
           </form>

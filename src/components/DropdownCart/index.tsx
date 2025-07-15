@@ -34,12 +34,12 @@ const DropdownCart: React.FC<{ onClose: () => void; position: { top: number; lef
         zIndex: 2000
       }}
     >
-      <div className="dropdown-cart-header">Sản Phẩm Mới Thêm</div>
+      <div className="dropdown-cart-header">Recently Added Products</div>
       <div className="dropdown-cart-list">
         {items.length === 0 ? (
           <div className="dropdown-cart-empty">
             <div style={{ fontSize: 38, color: '#eee', marginBottom: 8 }}>🛒</div>
-            <div style={{ color: '#888', fontSize: 15 }}>Chưa có sản phẩm</div>
+            <div style={{ color: '#888', fontSize: 15 }}>Your cart is empty</div>
           </div>
         ) : (
           <>
@@ -49,20 +49,20 @@ const DropdownCart: React.FC<{ onClose: () => void; position: { top: number; lef
                 <div className="dropdown-cart-info">
                   <div className="dropdown-cart-name" title={item.productName}>{item.productName}</div>
                 </div>
-                <div className="dropdown-cart-price">{item.price.toLocaleString()}<span>đ</span></div>
+                <div className="dropdown-cart-price">{item.price.toLocaleString()}<span>₫</span></div>
               </div>
             ))}
             {items.length > MAX_SHOW && (
-              <div className="dropdown-cart-more">{items.length - MAX_SHOW} Thêm Hàng Vào Giỏ</div>
+              <div className="dropdown-cart-more">{items.length - MAX_SHOW} more item(s)</div>
             )}
           </>
         )}
       </div>
       <div className="dropdown-cart-footer">
-        <button className="dropdown-cart-view-btn" onClick={() => { onClose(); navigate('/cart'); }}>Xem Giỏ Hàng</button>
+        <button className="dropdown-cart-view-btn" onClick={() => { onClose(); navigate('/cart'); }}>View Cart</button>
       </div>
     </div>
   );
 };
 
-export default DropdownCart; 
+export default DropdownCart;

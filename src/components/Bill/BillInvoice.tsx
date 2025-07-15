@@ -1,5 +1,5 @@
 import React, { forwardRef } from 'react';
-import { Typography, Divider, Table } from 'antd';
+import { Typography, Divider } from 'antd';
 import type { OrderItem, BillDetail } from '../../types';
 import { multiplyDecimals, formatCurrency } from '../../utils/decimalUtils';
 import './BillInvoice.css';
@@ -34,10 +34,10 @@ const BillInvoice = forwardRef<HTMLDivElement, BillInvoiceProps>(
     paymentMethod,
     paymentStatus,
   }, ref) => {
-    // Format ngày tháng
+
     const formatDate = (dateString: string): string => {
       const date = new Date(dateString);
-      return date.toLocaleDateString('vi-VN', {
+      return date.toLocaleDateString('en-US', {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric',
@@ -46,29 +46,27 @@ const BillInvoice = forwardRef<HTMLDivElement, BillInvoiceProps>(
       });
     };
 
-    // Chuyển đổi phương thức thanh toán để hiển thị
     const getPaymentMethodText = (method: string): string => {
       switch (method) {
         case 'CASH':
-          return 'Tiền mặt';
+          return 'Cash';
         case 'CREDIT_CARD':
-          return 'Thẻ tín dụng';
+          return 'Credit Card';
         case 'BANK_TRANSFER':
-          return 'Chuyển khoản ngân hàng';
+          return 'Bank Transfer';
         case 'MOBILE_PAYMENT':
-          return 'Thanh toán di động';
+          return 'Mobile Payment';
         default:
           return method;
       }
     };
 
-    // Chuyển đổi trạng thái thanh toán để hiển thị
     const getPaymentStatusText = (status: string): string => {
       switch (status) {
         case 'PENDING':
-          return 'Chưa thanh toán';
+          return 'Unpaid';
         case 'COMPLETED':
-          return 'Đã thanh toán';
+          return 'Paid';
         default:
           return status;
       }
@@ -81,9 +79,9 @@ const BillInvoice = forwardRef<HTMLDivElement, BillInvoiceProps>(
             <Title level={2}>SUPERMARKET</Title>
           </div>
           <div className="bill-info">
-            <Title level={3}>HÓA ĐƠN BÁN HÀNG</Title>
-            <Text>Số hóa đơn: #{orderId.toString().padStart(6, '0')}</Text>
-            <Text>Ngày: {dateOfPurchase ? formatDate(dateOfPurchase) : new Date().toLocaleDateString('vi-VN')}</Text>
+            <Title level={3}>SALES INVOICE</Title>
+            <Text>Invoice No: #{orderId.toString().padStart(6, '0')}</Text>
+            <Text>Date: {dateOfPurchase ? formatDate(dateOfPurchase) : new Date().toLocaleDateString('en-US')}</Text>
           </div>
         </div>
 
@@ -91,15 +89,15 @@ const BillInvoice = forwardRef<HTMLDivElement, BillInvoiceProps>(
 
         <div className="bill-customer">
           <div>
-            <Text strong>Khách hàng:</Text>
+            <Text strong>Customer:</Text>
             <Text>{customerInfo.fullName}</Text>
           </div>
           <div>
-            <Text strong>Địa chỉ:</Text>
+            <Text strong>Address:</Text>
             <Text>{customerInfo.address}</Text>
           </div>
           <div>
-            <Text strong>Số điện thoại:</Text>
+            <Text strong>Phone:</Text>
             <Text>{customerInfo.phone}</Text>
           </div>
         </div>
@@ -110,17 +108,16 @@ const BillInvoice = forwardRef<HTMLDivElement, BillInvoiceProps>(
           <table className="product-table">
             <thead>
               <tr>
-                <th>STT</th>
-                <th>Sản phẩm</th>
-                <th>Đơn giá</th>
-                <th>Số lượng</th>
-                <th>Khuyến mãi</th>
-                <th>Thành tiền</th>
+                <th>No</th>
+                <th>Product</th>
+                <th>Unit Price</th>
+                <th>Quantity</th>
+                <th>Promotion</th>
+                <th>Total</th>
               </tr>
             </thead>
             <tbody>
               {orderItems.map((item, index) => {
-                // Tính giá sau khuyến mãi với độ chính xác cao
                 let finalPrice = item.price;
                 if (item.discountPercent) {
                   finalPrice = multiplyDecimals(item.price, (100 - item.discountPercent) / 100, 2);
@@ -128,7 +125,6 @@ const BillInvoice = forwardRef<HTMLDivElement, BillInvoiceProps>(
                   finalPrice = item.price - item.discountAmount;
                 }
 
-                // Tính tổng tiền cho mỗi sản phẩm với độ chính xác cao
                 const itemTotal = multiplyDecimals(finalPrice, item.quantity, 2);
 
                 return (
@@ -157,11 +153,11 @@ const BillInvoice = forwardRef<HTMLDivElement, BillInvoiceProps>(
               </div>
             ))}
             <div className="detail-row">
-              <Text strong>Tổng giá sản phẩm:</Text>
+              <Text strong>Subtotal:</Text>
               <Text>{formatCurrency(orderAmount, 'USD', 2)}</Text>
             </div>
             <div className="detail-row total">
-              <Text strong>Tổng thanh toán:</Text>
+              <Text strong>Total Amount:</Text>
               <Text strong>{formatCurrency(billAmount, 'USD', 2)}</Text>
             </div>
           </div>
@@ -171,18 +167,18 @@ const BillInvoice = forwardRef<HTMLDivElement, BillInvoiceProps>(
 
         <div className="bill-payment">
           <div className="payment-row">
-            <Text strong>Phương thức thanh toán:</Text>
+            <Text strong>Payment Method:</Text>
             <Text>{getPaymentMethodText(paymentMethod)}</Text>
           </div>
           <div className="payment-row">
-            <Text strong>Trạng thái thanh toán:</Text>
+            <Text strong>Payment Status:</Text>
             <Text>{getPaymentStatusText(paymentStatus)}</Text>
           </div>
         </div>
 
         <div className="bill-footer">
-          <Text>Cảm ơn quý khách đã mua hàng tại Supermarket!</Text>
-          <Text>Địa chỉ: 123 Đường ABC, Quận 1, TP. Hồ Chí Minh</Text>
+          <Text>Thank you for shopping at Supermarket!</Text>
+          <Text>Address: 123 ABC Street, District 1, Ho Chi Minh City</Text>
           <Text>Hotline: 1900-1234</Text>
           <Text>Website: www.supermarket.com</Text>
         </div>
@@ -191,4 +187,4 @@ const BillInvoice = forwardRef<HTMLDivElement, BillInvoiceProps>(
   }
 );
 
-export default BillInvoice; 
+export default BillInvoice;

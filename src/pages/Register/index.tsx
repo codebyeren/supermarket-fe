@@ -8,15 +8,15 @@ const Register: React.FC = () => {
   const handleSuccess = () => {
     setTimeout(() => navigate('/auth/login'), 2000);
   };
-  
+
   return (
     <ModernAuth
       type="register"
-      title="Đăng Ký"
-      subtitle="Chào mừng bạn mới!"
-      switchText="Đã có tài khoản?"
+      title="Sign Up"
+      subtitle="Welcome new user!"
+      switchText="Already have an account?"
       switchLink="/auth/login"
-      switchLinkText="Đăng nhập tại đây"
+      switchLinkText="Login here"
       hideBrand
     >
       <RegisterForm twoColumn />
@@ -24,4 +24,4 @@ const Register: React.FC = () => {
   );
 };
 
-export default Register; 
+export default Register;

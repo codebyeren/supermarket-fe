@@ -121,12 +121,12 @@ const ProductDetail = () => {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
         }).format(value);
-    if (loading) return <div className="container py-4">Đang tải sản phẩm...</div>;
-    if (!product) return <div className="container py-4">Sản phẩm không tồn tại.</div>;
+
+    if (loading) return <div className="container py-4">Loading product...</div>;
+    if (!product) return <div className="container py-4">Product not found.</div>;
 
     return (
         <div className="container py-4">
-            {/* Chi tiết sản phẩm */}
             <div className="row mb-5">
                 <div className="col-md-5 text-center">
                     <img
@@ -136,7 +136,6 @@ const ProductDetail = () => {
                         style={{ maxHeight: 600, objectFit: 'contain', width: '20vw' }}
                     />
                 </div>
-
                 <div className="col-md-7">
                     <h4 className="fw-bold text-start d-flex align-items-center gap-2 mb-1">
                         <span
@@ -152,7 +151,7 @@ const ProductDetail = () => {
                                                 : '#6c757d',
                                 fontSize: 12,
                                 borderRadius: 4,
-                                textTransform: 'uppercase'
+                                textTransform: 'uppercase',
                             }}
                         >
                             {product.status}
@@ -162,14 +161,14 @@ const ProductDetail = () => {
                             onClick={handleToggleFavorite}
                             className="btn btn-link p-0 ms-2"
                             style={{ color: 'red', fontSize: '1.2rem' }}
-                            title={isFavorite ? 'Bỏ khỏi yêu thích' : 'Thêm vào yêu thích'}
+                            title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
                         >
                             <FaHeart color={isFavorite ? 'red' : 'gray'} />
                         </button>
                     </h4>
 
                     <PromotionDescription product={product} />
-                    <p className="text-muted small mb-1 text-start">Thương hiệu: {product.brand}</p>
+                    <p className="text-muted small mb-1 text-start">Brand: {product.brand}</p>
 
                     <div className="d-flex align-items-center mb-2">
                         {[...Array(5)].map((_, i) => (
@@ -181,22 +180,15 @@ const ProductDetail = () => {
                     </div>
 
                     <div className="d-flex align-items-baseline gap-2">
-                        {/* Giá sau giảm */}
                         <div className="fw-bold text-danger" style={{ fontSize: '1.1rem' }}>
                             {formatCurrency(product.price * (1 - (product.discountPercent ?? 0) / 100))}
                         </div>
-
-                        {/* Giá gốc nếu có giảm */}
                         {product.discountPercent && (
-                            <div
-                                className="text-muted text-decoration-line-through"
-                                style={{ fontSize: '0.9rem' }}
-                            >
+                            <div className="text-muted text-decoration-line-through" style={{ fontSize: '0.9rem' }}>
                                 {formatCurrency(product.price)}
                             </div>
                         )}
                     </div>
-
 
                     <div className="row g-2">
                         <div className="col-6">
@@ -204,7 +196,7 @@ const ProductDetail = () => {
                                 className="btn btn-outline-primary btn-sm w-100"
                                 onClick={() => setShowCompareModal(true)}
                             >
-                                So sánh sản phẩm
+                                Compare products
                             </button>
                         </div>
                     </div>
@@ -216,6 +208,7 @@ const ProductDetail = () => {
                             onSuccess={async () => {
                                 const data = await getProductBySlug(slug!);
                                 setRatings(data.ratings);
+
                                 setProduct(data.productDto);
                             }}
                         />
@@ -256,24 +249,22 @@ const ProductDetail = () => {
                                     startDate: product.startDate,
                                     endDate: product.endDate,
                                 });
-                                setSuccess(true); // ✅ Thành công
+                                setSuccess(true);
                                 setShowNotification(true);
                             } catch (error) {
-                                console.error("Lỗi thêm vào giỏ hàng", error);
-                                setSuccess(false); // ✅ Thất bại
+                                console.error("Add to cart error", error);
+                                setSuccess(false);
                                 setShowNotification(true);
                             }
                         }}
-
                     >
                         + Add to cart
                     </button>
-
                 </div>
             </div>
 
             <CarouselComponent
-                title="Sản Phẩm Liên Quan"
+                title="Related Products"
                 products={relatedProducts}
                 itemsPerView={{ desktop: 5, tablet: 3, mobile: 2 }}
                 onAddToCartSuccess={() => {
@@ -286,15 +277,14 @@ const ProductDetail = () => {
                 }}
             />
 
-
-            {<ProductRatings
+            <ProductRatings
                 ratings={ratings}
                 ratingScore={product.ratingScore}
                 onWriteRating={() => {
                     hasUserRated ? setShowRatingEditModal(true) : setShowRatingModal(true);
                 }}
             />
-            }
+
             {showCompareModal && (
                 <ComparePopup
                     show={showCompareModal}
@@ -306,6 +296,7 @@ const ProductDetail = () => {
                     }}
                 />
             )}
+
             {selectedCompareProduct && product && (
                 <CompareTwoProductsView
                     productA={product}
@@ -314,19 +305,63 @@ const ProductDetail = () => {
                 />
             )}
 
-
-
             {showNotification && (
                 <Notification
-                    message={success ? 'Đã thêm vào giỏ hàng' : 'Thêm vào giỏ hàng thất bại'}
+                    message={success ? 'Added to cart successfully' : 'Failed to add to cart'}
                     duration={2000}
                     borderColor={success ? 'green' : 'red'}
                     onClose={() => setShowNotification(false)}
                 />
             )}
-
         </div>
     );
 };
 
 export default ProductDetail;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

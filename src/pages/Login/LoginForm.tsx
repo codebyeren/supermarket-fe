@@ -20,10 +20,9 @@ const LoginForm: React.FC = () => {
   });
 
   const [submitted, setSubmitted] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const [showRedirectNotification, setShowRedirectNotification] = useState(false);
   const [errors, setErrors] = useState<Partial<LoginFormData>>({});
   const [message, setMessage] = useState<string | null>(null);
-  const [showRedirectNotification, setShowRedirectNotification] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -41,8 +40,8 @@ const LoginForm: React.FC = () => {
 
   const validateForm = (): boolean => {
     const newErrors: Partial<LoginFormData> = {};
-    if (!formData.username.trim()) newErrors.username = 'Vui lòng nhập tên tài khoản';
-    if (!formData.password) newErrors.password = 'Vui lòng nhập mật khẩu';
+    if (!formData.username.trim()) newErrors.username = 'Please enter your username';
+    if (!formData.password) newErrors.password = 'Please enter your password';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -72,14 +71,9 @@ const LoginForm: React.FC = () => {
       const result = await login(formData.username, formData.password, formData.rememberMe);
       if (result?.message) setMessage(result.message);
       if (result?.success) {
-        // Đánh dấu phiên hiện tại
         sessionStorage.setItem('current_session', 'active');
-        // Lấy giỏ hàng từ API khi đăng nhập thành công
         await getCartFromAPI();
-        console.log('Đã lấy giỏ hàng từ API sau khi đăng nhập thành công');
-        // Hiển thị thông báo chuyển hướng
         setShowRedirectNotification(true);
-        // Redirect dựa trên role sau 3 giây
         setTimeout(() => {
           redirectAfterLogin();
         }, 3000);
@@ -94,22 +88,22 @@ const LoginForm: React.FC = () => {
           id="username"
           type="text"
           name="username"
-          label="Tên Tài Khoản"
+          label="Username"
           value={formData.username}
           onChange={handleInputChange}
           error={errors.username}
-          placeholder="Nhập tên tài khoản của bạn"
+          placeholder="Enter your username"
         />
 
         <ModernInput
           id="password"
           type="password"
           name="password"
-          label="Mật Khẩu"
+          label="Password"
           value={formData.password}
           onChange={handleInputChange}
           error={errors.password}
-          placeholder="Nhập mật khẩu của bạn"
+          placeholder="Enter your password"
         />
 
         <div className="d-flex justify-content-between align-items-center mb-3">
@@ -123,11 +117,11 @@ const LoginForm: React.FC = () => {
               onChange={handleInputChange}
             />
             <label className="form-check-label" htmlFor="rememberMe">
-              Ghi nhớ đăng nhập
+              Remember me
             </label>
           </div>
           <Link to="/auth/forgot-password" className="text-muted small text-decoration-none">
-            Quên mật khẩu?
+            Forgot password?
           </Link>
         </div>
 
@@ -141,10 +135,10 @@ const LoginForm: React.FC = () => {
           loading={loading}
           disabled={loading}
         >
-          {loading ? 'Đang xử lý...' : 'Đăng Nhập'}
+          {loading ? 'Processing...' : 'Login'}
         </ModernButton>
       </form>
-      
+
       <RedirectNotification 
         isVisible={showRedirectNotification}
         onClose={() => setShowRedirectNotification(false)}

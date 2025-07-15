@@ -74,51 +74,51 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
   };
 
   return (
-    <div className={styles.paymentMethodContainer}>
-      <h2 className={styles.sectionTitle}>Phương thức thanh toán</h2>
-      
+     <div className={styles.paymentMethodContainer}>
+      <h2 className={styles.sectionTitle}>Payment Method</h2>
+
       <div className={styles.methodSelection}>
         <Radio.Group onChange={handlePaymentMethodChange} value={paymentMethod}>
           <Radio value="CASH" className={styles.paymentOption}>
             <div className={styles.paymentOptionContent}>
               <span className={styles.paymentOptionIcon}>💵</span>
               <div>
-                <div className={styles.paymentOptionTitle}>Tiền mặt</div>
-                <div className={styles.paymentOptionDescription}>Thanh toán khi nhận hàng</div>
+                <div className={styles.paymentOptionTitle}>Cash</div>
+                <div className={styles.paymentOptionDescription}>Pay on delivery</div>
               </div>
             </div>
           </Radio>
-          
+
           <Radio value="CREDIT_CARD" className={styles.paymentOption}>
             <div className={styles.paymentOptionContent}>
               <span className={styles.paymentOptionIcon}>💳</span>
               <div>
-                <div className={styles.paymentOptionTitle}>Thẻ tín dụng</div>
+                <div className={styles.paymentOptionTitle}>Credit Card</div>
                 <div className={styles.paymentOptionDescription}>
-                  {paymentInfo?.cardNumber 
-                    ? `**** **** **** ${paymentInfo.cardNumber.slice(-4)}` 
-                    : 'Thanh toán bằng thẻ tín dụng/ghi nợ'}
+                  {paymentInfo?.cardNumber
+                    ? `**** **** **** ${paymentInfo.cardNumber.slice(-4)}`
+                    : 'Pay using credit/debit card'}
                 </div>
               </div>
             </div>
           </Radio>
-          
+
           <Radio value="BANK_TRANSFER" className={styles.paymentOption}>
             <div className={styles.paymentOptionContent}>
               <span className={styles.paymentOptionIcon}>🏦</span>
               <div>
-                <div className={styles.paymentOptionTitle}>Chuyển khoản ngân hàng</div>
-                <div className={styles.paymentOptionDescription}>Chuyển khoản trực tiếp đến tài khoản của chúng tôi</div>
+                <div className={styles.paymentOptionTitle}>Bank Transfer</div>
+                <div className={styles.paymentOptionDescription}>Transfer directly to our account</div>
               </div>
             </div>
           </Radio>
-          
+
           <Radio value="MOBILE_PAYMENT" className={styles.paymentOption}>
             <div className={styles.paymentOptionContent}>
               <span className={styles.paymentOptionIcon}>📱</span>
               <div>
-                <div className={styles.paymentOptionTitle}>Thanh toán di động</div>
-                <div className={styles.paymentOptionDescription}>Thanh toán qua ứng dụng di động (MoMo, ZaloPay, VNPay...)</div>
+                <div className={styles.paymentOptionTitle}>Mobile Payment</div>
+                <div className={styles.paymentOptionDescription}>Pay via mobile apps (MoMo, ZaloPay, VNPay...)</div>
               </div>
             </div>
           </Radio>
@@ -127,7 +127,7 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
 
       {showCardForm && (
         <div className={styles.cardFormContainer}>
-          <h3>Thông tin thẻ tín dụng</h3>
+          <h3>Credit Card Information</h3>
           <Form
             form={form}
             layout="vertical"
@@ -136,10 +136,10 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
           >
             <Form.Item
               name="cardNumber"
-              label="Số thẻ"
+              label="Card Number"
               rules={[
-                { required: true, message: 'Vui lòng nhập số thẻ' },
-                { pattern: /^\d{16}$/, message: 'Số thẻ phải gồm 16 chữ số' }
+                { required: true, message: 'Please enter your card number' },
+                { pattern: /^\d{16}$/, message: 'Card number must be 16 digits' }
               ]}
             >
               <Input placeholder="1234 5678 9012 3456" maxLength={16} />
@@ -147,19 +147,19 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
 
             <Form.Item
               name="cardHolder"
-              label="Tên chủ thẻ"
-              rules={[{ required: true, message: 'Vui lòng nhập tên chủ thẻ' }]}
+              label="Card Holder Name"
+              rules={[{ required: true, message: 'Please enter the card holder name' }]}
             >
-              <Input placeholder="NGUYEN VAN A" />
+              <Input placeholder="JOHN DOE" />
             </Form.Item>
 
             <div className={styles.cardFormRow}>
               <Form.Item
                 name="expiryDate"
-                label="Ngày hết hạn"
+                label="Expiry Date"
                 rules={[
-                  { required: true, message: 'Vui lòng nhập ngày hết hạn' },
-                  { pattern: /^(0[1-9]|1[0-2])\/\d{2}$/, message: 'Định dạng MM/YY' }
+                  { required: true, message: 'Please enter expiry date' },
+                  { pattern: /^(0[1-9]|1[0-2])\/\d{2}$/, message: 'Format MM/YY' }
                 ]}
               >
                 <Input placeholder="MM/YY" maxLength={5} />
@@ -169,8 +169,8 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
                 name="cvv"
                 label="CVV"
                 rules={[
-                  { required: true, message: 'Vui lòng nhập CVV' },
-                  { pattern: /^\d{3,4}$/, message: 'CVV phải gồm 3-4 chữ số' }
+                  { required: true, message: 'Please enter CVV' },
+                  { pattern: /^\d{3,4}$/, message: 'CVV must be 3–4 digits' }
                 ]}
               >
                 <Input placeholder="123" maxLength={4} />
@@ -178,50 +178,49 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
             </div>
 
             <Button type="primary" htmlType="submit" block>
-              Lưu thông tin
+              Save Information
             </Button>
           </Form>
         </div>
       )}
 
       <Modal
-        title="Thanh toán chuyển khoản"
+        title="Bank Transfer Payment"
         open={showQRCode}
         onCancel={() => setShowQRCode(false)}
         footer={[
           <Button key="back" onClick={() => setShowQRCode(false)}>
-            Hủy
+            Cancel
           </Button>,
           <Button key="submit" type="primary" onClick={handleQRConfirm}>
-            Đã thanh toán
+            Payment Completed
           </Button>,
         ]}
       >
         <div className={styles.qrCodeContainer}>
           <div className={styles.qrCodeImage}>
-            {/* Đây là nơi sẽ hiển thị mã QR */}
             <div className={styles.mockQRCode}>
-              <img src="/img/qr_thanh_toan.png" alt="" />
+              <img src="/img/qr_thanh_toan.png" alt="QR Code" />
             </div>
           </div>
           <p className={styles.bankInfo}>
-            <strong>Ngân hàng:</strong> TECHCOMBANK<br />
-            <strong>Chủ tài khoản:</strong> CONG TY SUPERMARKET<br />
-            <strong>Số tài khoản:</strong> 19028450192845<br />
-            <strong>Nội dung:</strong> Thanh toan don hang #[ORDER_ID]
+            <strong>Bank:</strong> TECHCOMBANK<br />
+            <strong>Account Holder:</strong> SUPERMARKET COMPANY<br />
+            <strong>Account Number:</strong> 19028450192845<br />
+            <strong>Content:</strong> Payment for order #[ORDER_ID]
           </p>
         </div>
       </Modal>
 
       <div className={styles.buttonGroup}>
         <Button onClick={onCancel} className={styles.cancelButton}>
-          Hủy
+          Cancel
         </Button>
         <Button onClick={onBack} className={styles.backButton}>
-          Quay lại
+          Back
         </Button>
         <Button type="primary" onClick={handleSubmit} className={styles.continueButton}>
-          Hoàn tất đơn hàng
+          Complete Order
         </Button>
       </div>
     </div>

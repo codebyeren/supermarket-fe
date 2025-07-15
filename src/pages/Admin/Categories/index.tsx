@@ -161,13 +161,13 @@ export default function AdminCategories() {
     <div className="admin-categories">
       <div className="categories-header">
         <div>
-          <h1>Quản lý danh mục</h1>
+          <h1>Category Management</h1>
           <p className="categories-subtitle">
-            Hiển thị cấu trúc phân cấp danh mục với {filteredCategories.length} danh mục
+            Showing category hierarchy with {filteredCategories.length} categories
           </p>
         </div>
         <button className="add-category-btn" onClick={() => setShowAddModal(true)}>
-          + Thêm danh mục
+          + Add Category
         </button>
       </div>
 
@@ -175,7 +175,7 @@ export default function AdminCategories() {
         <div className="search-box">
           <input
             type="text"
-            placeholder="Tìm kiếm danh mục..."
+            placeholder="Search categories..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="search-input"
@@ -187,19 +187,18 @@ export default function AdminCategories() {
         <thead>
           <tr>
             <th>ID</th>
-            <th>Tên danh mục</th>
+            <th>Category Name</th>
             <th>Slug</th>
-            <th>Cấp độ</th>
-            <th>Số danh mục con</th>
-            <th>Thao tác</th>
+            <th>Level</th>
+            <th>Child Categories</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {filteredCategories.map((category, index) => {
-            // Kiểm tra xem có phải item cuối cùng trong cùng level không
             const isLastInLevel = index === filteredCategories.length - 1 || 
               filteredCategories[index + 1]?.level < category.level;
-            
+
             return (
               <tr key={category.id} className={`category-level-${category.level}`}>
                 <td>{category.id}</td>
@@ -213,8 +212,8 @@ export default function AdminCategories() {
                 <td>{category.level + 1}</td>
                 <td>{category.children?.length || 0}</td>
                 <td>
-                  <button className="edit-btn" onClick={() => openEditModal(category)}>Sửa</button>
-                  <button className="delete-btn" onClick={() => handleDeleteCategory(category.id)}>Xóa</button>
+                  <button className="edit-btn" onClick={() => openEditModal(category)}>Edit</button>
+                  <button className="delete-btn" onClick={() => handleDeleteCategory(category.id)}>Delete</button>
                 </td>
               </tr>
             );
@@ -224,21 +223,20 @@ export default function AdminCategories() {
 
       {filteredCategories.length === 0 && (
         <div className="no-categories">
-          <p>Không tìm thấy danh mục nào</p>
+          <p>No categories found</p>
         </div>
       )}
 
-      {/* Add/Edit Modal */}
       {(showAddModal || editingCategory) && (
         <div className="modal-overlay">
           <div className="modal">
-            <h2>{editingCategory ? 'Sửa danh mục' : 'Thêm danh mục mới'}</h2>
+            <h2>{editingCategory ? 'Edit Category' : 'Add New Category'}</h2>
             <form onSubmit={(e) => {
               e.preventDefault();
               editingCategory ? handleUpdateCategory() : handleAddCategory();
             }}>
               <div className="form-group">
-                <label>Tên danh mục:</label>
+                <label>Category Name:</label>
                 <input
                   type="text"
                   value={formData.categoryName}
@@ -259,7 +257,7 @@ export default function AdminCategories() {
               
               <div className="modal-actions">
                 <button type="submit" className="save-btn">
-                  {editingCategory ? 'Cập nhật' : 'Thêm'}
+                  {editingCategory ? 'Update' : 'Add'}
                 </button>
                 <button 
                   type="button" 
@@ -270,7 +268,7 @@ export default function AdminCategories() {
                     resetForm();
                   }}
                 >
-                  Hủy
+                  Cancel
                 </button>
               </div>
             </form>

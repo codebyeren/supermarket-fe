@@ -12,7 +12,6 @@ const ProductRatings: React.FC<Props> = ({ ratings, ratingScore, onWriteRating }
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
   const [visibleCount, setVisibleCount] = useState(4);
 
-
   const filteredRatings = useMemo(() => {
     let result = filterStar
       ? ratings.filter((r) => r.ratingScore === filterStar)
@@ -32,9 +31,9 @@ const ProductRatings: React.FC<Props> = ({ ratings, ratingScore, onWriteRating }
 
   return (
     <div className="mt-5">
-      <h4 className="fw-bold mb-3 text-start">Nhận Xét Và Đánh Giá</h4>
+      <h4 className="fw-bold mb-3 text-start">Reviews & Ratings</h4>
 
-      {/* Tổng điểm và nút gửi */}
+      {/* Average rating and write button */}
       <div className="d-flex align-items-center mb-4">
         <div style={{ fontSize: '2.5rem', color: 'red', fontWeight: 'bold' }}>
           {ratingScore.toFixed(1)}/5
@@ -47,24 +46,24 @@ const ProductRatings: React.FC<Props> = ({ ratings, ratingScore, onWriteRating }
               </span>
             ))}
           </div>
-          <div className="text-muted small">{ratings.length} lượt đánh giá</div>
+          <div className="text-muted small">{ratings.length} ratings</div>
         </div>
         {onWriteRating && (
           <div className="ms-auto">
             <button className="btn btn-primary btn-sm" onClick={onWriteRating}>
-              Gửi đánh giá
+              Write a review
             </button>
           </div>
         )}
       </div>
 
-      {/* Bộ lọc + sắp xếp */}
+      {/* Filter + sort */}
       <div className="mb-3 d-flex flex-wrap align-items-center gap-2">
         <button
           className={`btn btn-sm ${filterStar === null ? 'btn-danger' : 'btn-outline-secondary'}`}
           onClick={() => setFilterStar(null)}
         >
-          Tất cả
+          All
         </button>
         {[5, 4, 3, 2, 1].map((star) => (
           <button
@@ -76,7 +75,7 @@ const ProductRatings: React.FC<Props> = ({ ratings, ratingScore, onWriteRating }
           </button>
         ))}
 
-        {/* Bộ sắp xếp */}
+        {/* Sort options */}
         <div className="ms-auto">
           <select
             value={sortOrder}
@@ -84,14 +83,15 @@ const ProductRatings: React.FC<Props> = ({ ratings, ratingScore, onWriteRating }
             className="form-select form-select-sm"
             style={{ width: 160 }}
           >
-            <option value="newest">Mới nhất</option>
-            <option value="oldest">Cũ nhất</option>
+            <option value="newest">Newest</option>
+            <option value="oldest">Oldest</option>
           </select>
         </div>
       </div>
+
       <div className="border rounded p-3 bg-light">
         {filteredRatings.length === 0 ? (
-          <p>Chưa có đánh giá nào.</p>
+          <p>No reviews yet.</p>
         ) : (
           <>
             {filteredRatings.slice(0, visibleCount).map((rating) => (
@@ -123,14 +123,13 @@ const ProductRatings: React.FC<Props> = ({ ratings, ratingScore, onWriteRating }
                   className="btn btn-outline-primary btn-sm"
                   onClick={() => setVisibleCount((prev) => prev + 4)}
                 >
-                  Xem thêm
+                  Load more
                 </button>
               </div>
             )}
           </>
         )}
       </div>
-
     </div>
   );
 };

@@ -27,7 +27,7 @@ const SortPanel: React.FC<SortPanelProps> = ({ sortState, onSortChange, sortGrou
         fontWeight: 600,
         color: '#495057'
       }}>
-        Sắp xếp theo:
+        Sort by:
       </h3>
       <div
         style={{
@@ -60,13 +60,13 @@ const SortPanel: React.FC<SortPanelProps> = ({ sortState, onSortChange, sortGrou
                 width: '100%'
               }}
             >
-              <option value="">Mặc định</option>
+              <option value="">Default</option>
               {group.options.map(option => (
                 <option key={option.value} value={option.value}>{option.label}</option>
               ))}
             </select>
             <div style={{ fontSize: 12, color: '#6c757d', fontStyle: 'italic', marginTop: 2 }}>
-              {group.options.find(o => sortState[group.key] === o.value)?.description || 'Mặc định'}
+              {group.options.find(o => sortState[group.key] === o.value)?.description || 'Default'}
             </div>
           </div>
         ))}
@@ -75,4 +75,4 @@ const SortPanel: React.FC<SortPanelProps> = ({ sortState, onSortChange, sortGrou
   );
 };
 
-export default SortPanel; 
+export default SortPanel;

@@ -166,12 +166,13 @@ const CategoryPage: React.FC = () => {
         <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
         {showNotification && (
           <Notification
-            message={success ? 'Đã thêm vào giỏ hàng' : 'Thêm vào giỏ hàng thất bại'}
+            message={success ? 'Added to cart successfully' : 'Failed to add to cart'}
             duration={2000}
             borderColor={success ? 'green' : 'red'}
             onClose={() => setShowNotification(false)}
           />
         )}
+
       </main>
     </div>
   );

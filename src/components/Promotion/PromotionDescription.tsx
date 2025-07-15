@@ -31,7 +31,9 @@ const PromotionDisplay: React.FC<Props> = ({ product }) => {
   if (!promotionType) return null;
 
   const isGift =
-    promotionType === 'GIFT_ITEM' || promotionType === 'ORDER_QUANTITY_GIFT' || promotionType === 'BUY_ONE_GET_ONE';
+    promotionType === 'GIFT_ITEM' ||
+    promotionType === 'ORDER_QUANTITY_GIFT' ||
+    promotionType === 'BUY_ONE_GET_ONE';
 
   let title = '';
   let detail: React.ReactNode = null;
@@ -39,39 +41,41 @@ const PromotionDisplay: React.FC<Props> = ({ product }) => {
   switch (promotionType) {
     case 'PERCENT_DISCOUNT':
       if (discountPercent) {
-        detail = `Giảm ${discountPercent}% cho sản phẩm`;
+        detail = `Discount ${discountPercent}% on the product`;
       }
       break;
 
     case 'ORDER_VALUE_DISCOUNT':
       if (discountAmount && minOrderValue) {
-        title = 'Ưu đãi theo giá trị đơn';
+        title = 'Order Value Promotion';
         detail = (
           <>
-            Giảm <b>{formatCurrency(discountAmount)}</b> cho đơn từ <b>{formatCurrency(minOrderValue)}</b>
+            Save <b>{formatCurrency(discountAmount)}</b> for orders from{' '}
+            <b>{formatCurrency(minOrderValue)}</b>
           </>
         );
       }
       break;
 
     case 'BUY_ONE_GET_ONE':
-      title = 'Mua 1 tặng 1';
+      title = 'Buy One Get One Free';
       detail = giftProductName && giftProductSlug ? (
-        <>
-          Mua 1 tặng 1:&nbsp;
-        </>
+        <>Buy 1 get 1:&nbsp;</>
       ) : (
-        'Mua 1 tặng 1 cùng sản phẩm'
+        'Buy 1 get 1 same product'
       );
       break;
 
     case 'ORDER_QUANTITY_GIFT':
     case 'GIFT_ITEM':
-      title = 'Quà Tặng';
+      title = 'Gift';
       detail = (
         <>
-          Mua {minOrderQuantity || 1} tặng:&nbsp;
-          <Link to={`/product/${giftProductSlug}`} className="text-decoration-underline fw-semibold">
+          Buy {minOrderQuantity || 1} get:&nbsp;
+          <Link
+            to={`/product/${giftProductSlug}`}
+            className="text-decoration-underline fw-semibold"
+          >
             {giftProductName}
           </Link>
         </>
@@ -91,15 +95,25 @@ const PromotionDisplay: React.FC<Props> = ({ product }) => {
         <img
           src={`/img/${giftProductImg}`}
           alt={giftProductName}
-          style={{ width: 60, height: 60, objectFit: 'cover', borderRadius: 6 }}
+          style={{
+            width: 60,
+            height: 60,
+            objectFit: 'cover',
+            borderRadius: 6,
+          }}
         />
       )}
 
       <div style={{ flex: 1 }}>
-        <div style={{ color: '#d32f2f', fontWeight: 'bold', fontSize: 14 }}>
+        <div
+          style={{ color: '#d32f2f', fontWeight: 'bold', fontSize: 14 }}
+        >
           🎁 {title}{' '}
           {promotionDescription && (
-            <span className="text-muted" style={{ fontWeight: 'normal' }}>
+            <span
+              className="text-muted"
+              style={{ fontWeight: 'normal' }}
+            >
               [{promotionDescription}]
             </span>
           )}
@@ -109,8 +123,24 @@ const PromotionDisplay: React.FC<Props> = ({ product }) => {
         </div>
         {isGift && (
           <>
-            <div style={{ fontSize: 13, color: '#999', textDecoration: 'line-through' }}>{giftProductPrice}</div>
-            <div style={{ fontSize: 14, fontWeight: 'bold', color: '#00c853' }}>Free</div>
+            <div
+              style={{
+                fontSize: 13,
+                color: '#999',
+                textDecoration: 'line-through',
+              }}
+            >
+              {giftProductPrice}
+            </div>
+            <div
+              style={{
+                fontSize: 14,
+                fontWeight: 'bold',
+                color: '#00c853',
+              }}
+            >
+              Free
+            </div>
           </>
         )}
       </div>
