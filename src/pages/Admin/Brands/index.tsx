@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { getAllBrandsForAdmin, createBrand, updateBrand, deleteBrand } from '../../../services/brandService';
 import type { Brand } from '../../../types';
 import './Brands.css';
+import AddBrandModal from '../../../components/AdminBrand/addBrand';
+import BrandFormModal from '../../../components/AdminBrand/brandModal';
 
 interface BrandFormData {
   brandName: string;
@@ -12,8 +14,9 @@ export default function AdminBrands() {
   const [brands, setBrands] = useState<Brand[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [editingBrand, setEditingBrand] = useState<Brand | null>(null);
+  const [showFormModal, setShowFormModal] = useState(false);
+  const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
+
   const [formData, setFormData] = useState<BrandFormData>({
     brandName: '',
     slug: ''
@@ -38,34 +41,6 @@ export default function AdminBrands() {
     }
   };
 
-  const handleAddBrand = async () => {
-    try {
-      const response = await createBrand(formData);
-      if (response.code === 201) {
-        await fetchBrands();
-        setShowAddModal(false);
-        resetForm();
-      }
-    } catch (err) {
-      setError('Unable to add brand');
-      console.error('Error adding brand:', err);
-    }
-  };
-
-  const handleUpdateBrand = async () => {
-    if (!editingBrand) return;
-    try {
-      const response = await updateBrand(editingBrand.id, formData);
-      if (response.code === 200) {
-        await fetchBrands();
-        setEditingBrand(null);
-        resetForm();
-      }
-    } catch (err) {
-      setError('Unable to update brand');
-      console.error('Error updating brand:', err);
-    }
-  };
 
   const handleDeleteBrand = async (brandId: number) => {
     if (!confirm('Are you sure you want to delete this brand?')) return;
@@ -78,24 +53,19 @@ export default function AdminBrands() {
     }
   };
 
-  const resetForm = () => {
-    setFormData({
-      brandName: '',
-      slug: ''
-    });
+  const openAddBrand = () => {
+    setSelectedBrand(null);
+    setShowFormModal(true);
   };
 
-  const openEditModal = (brand: Brand) => {
-    setEditingBrand(brand);
-    setFormData({
-      brandName: brand.brandName,
-      slug: brand.slug
-    });
+  const openEditBrand = (brand: Brand) => {
+    setSelectedBrand(brand);
+    setShowFormModal(true);
   };
 
   const filteredBrands = brands.filter(brand => {
     const matchesSearch = brand.brandName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         brand.slug.toLowerCase().includes(searchTerm.toLowerCase());
+      brand.slug.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesSearch;
   });
 
@@ -111,7 +81,7 @@ export default function AdminBrands() {
     <div className="admin-brands">
       <div className="brands-header">
         <h1>Brand Management</h1>
-        <button className="add-brand-btn" onClick={() => setShowAddModal(true)}>
+        <button className="add-brand-btn" onClick={() => openAddBrand()}>
           + Add Brand
         </button>
       </div>
@@ -144,7 +114,7 @@ export default function AdminBrands() {
               <td>{brand.brandName}</td>
               <td>{brand.slug}</td>
               <td>
-                <button className="edit-btn" onClick={() => openEditModal(brand)}>Edit</button>
+                <button className="edit-btn" onClick={() => openEditBrand(brand)}>Edit</button>
                 <button className="delete-btn" onClick={() => handleDeleteBrand(brand.id)}>Delete</button>
               </td>
             </tr>
@@ -157,55 +127,15 @@ export default function AdminBrands() {
           <p>No brands found</p>
         </div>
       )}
-
-      {(showAddModal || editingBrand) && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <h2>{editingBrand ? 'Edit Brand' : 'Add New Brand'}</h2>
-            <form onSubmit={(e) => {
-              e.preventDefault();
-              editingBrand ? handleUpdateBrand() : handleAddBrand();
-            }}>
-              <div className="form-group">
-                <label>Brand Name:</label>
-                <input
-                  type="text"
-                  value={formData.brandName}
-                  onChange={(e) => setFormData(prev => ({ ...prev, brandName: e.target.value }))}
-                  required
-                />
-              </div>
-              
-              <div className="form-group">
-                <label>Slug:</label>
-                <input
-                  type="text"
-                  value={formData.slug}
-                  onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value }))}
-                  required
-                />
-              </div>
-              
-              <div className="modal-actions">
-                <button type="submit" className="save-btn">
-                  {editingBrand ? 'Update' : 'Add'}
-                </button>
-                <button 
-                  type="button" 
-                  className="cancel-btn"
-                  onClick={() => {
-                    setShowAddModal(false);
-                    setEditingBrand(null);
-                    resetForm();
-                  }}
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <BrandFormModal
+        show={showFormModal}
+        initialData={selectedBrand}
+        onClose={() => setShowFormModal(false)}
+        onSuccess={() => {
+          fetchBrands();
+          setShowFormModal(false);
+        }}
+      />
     </div>
   );
 }

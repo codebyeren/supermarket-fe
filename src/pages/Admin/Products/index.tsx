@@ -6,8 +6,10 @@ import type { Product } from '../../../types';
 import type { Brand } from '../../../types';
 import type { Category } from '../../../types';
 import './Products.css';
+import ProductFormModal from '../../../components/AdminProduct/ProductModal';
 
-interface ProductFormData {
+export interface ProductFormData {
+  productId: number;
   productName: string;
 
   price: number;
@@ -27,8 +29,10 @@ export default function AdminProducts() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+
+
   const [formData, setFormData] = useState<ProductFormData>({
+    productId: 0,
     productName: '',
     price: 0,
     slug: '',
@@ -68,30 +72,7 @@ export default function AdminProducts() {
     }
   };
 
-  const handleAddProduct = async () => {
-    try {
-      const newProduct = await createProduct(formData);
-      setProducts(prev => [...prev, newProduct]);
-      setShowAddModal(false);
-      resetForm();
-    } catch (err) {
-      setError('Không thể thêm sản phẩm');
-      console.error('Error adding product:', err);
-    }
-  };
 
-  const handleUpdateProduct = async () => {
-    if (!editingProduct) return;
-    try {
-      const updatedProduct = await updateProduct(editingProduct.productId, formData);
-      setProducts(prev => prev.map(p => p.productId === editingProduct.productId ? updatedProduct : p));
-      setEditingProduct(null);
-      resetForm();
-    } catch (err) {
-      setError('Không thể cập nhật sản phẩm');
-      console.error('Error updating product:', err);
-    }
-  };
 
   const handleDeleteProduct = async (productId: number) => {
     if (!confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) return;
@@ -104,8 +85,10 @@ export default function AdminProducts() {
     }
   };
 
-  const resetForm = () => {
+  // Add
+  const handleAddProduct = () => {
     setFormData({
+      productId: 0,
       productName: '',
       price: 0,
       slug: '',
@@ -113,25 +96,30 @@ export default function AdminProducts() {
       quantity: 0,
       unitCost: 0,
       totalAmount: 0,
-      brandId: 0,
+      brandId: brands.length > 0 ? brands[0].id : 0,
       imageUrl: ''
     });
+    setShowAddModal(true);
   };
 
-  const openEditModal = (product: Product) => {
-    setEditingProduct(product);
+  // Edit
+  const handleEditProduct = (product: Product) => {
     setFormData({
+      productId: product.productId,
       productName: product.productName,
       price: product.price,
       slug: product.slug,
       status: product.status,
       quantity: product.quantity,
-      unitCost: product.unitCost || 0,
-      totalAmount: product.totalAmount || 0,
-      brandId: product.brandId || 0,
+      unitCost: product.unitCost ?? 0,
+      totalAmount: product.totalAmount ?? 0,
+      brandId: product.brandId ?? 0,
       imageUrl: product.imageUrl
     });
+    setShowAddModal(true);
   };
+
+
 
   const filteredProducts = Array.isArray(products) ? products.filter(product => {
     const matchesSearch = product.productName.toLowerCase().includes(searchTerm.toLowerCase());
@@ -163,9 +151,11 @@ export default function AdminProducts() {
     <div className="admin-products">
       <div className="products-header">
         <h1>Quản lý sản phẩm</h1>
-        <button className="add-product-btn" onClick={() => setShowAddModal(true)}>
+        <button className="add-product-btn" onClick={handleAddProduct}>
           + Thêm sản phẩm
         </button>
+
+
       </div>
 
       <div className="products-filters">
@@ -259,7 +249,8 @@ export default function AdminProducts() {
               </span></td>
               <td><img src={`/img/${product.imageUrl}`} alt={product.productName} style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 4 }} /></td>
               <td>
-                <button className="edit-btn" onClick={() => openEditModal(product)}>Sửa</button>
+                <button onClick={() => handleEditProduct(product)}>Edit</button>
+
                 <button className="delete-btn" onClick={() => handleDeleteProduct(product.productId)}>Xóa</button>
               </td>
             </tr>
@@ -272,134 +263,15 @@ export default function AdminProducts() {
           <p>Không tìm thấy sản phẩm nào</p>
         </div>
       )}
-
-      {/* Add/Edit Modal */}
-      {(showAddModal || editingProduct) && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <h2>{editingProduct ? 'Sửa sản phẩm' : 'Thêm sản phẩm mới'}</h2>
-            <form onSubmit={(e) => {
-              e.preventDefault();
-              editingProduct ? handleUpdateProduct() : handleAddProduct();
-            }}>
-              <div className="form-group">
-                <label>Tên sản phẩm:</label>
-                <input
-                  type="text"
-                  value={formData.productName}
-                  onChange={(e) => setFormData(prev => ({ ...prev, productName: e.target.value }))}
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Giá:</label>
-                <input
-                  type="number"
-                  value={formData.price}
-                  onChange={(e) => setFormData(prev => ({ ...prev, price: Number(e.target.value) }))}
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Slug:</label>
-                <input
-                  type="text"
-                  value={formData.slug}
-                  onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value }))}
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Số lượng:</label>
-                <input
-                  type="number"
-                  value={formData.quantity}
-                  onChange={(e) => setFormData(prev => ({ ...prev, quantity: Number(e.target.value) }))}
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Giá vốn:</label>
-                <input
-                  type="number"
-                  value={formData.unitCost}
-                  onChange={(e) => setFormData(prev => ({ ...prev, unitCost: Number(e.target.value) }))}
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Tổng tiền:</label>
-                <input
-                  type="number"
-                  value={formData.totalAmount}
-                  onChange={(e) => setFormData(prev => ({ ...prev, totalAmount: Number(e.target.value) }))}
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Thương hiệu:</label>
-                <select
-                  value={formData.brandId}
-                  onChange={(e) => setFormData(prev => ({ ...prev, brandId: Number(e.target.value) }))}
-                  required
-                >
-                  <option value="">Chọn thương hiệu</option>
-                  {brands.map(brand => (
-                    <option key={brand.id} value={brand.id}>
-                      {brand.brandName}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label>URL hình ảnh:</label>
-                <input
-                  type="url"
-                  value={formData.imageUrl}
-                  onChange={(e) => setFormData(prev => ({ ...prev, imageUrl: e.target.value }))}
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Trạng thái:</label>
-                <select
-                  value={formData.status}
-                  onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value }))}
-                  required
-                >
-                  <option value="Available">Có sẵn</option>
-                  <option value="Unavailable">Không có sẵn</option>
-                </select>
-              </div>
-
-              <div className="modal-actions">
-                <button type="submit" className="save-btn">
-                  {editingProduct ? 'Cập nhật' : 'Thêm'}
-                </button>
-                <button
-                  type="button"
-                  className="cancel-btn"
-                  onClick={() => {
-                    setShowAddModal(false);
-                    setEditingProduct(null);
-                    resetForm();
-                  }}
-                >
-                  Hủy
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <ProductFormModal
+        show={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        onSuccess={fetchData}
+        id={formData.productId}
+        formData={formData}
+        setFormData={setFormData}
+        brands={brands}
+      />
     </div>
   );
 } 

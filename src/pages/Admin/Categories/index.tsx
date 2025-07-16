@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getAllCategoriesForAdmin, createCategory, updateCategory, deleteCategory } from '../../../services/categoryService';
 import type { Category } from '../../../types';
 import './Categories.css';
+import CategoryFormModal from '../../../components/AdminCategory/CategoryFormModal';
 
 interface CategoryFormData {
   categoryName: string;
@@ -12,7 +13,7 @@ interface CategoryWithLevel extends Category {
   level: number;
 }
 
-// Hàm chuyển đổi dữ liệu category API sang mảng phẳng với level để hiển thị tree
+
 function flattenCategoriesTree(apiCategories: any[], level: number = 0): CategoryWithLevel[] {
   const result: CategoryWithLevel[] = [];
   
@@ -44,8 +45,9 @@ export default function AdminCategories() {
   const [categories, setCategories] = useState<CategoryWithLevel[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [editingCategory, setEditingCategory] = useState<CategoryWithLevel | null>(null);
+  const [showFormModal, setShowFormModal] = useState(false);
+  
+  const [selectedCategory, setSelectedCategory] = useState<CategoryWithLevel | null>(null);
   const [formData, setFormData] = useState<CategoryFormData>({
     categoryName: '',
     slug: ''
@@ -70,35 +72,6 @@ export default function AdminCategories() {
     }
   };
 
-  const handleAddCategory = async () => {
-    try {
-      const response = await createCategory(formData);
-      if (response.code === 201) {
-        await fetchCategories(); 
-        setShowAddModal(false);
-        resetForm();
-      }
-    } catch (err) {
-      setError('Không thể thêm danh mục');
-      console.error('Error adding category:', err);
-    }
-  };
-
-  const handleUpdateCategory = async () => {
-    if (!editingCategory) return;
-    try {
-      const response = await updateCategory(editingCategory.id, formData);
-      if (response.code === 200) {
-        await fetchCategories(); // Refresh data
-        setEditingCategory(null);
-        resetForm();
-      }
-    } catch (err) {
-      setError('Không thể cập nhật danh mục');
-      console.error('Error updating category:', err);
-    }
-  };
-
   const handleDeleteCategory = async (categoryId: number) => {
     if (!confirm('Bạn có chắc chắn muốn xóa danh mục này?')) return;
     try {
@@ -117,13 +90,7 @@ export default function AdminCategories() {
     });
   };
 
-  const openEditModal = (category: CategoryWithLevel) => {
-    setEditingCategory(category);
-    setFormData({
-      categoryName: category.categoryName,
-      slug: category.slug
-    });
-  };
+
 
   const filteredCategories = categories.filter(category => {
     const name = category?.categoryName || '';
@@ -166,9 +133,7 @@ export default function AdminCategories() {
             Showing category hierarchy with {filteredCategories.length} categories
           </p>
         </div>
-        <button className="add-category-btn" onClick={() => setShowAddModal(true)}>
-          + Add Category
-        </button>
+        <button onClick={() => { setSelectedCategory(null); setShowFormModal(true); }}>+ Add Category</button>
       </div>
 
       <div className="categories-filters">
@@ -212,7 +177,7 @@ export default function AdminCategories() {
                 <td>{category.level + 1}</td>
                 <td>{category.children?.length || 0}</td>
                 <td>
-                  <button className="edit-btn" onClick={() => openEditModal(category)}>Edit</button>
+                          <button onClick={() => { setSelectedCategory(category); setShowFormModal(true); }}>Edit</button>
                   <button className="delete-btn" onClick={() => handleDeleteCategory(category.id)}>Delete</button>
                 </td>
               </tr>
@@ -227,54 +192,13 @@ export default function AdminCategories() {
         </div>
       )}
 
-      {(showAddModal || editingCategory) && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <h2>{editingCategory ? 'Edit Category' : 'Add New Category'}</h2>
-            <form onSubmit={(e) => {
-              e.preventDefault();
-              editingCategory ? handleUpdateCategory() : handleAddCategory();
-            }}>
-              <div className="form-group">
-                <label>Category Name:</label>
-                <input
-                  type="text"
-                  value={formData.categoryName}
-                  onChange={(e) => setFormData(prev => ({ ...prev, categoryName: e.target.value }))}
-                  required
-                />
-              </div>
-              
-              <div className="form-group">
-                <label>Slug:</label>
-                <input
-                  type="text"
-                  value={formData.slug}
-                  onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value }))}
-                  required
-                />
-              </div>
-              
-              <div className="modal-actions">
-                <button type="submit" className="save-btn">
-                  {editingCategory ? 'Update' : 'Add'}
-                </button>
-                <button 
-                  type="button" 
-                  className="cancel-btn"
-                  onClick={() => {
-                    setShowAddModal(false);
-                    setEditingCategory(null);
-                    resetForm();
-                  }}
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+        <CategoryFormModal
+        show={showFormModal}
+        onClose={() => setShowFormModal(false)}
+        onSuccess={() => fetchCategories()}
+        initialData={selectedCategory}
+      />
     </div>
+
   );
 } 

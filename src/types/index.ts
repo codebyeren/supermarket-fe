@@ -45,7 +45,10 @@ export interface Brand {
   brandName: string;
   slug: string;
 }
-
+export interface AddBrand{
+  brandName: string;
+  slug: string;
+}
 export interface Product {
   productId: number;
   productName: string;
@@ -188,3 +191,11 @@ export type DashboardData = {
   topProductByParentCategory: Record<string, Product[]>;
   revenueChart: { date: string; total: number }[];
 };
+export interface AddCategory {
+  categoryName: string;
+  slug: string;
+}
+
+export interface Category extends AddCategory {
+  id: number;
+}
