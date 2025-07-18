@@ -44,6 +44,14 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onClose, onSu
     }
   }, [form.parentCategoryId, categories]);
 
+  React.useEffect(() => {
+    if (initialData) {
+      setForm(initialData);
+      setImagePreview(initialData.imageUrl || '');
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  }, [initialData]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setForm((prev: any) => ({ ...prev, [name]: value }));
@@ -135,7 +143,7 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onClose, onSu
                 onChange={handleChange}
                 required
                 className="admin-search-input"
-                style={{fontSize: 18, padding: '14px 18px'}}
+                style={{fontSize: 18, padding: '14px 18px', color: '#222'}}
               />
             </div>
             <div className="form-group">
@@ -147,7 +155,7 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onClose, onSu
                 onChange={handleChange}
                 required
                 className="admin-search-input"
-                style={{fontSize: 18, padding: '14px 18px'}}
+                style={{fontSize: 18, padding: '14px 18px', color: '#222'}}
               />
             </div>
             <div className="form-group">
@@ -159,7 +167,7 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onClose, onSu
                 onChange={handleChange}
                 required
                 className="admin-search-input"
-                style={{fontSize: 18, padding: '14px 18px'}}
+                style={{fontSize: 18, padding: '14px 18px', color: '#222'}}
               />
             </div>
             <div className="form-group">
@@ -254,7 +262,7 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onClose, onSu
                 onChange={handleChange}
                 required
                 className="admin-search-input"
-                style={{fontSize: 18, padding: '14px 18px'}}
+                style={{fontSize: 18, padding: '14px 18px', color: '#222'}}
               />
             </div>
             <div className="form-group">
@@ -266,7 +274,7 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onClose, onSu
                 onChange={handleChange}
                 required
                 className="admin-search-input"
-                style={{fontSize: 18, padding: '14px 18px'}}
+                style={{fontSize: 18, padding: '14px 18px', color: '#222'}}
               />
             </div>
             <div className="form-group">
@@ -278,7 +286,7 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onClose, onSu
                 onChange={handleChange}
                 required
                 className="admin-search-input"
-                style={{fontSize: 18, padding: '14px 18px'}}
+                style={{fontSize: 18, padding: '14px 18px', color: '#222'}}
               />
             </div>
             <div className="form-group">
@@ -290,11 +298,11 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onClose, onSu
                 ref={fileInputRef}
                 onChange={handleImageChange}
                 className="admin-search-input"
-                style={{fontSize: 18, padding: '14px 18px'}}
+                style={{fontSize: 18, padding: '14px 18px', color: '#222'}}
               />
               {imagePreview && (
                 <div style={{marginTop: 12, textAlign: 'center'}}>
-                  <img src={imagePreview} alt="Preview" style={{width: 120, height: 120, objectFit: 'cover', borderRadius: 10, boxShadow: '0 2px 8px #ddd'}} />
+                  <img src={ `/img/${imagePreview}`} alt="Preview" style={{width: 120, height: 120, objectFit: 'cover', borderRadius: 10, boxShadow: '0 2px 8px #ddd'}} />
                   <div style={{fontSize: 13, color: '#888', marginTop: 4}}>{form.imageUrl}</div>
                   <button type="button" className="admin-btn delete-btn" style={{marginTop: 8}} onClick={handleImageRemove}>Remove image</button>
                 </div>

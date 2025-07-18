@@ -46,14 +46,11 @@ export default function AdminProducts() {
   const [editingProduct, setEditingProduct] = useState<any>(null);
 
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterCategory, setFilterCategory] = useState('all');
   const [filterBrand, setFilterBrand] = useState('all');
-  const [filterStatus, setFilterStatus] = useState<'all' | 'Available' | 'Unavailable'>('all');
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [detailProduct, setDetailProduct] = useState<Product | null>(null);
   const [loadingDetail, setLoadingDetail] = useState(false);
   const [detailError, setDetailError] = useState<string | null>(null);
-  const [parentCategories, setParentCategories] = useState<any[]>([]);
   const [childCategories, setChildCategories] = useState<any[]>([]);
   const [selectedParent, setSelectedParent] = useState('all');
   const [selectedChild, setSelectedChild] = useState('all');
@@ -157,7 +154,7 @@ export default function AdminProducts() {
     setDetailError(null);
     try {
       const detail = await getProductBySlug(slug);
-      setDetailProduct(detail as unknown as Product);
+      setDetailProduct(detail.productDto);
     } catch (e) {
       setDetailProduct(null);
       setDetailError('Cannot load product detail');
@@ -166,13 +163,50 @@ export default function AdminProducts() {
     }
   };
 
-  const handleAddProduct = () => {
-    setEditingProduct(null);
-    setShowProductForm(true);
+  const handleEditProduct = async (product: Product) => {
+    try {
+      const detail = await getProductBySlug(product.slug);
+      const p = detail.productDto;
+      // Map lại initialData cho form
+      let parentCategoryId = '';
+      let childCategoryId = '';
+      // Tìm parent/child category từ categories
+      if (p.categoryId) {
+        const foundParent = categories.find(cat =>
+          cat.children && cat.children.some(child => child.id === p.categoryId)
+        );
+        if (foundParent) {
+          parentCategoryId = String(foundParent.id);
+          childCategoryId = String(p.categoryId);
+        } else {
+          // Nếu là cha
+          parentCategoryId = String(p.categoryId);
+        }
+      }
+      console.log('Edit initialData', {
+        ...p,
+        brandId: p.brandId !== undefined ? String(p.brandId) : '',
+        promotionId: p.promotionId !== undefined ? String(p.promotionId) : '',
+        parentCategoryId,
+        childCategoryId,
+        status: p.status === 'active' || p.status === 'inactive' ? p.status : (p.status === 'Available' ? 'active' : 'inactive'),
+      });
+      setEditingProduct({
+        ...p,
+        brandId: p.brandId !== undefined ? String(p.brandId) : '',
+        promotionId: p.promotionId !== undefined ? String(p.promotionId) : '',
+        parentCategoryId,
+        childCategoryId,
+        status: p.status === 'active' || p.status === 'inactive' ? p.status : (p.status === 'Available' ? 'active' : 'inactive'),
+      });
+      setShowProductForm(true);
+    } catch (e) {
+   
+    }
   };
 
-  const handleEditProduct = (product: Product) => {
-    setEditingProduct(product);
+  const handleAddProduct = () => {
+    setEditingProduct(null);
     setShowProductForm(true);
   };
 
@@ -203,7 +237,7 @@ export default function AdminProducts() {
   }
 
   if (error) {
-    return <div className="error">{error}</div>;
+    window.alert(error);
   }
 
   return (
@@ -322,56 +356,56 @@ export default function AdminProducts() {
 
       {showDetailModal && (
         <AdminPopup open={showDetailModal} onClose={() => { setShowDetailModal(false); setDetailProduct(null); }}>
-          <div style={{minWidth: 1200, maxWidth: 1600, margin: '0 auto', padding: 32, position: 'relative'}}>
-            <button
-              className="close-modal-btn"
-              onClick={() => { setShowDetailModal(false); setDetailProduct(null); }}
-              aria-label="Đóng"
-            >×</button>
-            <h2 style={{marginBottom: 32, fontWeight: 700, fontSize: 28, textAlign: 'center'}}>Product Detail</h2>
-            {loadingDetail && <div>Loading...</div>}
-            {detailError && <div style={{color: 'red'}}>{detailError}</div>}
-            {detailProduct && !loadingDetail && !detailError && (
-              <div style={{background: '#f8f9fa', borderRadius: 16, padding: 32, boxShadow: '0 2px 12px #eee', maxWidth: 720, margin: '0 auto'}}>
-                <ul style={{listStyle: 'none', padding: 0, fontSize: 18, margin: 0}}>
-                  <li style={{marginBottom: 12}}><b>ID:</b> {detailProduct.productId}</li>
-                  <li style={{marginBottom: 12}}><b>Product Name:</b> {detailProduct.productName}</li>
-                  <li style={{marginBottom: 12}}><b>Price:</b> {formatPrice(detailProduct.price ?? 0)}</li>
-                  <li style={{marginBottom: 12}}><b>Slug:</b> {detailProduct.slug}</li>
-                  <li style={{marginBottom: 12}}><b>Status:</b> {detailProduct.status}</li>
-                  <li style={{marginBottom: 12}}><b>Brand:</b> {detailProduct.brand || '-'}</li>
-                  <li style={{marginBottom: 12}}><b>Quantity:</b> {detailProduct.quantity}</li>
-                  <li style={{marginBottom: 12}}><b>Rating Score:</b> {detailProduct.ratingScore}</li>
-                  <li style={{marginBottom: 12}}><b>Favorite:</b> {detailProduct.isFavorite ? 'Yes' : 'No'}</li>
-                  <li style={{marginBottom: 12}}><b>Promotion Name:</b> {detailProduct.promotionType || '-'}</li>
-                  <li style={{marginBottom: 12}}><b>Promotion Description:</b> {detailProduct.promotionDescription || '-'}</li>
-                  <li style={{marginBottom: 12}}><b>Discount Percent:</b> {detailProduct.discountPercent ? detailProduct.discountPercent + '%' : '-'}</li>
-                  <li style={{marginBottom: 12}}><b>Discount Amount:</b> {formatPrice(detailProduct.discountAmount ?? 0)}</li>
-                  <li style={{marginBottom: 12}}><b>Unit Cost:</b> {formatPrice(detailProduct.unitCost ?? 0)}</li>
-                  <li style={{marginBottom: 12}}><b>Total Amount:</b> {formatPrice(detailProduct.totalAmount ?? 0)}</li>
-                  <li style={{marginBottom: 12}}><b>Min Order Value:</b> {formatPrice(detailProduct.minOrderValue ?? 0)}</li>
-                  <li style={{marginBottom: 12}}><b>Min Order Quantity:</b> {detailProduct.minOrderQuantity ?? '-'}</li>
-                  <li style={{marginBottom: 12}}><b>Promotion Start Date:</b> {detailProduct.startDate ? new Date(detailProduct.startDate).toLocaleDateString('en-US') : 'None'}</li>
-                  <li style={{marginBottom: 12}}><b>Promotion End Date:</b> {detailProduct.endDate ? new Date(detailProduct.endDate).toLocaleDateString('en-US') : 'None'}</li>
-                  <li style={{marginBottom: 12}}><b>Product Image:</b><br/>
-                    <div style={{display: 'flex', justifyContent: 'center', margin: '16px 0'}}>
-                      <img src={detailProduct.imageUrl} alt={detailProduct.productName} style={{width: 180, height: 180, objectFit: 'cover', borderRadius: 12, background: '#fff', boxShadow: '0 2px 8px #ddd'}} />
-                    </div>
-                  </li>
-                  {detailProduct.giftProductName && (
-                    <li style={{marginBottom: 12}}><b>Gift:</b> {detailProduct.giftProductName}
-                      {detailProduct.giftProductImg && <div><img src={detailProduct.giftProductImg} alt={detailProduct.giftProductName} style={{width: 100, height: 100, objectFit: 'cover', borderRadius: 10, marginTop: 6}} /></div>}
-                      {detailProduct.giftProductPrice && <div>Gift Price: {formatPrice(detailProduct.giftProductPrice ?? 0)}</div>}
-                      {detailProduct.giftProductSlug && <div>Slug: {detailProduct.giftProductSlug}</div>}
-                    </li>
-                  )}
-                </ul>
+          <button
+            className="close-modal-btn"
+            onClick={() => { setShowDetailModal(false); setDetailProduct(null); }}
+            aria-label="Close"
+          >×</button>
+          <h2 style={{marginBottom: 32, fontWeight: 700, fontSize: 28, textAlign: 'center'}}>Product Detail</h2>
+          {loadingDetail && <div>Loading...</div>}
+          {detailError && <div style={{color: 'red'}}>{detailError}</div>}
+          {detailProduct && !loadingDetail && !detailError && (
+            <div style={{display: 'flex', gap: 32, flexWrap: 'wrap'}}>
+              <div style={{flex: 1, minWidth: 240, display: 'flex', flexDirection: 'column', gap: 20}}>
+                <div><b>Product Name:</b> {detailProduct.productName}</div>
+                <div><b>Price:</b> {formatPrice(detailProduct.price ?? 0)}</div>
+                <div><b>Slug:</b> {detailProduct.slug}</div>
+                <div><b>Status:</b> {detailProduct.status}</div>
+                <div><b>Quantity:</b> {detailProduct.quantity}</div>
+                <div><b>Unit Cost:</b> {formatPrice(detailProduct.unitCost ?? 0)}</div>
+                <div><b>Total Amount:</b> {formatPrice(detailProduct.totalAmount ?? 0)}</div>
+                <div><b>Brand:</b> {detailProduct.brand || '-'}</div>
+                <div><b>Category:</b> {detailProduct.categoryId || '-'}</div>
+                <div><b>Promotion:</b> {detailProduct.promotionType || '-'}</div>
               </div>
-            )}
-            {!detailProduct && !loadingDetail && !detailError && (
-              <div>No product data</div>
-            )}
-          </div>
+              <div style={{flex: 1, minWidth: 240, display: 'flex', flexDirection: 'column', gap: 20}}>
+                <div><b>Rating Score:</b> {detailProduct.ratingScore}</div>
+                <div><b>Favorite:</b> {detailProduct.isFavorite ? 'Yes' : 'No'}</div>
+                <div><b>Promotion Description:</b> {detailProduct.promotionDescription || '-'}</div>
+                <div><b>Discount Percent:</b> {detailProduct.discountPercent ? detailProduct.discountPercent + '%' : '-'}</div>
+                <div><b>Discount Amount:</b> {formatPrice(detailProduct.discountAmount ?? 0)}</div>
+                <div><b>Min Order Value:</b> {formatPrice(detailProduct.minOrderValue ?? 0)}</div>
+                <div><b>Min Order Quantity:</b> {detailProduct.minOrderQuantity ?? '-'}</div>
+                <div><b>Promotion Start Date:</b> {detailProduct.startDate ? new Date(detailProduct.startDate).toLocaleDateString('en-US') : 'None'}</div>
+                <div><b>Promotion End Date:</b> {detailProduct.endDate ? new Date(detailProduct.endDate).toLocaleDateString('en-US') : 'None'}</div>
+                <div><b>Product Image:</b><br/>
+                  <div style={{display: 'flex', justifyContent: 'center', margin: '16px 0'}}>
+                    <img src={`/img/${detailProduct.imageUrl}`} alt={detailProduct.productName} style={{width: 180, height: 180, objectFit: 'cover', borderRadius: 12, background: '#fff', boxShadow: '0 2px 8px #ddd'}} />
+                  </div>
+                </div>
+                {detailProduct.giftProductName && (
+                  <div><b>Gift:</b> {detailProduct.giftProductName}
+                    {detailProduct.giftProductImg && <div><img src={detailProduct.giftProductImg} alt={detailProduct.giftProductName} style={{width: 100, height: 100, objectFit: 'cover', borderRadius: 10, marginTop: 6}} /></div>}
+                    {detailProduct.giftProductPrice && <div>Gift Price: {formatPrice(detailProduct.giftProductPrice ?? 0)}</div>}
+                    {detailProduct.giftProductSlug && <div>Slug: {detailProduct.giftProductSlug}</div>}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+          {!detailProduct && !loadingDetail && !detailError && (
+            <div>No product data</div>
+          )}
         </AdminPopup>
       )}
     </div>
