@@ -57,6 +57,7 @@ export default function AdminCategories() {
   });
 
   const [searchTerm, setSearchTerm] = useState('');
+  const [openIds, setOpenIds] = useState<number[]>([]);
 
   useEffect(() => {
     fetchCategories();
@@ -77,11 +78,19 @@ export default function AdminCategories() {
 
   const handleDeleteCategory = async (categoryId: number) => {
     if (!confirm('Are you sure you want to delete this category?')) return;
+    // Kiểm tra nếu là cha và còn con thì không cho xóa
+    const category = categories.find(cat => cat.id === categoryId);
+    if (category && category.children && category.children.length > 0) {
+      window.alert('Cannot delete parent category when it has children!');
+      return;
+    }
     try {
       await deleteCategory(categoryId);
-      setCategories(prev => prev.filter(cat => cat.id !== categoryId));
+      window.alert('Delete category successfully!');
+      await fetchCategories(); // reload lại danh sách
     } catch (err) {
       setError('Cannot delete category');
+      window.alert('Delete category failed!');
       console.error('Error deleting category:', err);
     }
   };
@@ -119,12 +128,104 @@ export default function AdminCategories() {
     return indent + (hasChildren ? '├─ ' : '└─ ');
   };
 
+  // Tính toán filteredParents, filteredOpenIds cho search
+  const lowerSearch = searchTerm.trim().toLowerCase();
+  let filteredParents = categories.filter(cat => !cat.parentId);
+  let filteredOpenIds: number[] = [];
+  if (lowerSearch) {
+    filteredParents = filteredParents.filter(parent => {
+      const parentMatch = parent.categoryName.toLowerCase().includes(lowerSearch) || parent.slug.toLowerCase().includes(lowerSearch);
+      const childMatch = (parent.children || []).some(child =>
+        child.categoryName.toLowerCase().includes(lowerSearch) || child.slug.toLowerCase().includes(lowerSearch)
+      );
+      if (childMatch) filteredOpenIds.push(parent.id);
+      return parentMatch || childMatch;
+    });
+  }
+  useEffect(() => {
+    if (lowerSearch) setOpenIds(filteredOpenIds);
+    else setOpenIds([]);
+  }, [searchTerm]);
+
+  // Tree view UI với search
+  const renderCategoryTree = () => {
+    return (
+      <div style={{margin: '24px 0'}}>
+        {filteredParents.map(parent => (
+          <div key={parent.id} style={{
+            marginBottom: 12,
+            background: '#e9eafc',
+            borderRadius: 12,
+            padding: '12px 20px',
+            boxShadow: '0 2px 8px #f3f3fa',
+            color: '#4b5fa7',
+            transition: 'background 0.2s',
+            position: 'relative',
+          }}
+            onMouseOver={e => e.currentTarget.style.background = '#d6d6f7'}
+            onMouseOut={e => e.currentTarget.style.background = '#e9eafc'}
+          >
+            <div style={{display: 'flex', alignItems: 'center', gap: 8}}>
+              <button
+                style={{
+                  border: 'none', background: 'none', fontSize: 22, cursor: 'pointer',
+                  marginRight: 4, color: '#4b5fa7', fontWeight: 700, display: 'flex', alignItems: 'center'
+                }}
+                onClick={() => setOpenIds(ids => ids.includes(parent.id) ? ids.filter(id => id !== parent.id) : [...ids, parent.id])}
+                aria-label={openIds.includes(parent.id) ? 'Collapse' : 'Expand'}
+              >
+                <svg style={{transform: openIds.includes(parent.id) ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 0.2s'}} width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M7 5L13 10L7 15" stroke="#4b5fa7" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
+              <span style={{fontWeight: 700, fontSize: 17, flex: 3, display: 'flex', gap: 12}}>
+                <span style={{background: '#f7f8fc', borderRadius: 6, padding: '4px 80px ', fontWeight: 700, color: '#4b5fa7'}}>{parent.categoryName}</span>
+                <span style={{background: '#ecebfa', borderRadius: 6, padding: '4px 80px ', fontWeight: 500, fontSize: 15, color: '#7f53ac'}}>{parent.slug}</span>
+              </span>
+              <div style={{display: 'flex', gap: 6, flex: 1, justifyContent: 'flex-end'}}>
+                <button className="admin-btn edit-btn" style={{padding: '6px 14px', minWidth: 60, fontSize: 14, marginLeft: 0, background: '#e9eafc', color: '#4b5fa7', fontWeight: 700, border: '1.5px solid #b3b6e0', borderRadius: 7}} onClick={() => { const p = categories.find(cat => cat.id === parent.id); console.log('Edit parent:', p); if (p) setSelectedCategory(p); setShowFormModal(true); }}>Edit</button>
+                <button className="admin-btn delete-btn" style={{padding: '6px 14px', minWidth: 60, fontSize: 14, marginLeft: 0, background: '#e9eafc', color: '#fc5c7d', fontWeight: 700, border: '1.5px solid #f7b6c7', borderRadius: 7}} onClick={() => handleDeleteCategory(parent.id)}>Delete</button>
+              </div>
+            </div>
+            {openIds.includes(parent.id) && parent.children && parent.children.length > 0 && (
+              <div style={{marginLeft: 32, marginTop: 8, borderLeft: '3px solid #d6d6f7', paddingLeft: 16}}>
+                {parent.children.filter(child => {
+                  if (!lowerSearch) return true;
+                  return child.categoryName.toLowerCase().includes(lowerSearch) || child.slug.toLowerCase().includes(lowerSearch);
+                }).map(child => (
+                  <div key={child.id} style={{
+                    display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6,
+                    background: '#f7f8fc', borderRadius: 7, padding: '8px 14px',
+                    color: '#4b5fa7', fontWeight: 600, boxShadow: '0 1px 4px #f3e6fa',
+                    transition: 'background 0.2s',
+                  }}
+                    onMouseOver={e => e.currentTarget.style.background = '#ecebfa'}
+                    onMouseOut={e => e.currentTarget.style.background = '#f7f8fc'}
+                  >
+                    <span style={{display: 'flex', gap: 12, flex: 3}}>
+                      <span style={{background: '#ecebfa', borderRadius: 6, padding: '4px  80px', fontWeight: 600, color: '#4b5fa7'}}>{child.categoryName}</span>
+                      <span style={{background: '#e1e5e9', borderRadius: 6, padding: '4px  80px', fontWeight: 500, fontSize: 14, color: '#7f53ac'}}>{child.slug}</span>
+                    </span>
+                    <div style={{display: 'flex', gap: 6, flex: 1, justifyContent: 'flex-end'}}>
+                      <button className="admin-btn edit-btn" style={{padding: '6px 14px', minWidth: 60, fontSize: 14, marginLeft: 0, background: '#ecebfa', color: '#4b5fa7', fontWeight: 700, border: '1.5px solid #b3b6e0', borderRadius: 7}} onClick={() => { const c = categories.find(cat => cat.id === child.id); console.log('Edit child:', c); if (c) setSelectedCategory(c); setShowFormModal(true); }}>Edit</button>
+                      <button className="admin-btn delete-btn" style={{padding: '6px 14px', minWidth: 60, fontSize: 14, marginLeft: 0, background: '#ecebfa', color: '#fc5c7d', fontWeight: 700, border: '1.5px solid #f7b6c7', borderRadius: 7}} onClick={() => handleDeleteCategory(child.id)}>Delete</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   if (loading) {
     return <div className="loading">Loading...</div>;
   }
 
   if (error) {
-    return <div className="error">{error}</div>;
+    window.alert(error);
   }
 
   return (
@@ -133,7 +234,7 @@ export default function AdminCategories() {
         <div>
           <h1>Category Management</h1>
           <p className="categories-subtitle">
-            Showing category hierarchy with {filteredCategories.length} categories
+            Showing category hierarchy with {categories.length} categories
           </p>
         </div>
         <button className="admin-btn add-category-btn" onClick={() => { setSelectedCategory(null); setShowFormModal(true); }}>+ Add Category</button>
@@ -151,43 +252,7 @@ export default function AdminCategories() {
         </div>
       </div>
 
-      <table className="admin-table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Category Name</th>
-            <th>Slug</th>
-            <th>Level</th>
-            <th>Child Categories</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredCategories.map((category, index) => {
-            const isLastInLevel = index === filteredCategories.length - 1 || 
-              filteredCategories[index + 1]?.level < category.level;
-
-            return (
-              <tr key={category.id} className={`category-level-${category.level}`}>
-                <td>{category.id}</td>
-                <td className="category-name-cell">
-                  <span className="category-tree-display">
-                    {getTreePrefix(category.level, (category.children?.length || 0) > 0, isLastInLevel)}
-                    {category.categoryName}
-                  </span>
-                </td>
-                <td>{category.slug}</td>
-                <td>{category.level + 1}</td>
-                <td>{category.children?.length || 0}</td>
-                <td>
-                  <button className="admin-btn edit-btn" onClick={() => { setSelectedCategory(category); setShowFormModal(true); }}>Edit</button>
-                  <button className="admin-btn delete-btn" onClick={() => handleDeleteCategory(category.id)}>Delete</button>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+      {renderCategoryTree()}
 
       {filteredCategories.length === 0 && (
         <div className="no-categories">
@@ -200,6 +265,7 @@ export default function AdminCategories() {
         onClose={() => setShowFormModal(false)}
         onSuccess={() => fetchCategories()}
         initialData={selectedCategory}
+        categories={categories}
       />
     </div>
 
