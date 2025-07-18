@@ -37,8 +37,8 @@ export interface Category {
   id: number;
   categoryName: string;
   slug: string;
-  parentId: number | null;
-  children: Category[];
+  parentId?: number | null; // Cho phép null hoặc undefined
+  children?: Category[]; // Có thể undefined
 }
 
 export interface Brand {
@@ -57,27 +57,28 @@ export interface Product {
   slug: string;
   status: string;
   brand: string;
-  categoryId?: string;
-  brandId?: number; // Thêm brandId cho admin
+  categoryId?: number | null; // Sửa về number hoặc null cho đồng bộ
+  brandId?: number | null;
   imageUrl: string;
   quantity: number;
-  unitCost?: number; // Thêm unitCost cho admin
-  totalAmount?: number; // Thêm totalAmount cho admin
+  unitCost?: number;
+  totalAmount?: number;
   isFavorite: boolean;
   ratingScore: number;
-  promotionDescription: string;
-  giftProductName: string,
-  giftProductImg: string,
-  giftProductSlug: string,
-  giftProductPrice : number ,
-  promotionType: string | null;
-  discountPercent: number | null;
-  discountAmount: number | null;
-  giftProductId: number | null;
-  minOrderValue: number | null;
-  minOrderQuantity: number | null;
-  startDate: string;
-  endDate: string;
+  promotionId?: number | null; // Thêm trường này cho đồng bộ
+  promotionDescription?: string | null;
+  giftProductName?: string | null;
+  giftProductImg?: string | null;
+  giftProductSlug?: string | null;
+  giftProductPrice?: number | null;
+  promotionType?: string | null;
+  discountPercent?: number | null;
+  discountAmount?: number | null;
+  giftProductId?: number | null;
+  minOrderValue?: number | null;
+  minOrderQuantity?: number | null;
+  startDate?: string | null;
+  endDate?: string | null;
 }
 
 export interface ApiResponse<T> {

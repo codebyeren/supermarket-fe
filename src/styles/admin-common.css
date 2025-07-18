@@ -12,6 +12,11 @@
 .admin-search-input:focus {
   border-color: #007bff;
 }
+.admin-search-input,
+.admin-search-input input,
+.admin-search-input select {
+  color: #222;
+}
 
 .admin-btn {
   border: none;
