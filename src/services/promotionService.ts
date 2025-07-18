@@ -82,3 +82,18 @@ export const updateProductPromotionIsActive = async (
     throw new Error(error.response?.data?.message || 'Failed to update isActive status');
   }
 };
+
+
+export const togglePromotionStatus = async (promotionId: number, newStatus: boolean) => {
+  try {
+    const response = await axiosInstance.put(`/promotions/${promotionId}`, newStatus, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error toggling promotion status:', error);
+    throw error;
+  }
+};

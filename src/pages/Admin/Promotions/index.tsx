@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import './Promotions.css';
-import { fetchPromotions } from '../../../services/promotionService';
+import { fetchPromotions, togglePromotionStatus } from '../../../services/promotionService';
 import AdminPopup from '../../../components/AdminPopup/AdminPopup';
 import axiosInstance from '../../../services/axiosInstance';
 import '../../../styles/admin-common.css';
@@ -118,6 +118,21 @@ export default function AdminPromotions() {
   const getStatusText = (isActive: boolean) => {
     return isActive ? 'Active' : 'Inactive';
   };
+  const handleTogglePromotionStatus = async (promotionId: number, isActive: boolean) => {
+    try {
+      await togglePromotionStatus(promotionId, !isActive);
+      setPromotions((prev) =>
+        prev.map((promotion) =>
+          promotion.promotionId === promotionId
+            ? { ...promotion, isActive: !isActive }
+            : promotion
+        )
+      );
+    } catch (error) {
+      console.error('Error updating promotion status:', error);
+    }
+  };
+
 
 
   return (
@@ -136,6 +151,7 @@ export default function AdminPromotions() {
           <button className="add-promotion-btn" onClick={() => setShowAddModal(true)}>
             + Add Promotion
           </button>
+          <button className="add-promotion-btn" onClick={() => setShowAttachPopup(true)}>Promotion Manager</button>
         </div>
       </header>
 
@@ -259,10 +275,12 @@ export default function AdminPromotions() {
 
               <div className="promotion-actions mt-2">
                 <button className="admin-btn edit-btn">Edit</button>
-                <button className={`toggle-status-btn ${promotion.isActive ? 'active' : 'inactive'}`}>
+                <button
+                  className={`toggle-status-btn ${promotion.isActive ? 'active' : 'inactive'}`}
+                  onClick={() => handleTogglePromotionStatus(promotion.promotionId, promotion.isActive)}
+                >
                   {promotion.isActive ? 'Deactivate' : 'Activate'}
                 </button>
-                <button className="admin-btn delete-btn" onClick={() => setShowAttachPopup(true)}>Delete</button>
                 <button
                   className="admin-btn detail-btn"
                   onClick={() => {
