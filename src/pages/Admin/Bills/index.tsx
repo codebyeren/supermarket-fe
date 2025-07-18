@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './Bills.css';
+import '../../../styles/admin-common.css';
 
 interface Bill {
   id: string;
@@ -93,7 +94,7 @@ export default function AdminBills() {
             placeholder="Search by bill ID or customer name..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="search-input"
+            className="admin-search-input"
           />
         </div>
         
@@ -152,9 +153,9 @@ export default function AdminBills() {
                 <td>{bill.createdAt}</td>
                 <td>
                   <div className="action-buttons">
-                    <button className="view-btn">View</button>
-                    <button className="edit-btn">Edit</button>
-                    <button className="delete-btn">Delete</button>
+                    <button className="admin-btn view-btn">View</button>
+                    <button className="admin-btn edit-btn">Edit</button>
+                    <button className="admin-btn delete-btn">Delete</button>
                   </div>
                 </td>
               </tr>

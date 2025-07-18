@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { getAllProductsForAdmin, createProduct, updateProduct, deleteProduct } from '../../../services/productService';
+import { getAllProductsForAdmin, createProduct, updateProduct, deleteProduct, getProductBySlug } from '../../../services/productService';
 import { getAllBrandsForAdmin } from '../../../services/brandService';
 import { getAllCategoriesForAdmin } from '../../../services/categoryService';
+import { fetchPromotions as fetchPromotionsApi } from '../../../services/promotionService';
 import type { Product } from '../../../types';
 import type { Brand } from '../../../types';
 import type { Category } from '../../../types';
 import './Products.css';
-import ProductFormModal from '../../../components/AdminProduct/ProductModal';
+import '../../../styles/admin-common.css';
+import AdminPopup from '../../../components/AdminPopup';
+import ProductFormModal from '../../../components/AdminProduct/ProductFormModal';
 
 export interface ProductFormData {
   productId: number;
   productName: string;
-
   price: number;
   slug: string;
   status: string;
@@ -22,115 +24,172 @@ export interface ProductFormData {
   imageUrl: string;
 }
 
+// Hàm chuyển đổi dữ liệu category từ API về type Category FE
+function mapApiCategory(apiCat: any, parentId: number | null = null): Category {
+  const thisId = apiCat.categoryDto.id;
+  return {
+    id: thisId,
+    categoryName: apiCat.categoryDto.categoryName,
+    slug: apiCat.categoryDto.slug,
+    parentId: parentId,
+    children: (apiCat.children || []).map((child: any) => mapApiCategory(child, thisId))
+  };
+}
+
 export default function AdminProducts() {
   const [products, setProducts] = useState<Product[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showAddModal, setShowAddModal] = useState(false);
-
-
-  const [formData, setFormData] = useState<ProductFormData>({
-    productId: 0,
-    productName: '',
-    price: 0,
-    slug: '',
-    status: 'Available',
-    quantity: 0,
-    unitCost: 0,
-    totalAmount: 0,
-    brandId: 0,
-    imageUrl: ''
-  });
+  const [showProductForm, setShowProductForm] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<any>(null);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('all');
   const [filterBrand, setFilterBrand] = useState('all');
   const [filterStatus, setFilterStatus] = useState<'all' | 'Available' | 'Unavailable'>('all');
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [detailProduct, setDetailProduct] = useState<Product | null>(null);
+  const [loadingDetail, setLoadingDetail] = useState(false);
+  const [detailError, setDetailError] = useState<string | null>(null);
+  const [parentCategories, setParentCategories] = useState<any[]>([]);
+  const [childCategories, setChildCategories] = useState<any[]>([]);
+  const [selectedParent, setSelectedParent] = useState('all');
+  const [selectedChild, setSelectedChild] = useState('all');
+  const [promotions, setPromotions] = useState<any[]>([]);
 
+  // useEffect fetch data ban đầu (brands, categories)
   useEffect(() => {
-    fetchData();
+    fetchBrandsAndCategories();
+    fetchPromotions();
   }, []);
 
-  const fetchData = async () => {
+  // useEffect fetch products khi filter thay đổi
+  useEffect(() => {
+    fetchProducts();
+  }, [searchTerm, selectedParent, selectedChild, filterBrand]);
+
+  // useEffect cập nhật childCategories khi chọn cha
+  useEffect(() => {
+    if (selectedParent === 'all') {
+      setChildCategories([]);
+      setSelectedChild('all');
+    } else {
+      const found = categories.find(item => String(item.id) === selectedParent);
+      setChildCategories(found?.children || []);
+      setSelectedChild('all');
+    }
+  }, [selectedParent, categories]);
+
+  const fetchBrandsAndCategories = async () => {
     try {
       setLoading(true);
-      const [productsData, brandsData, categoriesData] = await Promise.all([
-        getAllProductsForAdmin(),
+      const [brandsData, categoriesData] = await Promise.all([
         getAllBrandsForAdmin(),
         getAllCategoriesForAdmin()
       ]);
-      setProducts(Array.isArray(productsData) ? productsData : []);
       setBrands(brandsData);
-      setCategories(categoriesData);
+      setCategories(Array.isArray(categoriesData) ? categoriesData.map(cat => mapApiCategory(cat, null)) : []);
     } catch (err) {
-      setError('Không thể tải dữ liệu');
-      console.error('Error fetching data:', err);
+      setError('Cannot load brands/categories');
+      console.error('Error fetching brands/categories:', err);
     } finally {
       setLoading(false);
     }
   };
 
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      let categorySlug = '';
+      if (selectedChild !== 'all') {
+        const foundParent = categories.find(cat => String(cat.id) === selectedParent);
+        const foundChild = foundParent?.children.find(child => String(child.id) === selectedChild);
+        categorySlug = foundChild?.slug || '';
+      } else if (selectedParent !== 'all') {
+        const foundParent = categories.find(cat => String(cat.id) === selectedParent);
+        categorySlug = foundParent?.slug || '';
+      }
+      let brandSlug = '';
+      if (filterBrand !== 'all') {
+        const foundBrand = brands.find(brand => String(brand.id) === filterBrand);
+        brandSlug = foundBrand?.slug || '';
+      }
+      const filters = {
+        searchName: searchTerm,
+        category: categorySlug,
+        brand: brandSlug
+      };
+      const productsData = await getAllProductsForAdmin(filters);
+      setProducts(Array.isArray(productsData) ? productsData : []);
+    } catch (err) {
+      setError('Cannot load products');
+      console.error('Error fetching products:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  const fetchPromotions = async () => {
+    try {
+      const data = await fetchPromotionsApi();
+      setPromotions(Array.isArray(data) ? data : []);
+    } catch (err) {
+      setPromotions([]);
+    }
+  };
 
   const handleDeleteProduct = async (productId: number) => {
-    if (!confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) return;
+    if (!confirm('Are you sure you want to delete this product?')) return;
     try {
       await deleteProduct(productId);
       setProducts(prev => prev.filter(p => p.productId !== productId));
     } catch (err) {
-      setError('Không thể xóa sản phẩm');
+      setError('Cannot delete product');
       console.error('Error deleting product:', err);
     }
   };
 
-  // Add
+  const handleShowDetail = async (slug: string) => {
+    setShowDetailModal(true);
+    setLoadingDetail(true);
+    setDetailError(null);
+    try {
+      const detail = await getProductBySlug(slug);
+      setDetailProduct(detail as unknown as Product);
+    } catch (e) {
+      setDetailProduct(null);
+      setDetailError('Cannot load product detail');
+    } finally {
+      setLoadingDetail(false);
+    }
+  };
+
   const handleAddProduct = () => {
-    setFormData({
-      productId: 0,
-      productName: '',
-      price: 0,
-      slug: '',
-      status: 'Available',
-      quantity: 0,
-      unitCost: 0,
-      totalAmount: 0,
-      brandId: brands.length > 0 ? brands[0].id : 0,
-      imageUrl: ''
-    });
-    setShowAddModal(true);
+    setEditingProduct(null);
+    setShowProductForm(true);
   };
 
-  // Edit
   const handleEditProduct = (product: Product) => {
-    setFormData({
-      productId: product.productId,
-      productName: product.productName,
-      price: product.price,
-      slug: product.slug,
-      status: product.status,
-      quantity: product.quantity,
-      unitCost: product.unitCost ?? 0,
-      totalAmount: product.totalAmount ?? 0,
-      brandId: product.brandId ?? 0,
-      imageUrl: product.imageUrl
-    });
-    setShowAddModal(true);
+    setEditingProduct(product);
+    setShowProductForm(true);
   };
 
-
-
-  const filteredProducts = Array.isArray(products) ? products.filter(product => {
-    const matchesSearch = product.productName.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = filterCategory === 'all' ||
-      categories.find(cat => cat.id === product.brandId)?.categoryName === filterCategory;
-    const matchesBrand = filterBrand === 'all' ||
-      brands.find(brand => brand.id === product.brandId)?.brandName === filterBrand;
-    const matchesStatus = filterStatus === 'all' || product.status === filterStatus;
-
-    return matchesSearch && matchesCategory && matchesBrand && matchesStatus;
-  }) : [];
+  const handleProductFormSuccess = async (formData: any) => {
+    try {
+      if (editingProduct) {
+        await updateProduct(formData.productId, formData);
+      } else {
+        await createProduct(formData);
+      }
+      await fetchProducts();
+      setShowProductForm(false);
+      setEditingProduct(null);
+    } catch (err) {
+      setError('Cannot save product');
+    }
+  };
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('vi-VN', {
@@ -140,7 +199,7 @@ export default function AdminProducts() {
   };
 
   if (loading) {
-    return <div className="loading">Đang tải...</div>;
+    return <div className="loading">Loading...</div>;
   }
 
   if (error) {
@@ -150,60 +209,63 @@ export default function AdminProducts() {
   return (
     <div className="admin-products">
       <div className="products-header">
-        <h1>Quản lý sản phẩm</h1>
+        <h1>Product Management</h1>
         <button className="add-product-btn" onClick={handleAddProduct}>
-          + Thêm sản phẩm
+          + Add Product
         </button>
-
-
       </div>
 
       <div className="products-filters">
         <div className="search-box">
           <input
             type="text"
-            placeholder="Tìm kiếm sản phẩm..."
+            placeholder="Search products..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="search-input"
+            className="admin-search-input"
           />
         </div>
 
         <div className="filter-controls">
+          {/* Dropdown cha */}
           <select
-            value={filterCategory}
-            onChange={(e) => setFilterCategory(e.target.value)}
+            value={selectedParent}
+            onChange={e => setSelectedParent(e.target.value)}
             className="filter-select text-dark"
           >
-            <option value="all">Tất cả danh mục</option>
-            {categories.map(category => (
-              <option key={category.id} value={category.id}>
-                {category.categoryName}
+            <option value="all">All Parent Categories</option>
+            {categories.filter(cat => !cat.parentId && cat.children && cat.children.length > 0).map(parent => (
+              <option key={parent.id} value={String(parent.id)}>
+                {parent.categoryName}
               </option>
             ))}
           </select>
-
+          {/* Dropdown con */}
+          <select
+            value={selectedChild}
+            onChange={e => setSelectedChild(e.target.value)}
+            className="filter-select text-dark"
+            disabled={childCategories.length === 0}
+          >
+            <option value="all">All Subcategories</option>
+            {childCategories.map(child => (
+              <option key={child.id} value={String(child.id)}>
+                {child.categoryName}
+              </option>
+            ))}
+          </select>
+          {/* Dropdown brand giữ nguyên */}
           <select
             value={filterBrand}
             onChange={(e) => setFilterBrand(e.target.value)}
             className="filter-select text-dark"
           >
-            <option value="all">Tất cả thương hiệu</option>
+            <option value="all">All Brands</option>
             {brands.map(brand => (
-              <option key={brand.id} value={brand.brandName}>
+              <option key={brand.id} value={String(brand.id)}>
                 {brand.brandName}
               </option>
             ))}
-          </select>
-
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value as any)}
-            className="filter-select text-dark"
-          >
-            <option value="all">Tất cả trạng thái</option>
-            <option value="Available">Có sẵn</option>
-            <option value="Unavailable">Không có sẵn</option>
           </select>
         </div>
       </div>
@@ -212,66 +274,106 @@ export default function AdminProducts() {
         <thead>
           <tr>
             <th>ID</th>
-            <th>Tên sản phẩm</th>
-            <th>Giá</th>
-            <th>Số lượng</th>
-            <th>Thương hiệu</th>
-            <th>Trạng thái</th>
-            <th>Hình ảnh</th>
-            <th>Thao tác</th>
+            <th>Product Name</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Promotion Name</th>
+            <th>Promotion Description</th>
+            <th>Image</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          {filteredProducts.map(product => (
+          {products.map(product => (
             <tr key={product.productId}>
               <td>{product.productId}</td>
               <td>{product.productName}</td>
               <td>{formatPrice(product.price)}</td>
               <td>{product.quantity}</td>
-              <td>{product.brand || 'N/A'}</td>
-              <td><span
-                className="badge px-2 py-1 text-white"
-                style={{
-                  backgroundColor:
-                    product.status === 'Hot Deal'
-                      ? '#e53935'
-                      : product.status === 'Best Seller'
-                        ? '#fb8c00'
-                        : product.status === 'New Arrival'
-                          ? '#43a047'
-                          : '#6c757d',
-                  fontSize: 12,
-                  borderRadius: 4,
-                  textTransform: 'uppercase'
-                }}
-              >
-                {product.status}
-              </span></td>
-              <td><img src={`/img/${product.imageUrl}`} alt={product.productName} style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 4 }} /></td>
+              <td>{product.promotionType || 'None'}</td>
+              <td>{product.promotionDescription || 'None'}</td>
+              <td><img src={`/img/${product.imageUrl}`} alt={product.productName} style={{width: 48, height: 48, objectFit: 'cover', borderRadius: 4}} /></td>
               <td>
-                <button onClick={() => handleEditProduct(product)}>Edit</button>
-
-                <button className="delete-btn" onClick={() => handleDeleteProduct(product.productId)}>Xóa</button>
+                <button className="admin-btn edit-btn" onClick={() => handleEditProduct(product)}>Edit</button>
+                <button className="admin-btn delete-btn" onClick={() => handleDeleteProduct(product.productId)}>Delete</button>
+                <button className="admin-btn detail-btn" onClick={() => handleShowDetail(product.slug)}>Detail</button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
 
-      {filteredProducts.length === 0 && (
+      {products.length === 0 && (
         <div className="no-products">
-          <p>Không tìm thấy sản phẩm nào</p>
+          <p>No products found</p>
         </div>
       )}
+
+      {/* Add/Edit Modal */}
       <ProductFormModal
-        show={showAddModal}
-        onClose={() => setShowAddModal(false)}
-        onSuccess={fetchData}
-        id={formData.productId}
-        formData={formData}
-        setFormData={setFormData}
+        open={showProductForm}
+        onClose={() => { setShowProductForm(false); setEditingProduct(null); }}
+        onSuccess={handleProductFormSuccess}
+        initialData={editingProduct}
         brands={brands}
+        promotions={promotions}
+        categories={categories}
       />
+
+      {showDetailModal && (
+        <AdminPopup open={showDetailModal} onClose={() => { setShowDetailModal(false); setDetailProduct(null); }}>
+          <div style={{minWidth: 1200, maxWidth: 1600, margin: '0 auto', padding: 32, position: 'relative'}}>
+            <button
+              className="close-modal-btn"
+              onClick={() => { setShowDetailModal(false); setDetailProduct(null); }}
+              aria-label="Đóng"
+            >×</button>
+            <h2 style={{marginBottom: 32, fontWeight: 700, fontSize: 28, textAlign: 'center'}}>Product Detail</h2>
+            {loadingDetail && <div>Loading...</div>}
+            {detailError && <div style={{color: 'red'}}>{detailError}</div>}
+            {detailProduct && !loadingDetail && !detailError && (
+              <div style={{background: '#f8f9fa', borderRadius: 16, padding: 32, boxShadow: '0 2px 12px #eee', maxWidth: 720, margin: '0 auto'}}>
+                <ul style={{listStyle: 'none', padding: 0, fontSize: 18, margin: 0}}>
+                  <li style={{marginBottom: 12}}><b>ID:</b> {detailProduct.productId}</li>
+                  <li style={{marginBottom: 12}}><b>Product Name:</b> {detailProduct.productName}</li>
+                  <li style={{marginBottom: 12}}><b>Price:</b> {formatPrice(detailProduct.price ?? 0)}</li>
+                  <li style={{marginBottom: 12}}><b>Slug:</b> {detailProduct.slug}</li>
+                  <li style={{marginBottom: 12}}><b>Status:</b> {detailProduct.status}</li>
+                  <li style={{marginBottom: 12}}><b>Brand:</b> {detailProduct.brand || '-'}</li>
+                  <li style={{marginBottom: 12}}><b>Quantity:</b> {detailProduct.quantity}</li>
+                  <li style={{marginBottom: 12}}><b>Rating Score:</b> {detailProduct.ratingScore}</li>
+                  <li style={{marginBottom: 12}}><b>Favorite:</b> {detailProduct.isFavorite ? 'Yes' : 'No'}</li>
+                  <li style={{marginBottom: 12}}><b>Promotion Name:</b> {detailProduct.promotionType || '-'}</li>
+                  <li style={{marginBottom: 12}}><b>Promotion Description:</b> {detailProduct.promotionDescription || '-'}</li>
+                  <li style={{marginBottom: 12}}><b>Discount Percent:</b> {detailProduct.discountPercent ? detailProduct.discountPercent + '%' : '-'}</li>
+                  <li style={{marginBottom: 12}}><b>Discount Amount:</b> {formatPrice(detailProduct.discountAmount ?? 0)}</li>
+                  <li style={{marginBottom: 12}}><b>Unit Cost:</b> {formatPrice(detailProduct.unitCost ?? 0)}</li>
+                  <li style={{marginBottom: 12}}><b>Total Amount:</b> {formatPrice(detailProduct.totalAmount ?? 0)}</li>
+                  <li style={{marginBottom: 12}}><b>Min Order Value:</b> {formatPrice(detailProduct.minOrderValue ?? 0)}</li>
+                  <li style={{marginBottom: 12}}><b>Min Order Quantity:</b> {detailProduct.minOrderQuantity ?? '-'}</li>
+                  <li style={{marginBottom: 12}}><b>Promotion Start Date:</b> {detailProduct.startDate ? new Date(detailProduct.startDate).toLocaleDateString('en-US') : 'None'}</li>
+                  <li style={{marginBottom: 12}}><b>Promotion End Date:</b> {detailProduct.endDate ? new Date(detailProduct.endDate).toLocaleDateString('en-US') : 'None'}</li>
+                  <li style={{marginBottom: 12}}><b>Product Image:</b><br/>
+                    <div style={{display: 'flex', justifyContent: 'center', margin: '16px 0'}}>
+                      <img src={detailProduct.imageUrl} alt={detailProduct.productName} style={{width: 180, height: 180, objectFit: 'cover', borderRadius: 12, background: '#fff', boxShadow: '0 2px 8px #ddd'}} />
+                    </div>
+                  </li>
+                  {detailProduct.giftProductName && (
+                    <li style={{marginBottom: 12}}><b>Gift:</b> {detailProduct.giftProductName}
+                      {detailProduct.giftProductImg && <div><img src={detailProduct.giftProductImg} alt={detailProduct.giftProductName} style={{width: 100, height: 100, objectFit: 'cover', borderRadius: 10, marginTop: 6}} /></div>}
+                      {detailProduct.giftProductPrice && <div>Gift Price: {formatPrice(detailProduct.giftProductPrice ?? 0)}</div>}
+                      {detailProduct.giftProductSlug && <div>Slug: {detailProduct.giftProductSlug}</div>}
+                    </li>
+                  )}
+                </ul>
+              </div>
+            )}
+            {!detailProduct && !loadingDetail && !detailError && (
+              <div>No product data</div>
+            )}
+          </div>
+        </AdminPopup>
+      )}
     </div>
   );
 } 

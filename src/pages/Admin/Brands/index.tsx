@@ -4,6 +4,7 @@ import type { Brand } from '../../../types';
 import './Brands.css';
 import AddBrandModal from '../../../components/AdminBrand/addBrand';
 import BrandFormModal from '../../../components/AdminBrand/brandModal';
+import '../../../styles/admin-common.css';
 
 interface BrandFormData {
   brandName: string;
@@ -93,7 +94,7 @@ export default function AdminBrands() {
             placeholder="Search brands..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="search-input"
+            className="admin-search-input"
           />
         </div>
       </div>
@@ -114,8 +115,8 @@ export default function AdminBrands() {
               <td>{brand.brandName}</td>
               <td>{brand.slug}</td>
               <td>
-                <button className="edit-btn" onClick={() => openEditBrand(brand)}>Edit</button>
-                <button className="delete-btn" onClick={() => handleDeleteBrand(brand.id)}>Delete</button>
+                <button className="admin-btn edit-btn" onClick={() => openEditBrand(brand)}>Edit</button>
+                <button className="admin-btn delete-btn" onClick={() => handleDeleteBrand(brand.id)}>Delete</button>
               </td>
             </tr>
           ))}

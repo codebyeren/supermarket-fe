@@ -37,6 +37,7 @@ export interface Category {
   id: number;
   categoryName: string;
   slug: string;
+  parentId: number | null;
   children: Category[];
 }
 

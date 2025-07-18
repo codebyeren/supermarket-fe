@@ -3,7 +3,7 @@ export const validation = {
   // Check if field is required
   required: (value: string, fieldName: string): string => {
     if (!value || !value.trim()) {
-      return `${fieldName} không được để trống`;
+      return `${fieldName} not empty`;
     }
     return '';
   },
@@ -13,7 +13,7 @@ export const validation = {
     if (!value) return '';
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(value)) {
-      return 'Email không hợp lệ';
+      return 'Email invalid';
     }
     return '';
   },
@@ -23,7 +23,7 @@ export const validation = {
     if (!value) return '';
     const phoneRegex = /^[0-9]{10}$/;
     if (!phoneRegex.test(value)) {
-      return 'Số điện thoại phải có 10 chữ số';
+      return 'Phone number must be 10 digits';
     }
     return '';
   },
@@ -32,10 +32,10 @@ export const validation = {
   username: (value: string): string => {
     if (!value) return '';
     if (value.length < 3) {
-      return 'Tên đăng nhập phải có ít nhất 3 ký tự';
+      return 'Username must be at least 3 characters';
     }
     if (!/^[a-zA-Z0-9_-]*$/.test(value)) {
-      return 'Tên đăng nhập chỉ được chứa chữ cái, số và dấu gạch dưới';
+      return 'Username can only contain letters, numbers, and underscores';
     }
     return '';
   },
@@ -44,10 +44,10 @@ export const validation = {
   password: (value: string): string => {
     if (!value) return '';
     if (value.length < 6) {
-      return 'Mật khẩu phải có ít nhất 6 ký tự';
+      return 'Password must be at least 6 characters';
     }
     if (!/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$.!%*#?&]{6,}$/.test(value)) {
-      return 'Mật khẩu phải chứa ít nhất một chữ hoa, một chữ thường, một số và một ký tự đặc biệt';
+      return 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character';
     }
     return '';
   },
@@ -56,7 +56,7 @@ export const validation = {
   confirmPassword: (password: string, confirmPassword: string): string => {
     if (!confirmPassword) return '';
     if (password !== confirmPassword) {
-      return 'Mật khẩu xác nhận không khớp';
+      return 'Confirm password does not match';
     }
     return '';
   },
@@ -68,11 +68,11 @@ export const validation = {
     const today = new Date();
     
     if (isNaN(dob.getTime())) {
-      return 'Ngày sinh không hợp lệ';
+      return 'Date of birth is invalid';
     }
     
     if (dob > today) {
-      return 'Ngày sinh không thể là ngày trong tương lai';
+      return 'Date of birth cannot be in the future';
     }
     
     let age = today.getFullYear() - dob.getFullYear();
@@ -82,10 +82,10 @@ export const validation = {
     }
     
     if (age < 10) {
-      return 'Bạn phải đủ 10 tuổi để đăng ký';
+      return 'You must be at least 10 years old to register';
     }
     if (age > 100) {
-      return 'Ngày sinh không hợp lệ (tuổi tối đa là 100)';
+      return 'Date of birth is invalid (maximum age is 100)';
     }
     return '';
   },
@@ -94,7 +94,7 @@ export const validation = {
   minLength: (value: string, minLength: number, fieldName: string): string => {
     if (!value) return '';
     if (value.length < minLength) {
-      return `${fieldName} phải có ít nhất ${minLength} ký tự`;
+      return `${fieldName} must be at least ${minLength} characters`;
     }
     return '';
   },
@@ -103,7 +103,7 @@ export const validation = {
   maxLength: (value: string, maxLength: number, fieldName: string): string => {
     if (!value) return '';
     if (value.length > maxLength) {
-      return `${fieldName} không được vượt quá ${maxLength} ký tự`;
+      return `${fieldName} cannot exceed ${maxLength} characters`;
     }
     return '';
   }
@@ -111,15 +111,15 @@ export const validation = {
 
 // Field name mappings
 export const fieldNames: { [key: string]: string } = {
-  firstName: 'Họ',
-  lastName: 'Tên',
-  phoneNumber: 'Số điện thoại',
+  firstName: 'First name',
+  lastName: 'Last name',
+  phoneNumber: 'Phone number',
   email: 'Email',
-  address: 'Địa chỉ',
-  dob: 'Ngày sinh',
-  username: 'Tên đăng nhập',
-  password: 'Mật khẩu',
-  confirmPassword: 'Xác nhận mật khẩu'
+  address: 'Address',
+  dob: 'Date of birth',
+  username: 'Username',
+  password: 'Password',
+  confirmPassword: 'Confirm password'
 };
 
 // Get field name for display

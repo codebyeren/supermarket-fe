@@ -7,6 +7,7 @@ function mapCategoryApiToFE(apiCat: any): Category {
   const { id, categoryName, slug } = apiCat.categoryDto;
   return {
     id,
+    parentId: apiCat.parentId,
     categoryName,
     slug,
     children: Array.isArray(apiCat.children)

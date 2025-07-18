@@ -1,6 +1,7 @@
 /* Admin Brands Styles */
 .admin-brands {
   max-width: 1200px;
+  min-width: 50vw;
   margin: 0 auto;
 }
 
@@ -46,20 +47,6 @@
 .search-box {
   flex: 1;
   min-width: 300px;
-}
-
-.search-input {
-  width: 100%;
-  padding: 12px 16px;
-  border: 2px solid #e9ecef;
-  border-radius: 8px;
-  font-size: 14px;
-  transition: border-color 0.3s ease;
-}
-
-.search-input:focus {
-  outline: none;
-  border-color: #667eea;
 }
 
 .filter-controls {

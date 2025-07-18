@@ -161,10 +161,19 @@ export const deleteProduct = async (productId: number): Promise<void> => {
   await axiosInstance.delete(`/products/${productId}`);
 };
 
-export const getAllProductsForAdmin = async (): Promise<Product[]> => {
-  const response = await axiosInstance.get('/products');
-  // Đảm bảo luôn trả về array
+export const getAllProductsForAdmin = async (filters?: {
+  searchName?: string;
+  category?: string;
+  brand?: string;
+}): Promise<Product[]> => {
+  const params = new URLSearchParams();
+  if (filters?.searchName) params.append('searchName', filters.searchName);
+  if (filters?.category && filters.category !== '') params.append('category', filters.category);
+  if (filters?.brand && filters.brand !== '') params.append('brand', filters.brand);
+  const url = params.toString() ? `/products/filter?${params.toString()}` : '/products';
+  const response = await axiosInstance.get(url);
   if (Array.isArray(response.data)) return response.data;
   if (Array.isArray(response.data?.data)) return response.data.data;
   return [];
 };
+

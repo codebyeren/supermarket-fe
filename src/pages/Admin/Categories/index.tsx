@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getAllCategoriesForAdmin, createCategory, updateCategory, deleteCategory } from '../../../services/categoryService';
 import type { Category } from '../../../types';
 import './Categories.css';
+import '../../../styles/admin-common.css';
 import CategoryFormModal from '../../../components/AdminCategory/CategoryFormModal';
 
 interface CategoryFormData {
@@ -18,15 +19,17 @@ function flattenCategoriesTree(apiCategories: any[], level: number = 0): Categor
   const result: CategoryWithLevel[] = [];
   
   function traverse(node: any, currentLevel: number) {
-    const { id, categoryName, slug } = node.categoryDto;
+    const { id, categoryName, slug, parentId } = node.categoryDto;
     result.push({
       id,
       categoryName,
       slug,
+      parentId,
       children: node.children ? node.children.map((child: any) => ({
         id: child.categoryDto.id,
         categoryName: child.categoryDto.categoryName,
         slug: child.categoryDto.slug,
+        parentId: child.categoryDto.parentId,
         children: []
       })) : [],
       level: currentLevel
@@ -65,7 +68,7 @@ export default function AdminCategories() {
       const categoriesData = await getAllCategoriesForAdmin();
       setCategories(Array.isArray(categoriesData) ? flattenCategoriesTree(categoriesData) : []);
     } catch (err) {
-      setError('Không thể tải dữ liệu danh mục');
+      setError('Cannot load category data');
       console.error('Error fetching categories:', err);
     } finally {
       setLoading(false);
@@ -73,12 +76,12 @@ export default function AdminCategories() {
   };
 
   const handleDeleteCategory = async (categoryId: number) => {
-    if (!confirm('Bạn có chắc chắn muốn xóa danh mục này?')) return;
+    if (!confirm('Are you sure you want to delete this category?')) return;
     try {
       await deleteCategory(categoryId);
       setCategories(prev => prev.filter(cat => cat.id !== categoryId));
     } catch (err) {
-      setError('Không thể xóa danh mục');
+      setError('Cannot delete category');
       console.error('Error deleting category:', err);
     }
   };
@@ -117,7 +120,7 @@ export default function AdminCategories() {
   };
 
   if (loading) {
-    return <div className="loading">Đang tải...</div>;
+    return <div className="loading">Loading...</div>;
   }
 
   if (error) {
@@ -133,7 +136,7 @@ export default function AdminCategories() {
             Showing category hierarchy with {filteredCategories.length} categories
           </p>
         </div>
-        <button onClick={() => { setSelectedCategory(null); setShowFormModal(true); }}>+ Add Category</button>
+        <button className="admin-btn add-category-btn" onClick={() => { setSelectedCategory(null); setShowFormModal(true); }}>+ Add Category</button>
       </div>
 
       <div className="categories-filters">
@@ -143,7 +146,7 @@ export default function AdminCategories() {
             placeholder="Search categories..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="search-input"
+            className="admin-search-input"
           />
         </div>
       </div>
@@ -177,8 +180,8 @@ export default function AdminCategories() {
                 <td>{category.level + 1}</td>
                 <td>{category.children?.length || 0}</td>
                 <td>
-                          <button onClick={() => { setSelectedCategory(category); setShowFormModal(true); }}>Edit</button>
-                  <button className="delete-btn" onClick={() => handleDeleteCategory(category.id)}>Delete</button>
+                  <button className="admin-btn edit-btn" onClick={() => { setSelectedCategory(category); setShowFormModal(true); }}>Edit</button>
+                  <button className="admin-btn delete-btn" onClick={() => handleDeleteCategory(category.id)}>Delete</button>
                 </td>
               </tr>
             );

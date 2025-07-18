@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './Users.css';
+import '../../../styles/admin-common.css';
 
 interface User {
   id: string;
@@ -72,7 +73,7 @@ export default function AdminUsers() {
             placeholder="Tìm kiếm theo tên hoặc email..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="search-input"
+            className="admin-search-input"
           />
         </div>
         
@@ -146,8 +147,8 @@ export default function AdminUsers() {
                     >
                       {user.status === 'active' ? 'Vô hiệu hóa' : 'Kích hoạt'}
                     </button>
-                    <button className="edit-btn">Sửa</button>
-                    <button className="delete-btn"   disabled={user.username === 'admin' } >Xóa</button>
+                    <button className="admin-btn edit-btn">Sửa</button>
+                    <button className="admin-btn delete-btn"   disabled={user.username === 'admin' } >Xóa</button>
                   </div>
                 </td>
               </tr>

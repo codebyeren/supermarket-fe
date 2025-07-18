@@ -1,6 +1,6 @@
 /* Admin Products Styles */
 .admin-products {
-  max-width: 1200px;
+  max-width: 1500px;
   margin: 0 auto;
 }
 
@@ -73,13 +73,31 @@
   border-radius: 8px;
   font-size: 14px;
   background: white;
+  color: #222;
   cursor: pointer;
-  transition: border-color 0.3s ease;
+  transition: border-color 0.3s ease, box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 
 .filter-select:focus {
   outline: none;
   border-color: #667eea;
+  box-shadow: 0 4px 16px rgba(102,126,234,0.10);
+}
+
+.filter-select option {
+  background: #fff;
+  color: #222;
+}
+
+.filter-select option:checked {
+  background: #e9ecef;
+  color: #222;
+}
+
+.filter-select option:hover {
+  background: #f3f6fa;
+  color: #222;
 }
 
 .products-grid {
@@ -138,7 +156,8 @@
 }
 
 .product-overlay .edit-btn,
-.product-overlay .delete-btn {
+.product-overlay .delete-btn,
+.product-overlay .detail-btn {
   padding: 8px 16px;
   border: none;
   border-radius: 6px;
@@ -164,6 +183,15 @@
 
 .product-overlay .delete-btn:hover {
   background-color: #c82333;
+}
+
+.product-overlay .detail-btn {
+  background-color: #007bff;
+  color: white;
+}
+
+.product-overlay .detail-btn:hover {
+  background-color: #0056b3;
 }
 
 .product-info {
@@ -282,103 +310,6 @@
   margin: 20px;
 }
 
-/* Modal Styles */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.modal {
-  background: white;
-  border-radius: 12px;
-  padding: 30px;
-  width: 90%;
-  max-width: 500px;
-  max-height: 80vh;
-  overflow-y: auto;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-}
-
-.modal h2 {
-  margin: 0 0 20px 0;
-  color: #333;
-  font-size: 24px;
-}
-
-.form-group {
-  margin-bottom: 20px;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 600;
-  color: #333;
-}
-
-.form-group input,
-.form-group select {
-  width: 100%;
-  padding: 12px;
-  border: 2px solid #e1e5e9;
-  border-radius: 8px;
-  font-size: 16px;
-  transition: border-color 0.3s;
-}
-
-.form-group input:focus,
-.form-group select:focus {
-  outline: none;
-  border-color: #007bff;
-}
-
-.modal-actions {
-  display: flex;
-  gap: 12px;
-  justify-content: flex-end;
-  margin-top: 30px;
-}
-
-.save-btn {
-  background: #007bff;
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.save-btn:hover {
-  background: #0056b3;
-}
-
-.cancel-btn {
-  background: #6c757d;
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.cancel-btn:hover {
-  background: #545b62;
-}
-
 /* Status Badge */
 .status-badge {
   padding: 4px 12px;
@@ -462,4 +393,32 @@
 }
 .admin-table tr:nth-child(even) {
   background: #fafbfc;
+} 
+
+/* Popup chi tiết sản phẩm custom */
+.custom-detail-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 350px;
+  max-width: 90vw;
+  max-height: 80vh;
+  overflow-y: auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  z-index: 999999;
+  padding: 32px 24px 24px 24px;
+  animation: popup-fade-in 0.2s;
+}
+.custom-detail-popup-bg {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: transparent;
+  z-index: 999998;
+}
+@keyframes popup-fade-in {
+  from { opacity: 0; transform: translate(-50%, -60%);}
+  to { opacity: 1; transform: translate(-50%, -50%);}
 } 

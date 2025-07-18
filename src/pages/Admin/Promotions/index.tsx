@@ -1,92 +1,86 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './Promotions.css';
+import { fetchPromotions } from '../../../services/promotionService';
+import AdminPopup from '../../../components/AdminPopup/AdminPopup';
+import axiosInstance from '../../../services/axiosInstance';
+import '../../../styles/admin-common.css';
 
 interface Promotion {
-  id: string;
-  name: string;
+  promotionId: number;
+  promotionType: string;
   description: string;
-  discountType: 'percentage' | 'fixed';
-  discountValue: number;
   startDate: string;
   endDate: string;
-  status: 'active' | 'inactive' | 'expired';
-  usageCount: number;
-  maxUsage: number;
+  discountPercent: number | null;
+  discountAmount: number | null;
+  giftProductId: number | null;
+  giftProductName: string | null;
+  giftProductImg: string | null;
+  giftProductSlug: string | null;
+  minOrderValue: number | null;
+  minOrderQuantity: number | null;
+  isActive: boolean;
+  products: any[];
 }
 
 export default function AdminPromotions() {
-  const [promotions, setPromotions] = useState<Promotion[]>([
-    {
-      id: 'PROMO001',
-      name: 'Giảm giá mùa hè',
-      description: 'Giảm giá 20% cho tất cả đồ uống',
-      discountType: 'percentage',
-      discountValue: 20,
-      startDate: '2024-06-01',
-      endDate: '2024-08-31',
-      status: 'active',
-      usageCount: 45,
-      maxUsage: 100
-    },
-    {
-      id: 'PROMO002',
-      name: 'Khuyến mãi mới',
-      description: 'Giảm 50,000đ cho đơn hàng từ 500,000đ',
-      discountType: 'fixed',
-      discountValue: 50000,
-      startDate: '2024-01-01',
-      endDate: '2024-12-31',
-      status: 'active',
-      usageCount: 12,
-      maxUsage: 50
-    }
-  ]);
-
+  const [promotions, setPromotions] = useState<Promotion[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'inactive' | 'expired'>('all');
+  const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'inactive'>('all');
+  const [detail, setDetail] = useState<Promotion | null>(null);
+  const [showDetail, setShowDetail] = useState(false);
+  const [loadingDetail, setLoadingDetail] = useState(false);
+
+  useEffect(() => {
+    fetchPromotions().then(setPromotions);
+  }, []);
 
   const filteredPromotions = promotions.filter(promotion => {
-    const matchesSearch = promotion.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         promotion.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = filterStatus === 'all' || promotion.status === filterStatus;
-    
+    const matchesSearch = promotion.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus =
+      filterStatus === 'all' ||
+      (filterStatus === 'active' && promotion.isActive) ||
+      (filterStatus === 'inactive' && !promotion.isActive);
     return matchesSearch && matchesStatus;
   });
 
-  const handleStatusToggle = (promotionId: string) => {
-    setPromotions(prev => prev.map(promotion => 
-      promotion.id === promotionId 
-        ? { ...promotion, status: promotion.status === 'active' ? 'inactive' : 'active' }
-        : promotion
-    ));
-  };
-
-  const formatDiscount = (type: 'percentage' | 'fixed', value: number) => {
-    if (type === 'percentage') {
-      return `${value}%`;
-    } else {
-      return new Intl.NumberFormat('vi-VN', {
-        style: 'currency',
-        currency: 'VND'
-      }).format(value);
+  const formatDiscount = (promotion: Promotion) => {
+    if (promotion.promotionType === 'PERCENT_DISCOUNT' && promotion.discountPercent) {
+      return `${promotion.discountPercent}%`;
     }
-  };
-
-  const getStatusColor = (status: Promotion['status']) => {
-    switch (status) {
-      case 'active': return 'success';
-      case 'inactive': return 'warning';
-      case 'expired': return 'danger';
-      default: return 'secondary';
+    if (promotion.promotionType === 'ORDER_VALUE_DISCOUNT' && promotion.discountAmount) {
+      return `-${promotion.discountAmount} USD`;
     }
+    if (promotion.promotionType === 'BUY_ONE_GET_ONE' && promotion.giftProductName) {
+      return `Mua 1 tặng 1: ${promotion.giftProductName}`;
+    }
+    if (promotion.promotionType === 'GIFT_ITEM' && promotion.giftProductName) {
+      return `Tặng: ${promotion.giftProductName}`;
+    }
+    if (promotion.promotionType === 'ORDER_QUANTITY_GIFT' && promotion.giftProductName) {
+      return `Tặng: ${promotion.giftProductName}`;
+    }
+    return '';
   };
 
-  const getStatusText = (status: Promotion['status']) => {
-    switch (status) {
-      case 'active': return 'Đang hoạt động';
-      case 'inactive': return 'Tạm dừng';
-      case 'expired': return 'Hết hạn';
-      default: return status;
+  const getStatusColor = (isActive: boolean) => {
+    return isActive ? 'success' : 'warning';
+  };
+
+  const getStatusText = (isActive: boolean) => {
+    return isActive ? 'Đang hoạt động' : 'Tạm dừng';
+  };
+
+  const handleShowDetail = async (promotionId: number) => {
+    setLoadingDetail(true);
+    try {
+      const res = await axiosInstance.get(`/promotions/${promotionId}`);
+      setDetail(res.data.data);
+      setShowDetail(true);
+    } catch (e) {
+      alert('Không lấy được chi tiết khuyến mãi!');
+    } finally {
+      setLoadingDetail(false);
     }
   };
 
@@ -104,89 +98,90 @@ export default function AdminPromotions() {
             placeholder="Tìm kiếm khuyến mãi..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="search-input"
+            className="admin-search-input"
           />
         </div>
-        
         <div className="filter-controls">
-          <select 
-            value={filterStatus} 
+          <select
+            value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value as any)}
             className="filter-select text-dark"
           >
             <option value="all">Tất cả trạng thái</option>
             <option value="active">Đang hoạt động</option>
             <option value="inactive">Tạm dừng</option>
-            <option value="expired">Hết hạn</option>
           </select>
         </div>
       </div>
 
-      <div className="promotions-grid">
-        {filteredPromotions.map(promotion => (
-          <div key={promotion.id} className="promotion-card">
-            <div className="promotion-header">
-              <h3 className="promotion-name">{promotion.name}</h3>
-              <span className={`status-badge ${getStatusColor(promotion.status)}`}>
-                {getStatusText(promotion.status)}
-              </span>
+      {filteredPromotions.map(promotion => (
+        <div key={promotion.promotionId} className="promotion-card">
+          <div className="promotion-header">
+            <h3 className="promotion-name">{promotion.description}</h3>
+            <span className={`status-badge ${getStatusColor(promotion.isActive)}`}>
+              {getStatusText(promotion.isActive)}
+            </span>
+          </div>
+
+          <p className="promotion-description">{formatDiscount(promotion)}</p>
+
+          <div className="promotion-dates">
+            <div className="date-item">
+              <span className="date-label">Từ:</span>
+              <span className="date-value">{promotion.startDate.slice(0, 10)}</span>
             </div>
-            
-            <p className="promotion-description">{promotion.description}</p>
-            
-            <div className="promotion-discount">
-              <span className="discount-value">
-                {formatDiscount(promotion.discountType, promotion.discountValue)}
-              </span>
-              <span className="discount-type">
-                {promotion.discountType === 'percentage' ? 'Giảm %' : 'Giảm tiền'}
-              </span>
-            </div>
-            
-            <div className="promotion-dates">
-              <div className="date-item">
-                <span className="date-label">Từ:</span>
-                <span className="date-value">{promotion.startDate}</span>
-              </div>
-              <div className="date-item">
-                <span className="date-label">Đến:</span>
-                <span className="date-value">{promotion.endDate}</span>
-              </div>
-            </div>
-            
-            <div className="promotion-usage">
-              <div className="usage-info">
-                <span className="usage-label">Sử dụng:</span>
-                <span className="usage-value">{promotion.usageCount}/{promotion.maxUsage}</span>
-              </div>
-              <div className="usage-progress">
-                <div 
-                  className="usage-bar" 
-                  style={{ width: `${(promotion.usageCount / promotion.maxUsage) * 100}%` }}
-                ></div>
-              </div>
-            </div>
-            
-            <div className="promotion-actions">
-              <button className="edit-btn">Sửa</button>
-              <button 
-                className={`toggle-status-btn ${promotion.status}`}
-                onClick={() => handleStatusToggle(promotion.id)}
-                disabled={promotion.status === 'expired'}
-              >
-                {promotion.status === 'active' ? 'Tạm dừng' : 'Kích hoạt'}
-              </button>
-              <button className="delete-btn">Xóa</button>
+            <div className="date-item">
+              <span className="date-label">Đến:</span>
+              <span className="date-value">{promotion.endDate.slice(0, 10)}</span>
             </div>
           </div>
-        ))}
-      </div>
+
+          <div className="promotion-actions">
+            <button className="admin-btn edit-btn">Sửa</button>
+            <button className={`toggle-status-btn ${promotion.isActive ? 'active' : 'inactive'}`}>{promotion.isActive ? 'Tạm dừng' : 'Kích hoạt'}</button>
+            <button className="admin-btn delete-btn">Xóa</button>
+            <button className="admin-btn detail-btn" onClick={() => handleShowDetail(promotion.promotionId)} disabled={loadingDetail}>Xem chi tiết</button>
+          </div>
+        </div>
+      ))}
 
       {filteredPromotions.length === 0 && (
         <div className="no-promotions">
           <p>Không tìm thấy khuyến mãi nào</p>
         </div>
       )}
+
+      <AdminPopup open={showDetail} onClose={() => setShowDetail(false)}>
+        {detail && (
+          <div style={{minWidth: 350}}>
+            <h2>Chi tiết khuyến mãi</h2>
+            <div><b>Mã:</b> {detail.promotionId}</div>
+            <div><b>Loại:</b> {detail.promotionType}</div>
+            <div><b>Mô tả:</b> {detail.description}</div>
+            <div><b>Thời gian:</b> {detail.startDate.slice(0,10)} - {detail.endDate.slice(0,10)}</div>
+            {detail.discountPercent && <div><b>Giảm %:</b> {detail.discountPercent}%</div>}
+            {detail.discountAmount && <div><b>Giảm tiền:</b> {detail.discountAmount}</div>}
+            {detail.giftProductName && <div><b>Sản phẩm tặng:</b> {detail.giftProductName}</div>}
+            {detail.minOrderValue && <div><b>Đơn tối thiểu:</b> {detail.minOrderValue}</div>}
+            {detail.minOrderQuantity && <div><b>Số lượng tối thiểu:</b> {detail.minOrderQuantity}</div>}
+            <div><b>Trạng thái:</b> {detail.isActive ? 'Đang hoạt động' : 'Tạm dừng'}</div>
+            <div style={{marginTop: 12}}>
+              <b>Sản phẩm áp dụng:</b>
+              {detail.products && detail.products.length > 0 ? (
+                <ul style={{margin: 0, paddingLeft: 18}}>
+                  {detail.products.map((p: any) => (
+                    <li key={p.productId}>
+                      <span>{p.productName}</span> - <span>{p.price} USD</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div>Không có sản phẩm áp dụng</div>
+              )}
+            </div>
+          </div>
+        )}
+      </AdminPopup>
     </div>
   );
 } 

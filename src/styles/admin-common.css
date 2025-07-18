@@ -1,0 +1,70 @@
+/* CSS dùng chung cho admin side */
+.admin-search-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e1e5e9;
+  background-color: #fff;
+  border-radius: 8px;
+  font-size: 15px;
+  transition: border-color 0.3s;
+  outline: none;
+}
+.admin-search-input:focus {
+  border-color: #007bff;
+}
+
+.admin-btn {
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+  margin-left: 4px;
+}
+.admin-btn.detail-btn {
+  background-color: #007bff;
+  color: #fff;
+  font-size: 12px
+}
+.admin-btn.detail-btn:hover {
+  background-color: #0056b3;
+  box-shadow: 0 2px 8px rgba(0,123,255,0.15);
+}
+.admin-btn.edit-btn {
+  background-color: #17a2b8;
+  color: #fff;
+}
+.admin-btn.edit-btn:hover {
+  background-color: #138496;
+}
+.admin-btn.delete-btn {
+  background-color: #dc3545;
+  color: #fff;
+}
+.admin-btn.delete-btn:hover {
+  background-color: #c82333;
+}
+.close-modal-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: #888;
+  font-size: 32px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, color 0.2s;
+  z-index: 10;
+}
+.close-modal-btn:hover {
+  background: #f0f0f0;
+  color: #333;
+} 
