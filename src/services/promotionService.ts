@@ -27,3 +27,58 @@ export const createPromotion = async (data: FormDataPromotionAddType) => {
     );
   }
 };
+export const getPromotionById = async (promotionId: number) => {
+  try {
+    const response = await axiosInstance.get(`/promotions/${promotionId}`);
+    if (!response?.data?.data) {
+      throw new Error("No data received from the server");
+    }
+    return response.data.data;
+  } catch (error: any) {
+    console.error("Error fetching promotion by ID:", {
+      message: error.message,
+      status: error.response?.status,
+      response: error.response?.data,
+    });
+    throw new Error(
+      error.response?.data?.message || "Failed to fetch promotion detail"
+    );
+  }
+};
+export const attachProductToPromotion = async (promotionId: number, productId: number) => {
+  try {
+    const response = await axiosInstance.post(`/promotions/${promotionId}/products/${productId}`);
+    if (!response?.data?.data) {
+      throw new Error('Không nhận được phản hồi từ server');
+    }
+    return response.data;
+  } catch (error: any) {
+    console.error('Error attaching product to promotion:', {
+      message: error.message,
+      status: error.response?.status,
+      response: error.response?.data,
+    });
+    throw new Error(error.response?.data?.message || 'Gắn product thất bại');
+  }
+};
+export const updateProductPromotionIsActive = async (
+  promotionId: number,
+  productId: number,
+  isActive: boolean
+) => {
+  try {
+    const response = await axiosInstance.put(
+      `/promotions/${promotionId}/products/${productId}`,
+      isActive,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error('Error updating product-promotion isActive:', error);
+    throw new Error(error.response?.data?.message || 'Failed to update isActive status');
+  }
+};
