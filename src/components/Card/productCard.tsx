@@ -155,8 +155,7 @@ const ProductCard = ({ product, onAddToCartSuccess, onAddToCartFail, hideAddToCa
                 giftProductId: product.giftProductId,
                 minOrderValue: product.minOrderValue,
                 minOrderQuantity: product.minOrderQuantity,
-                startDate: product.startDate,
-                endDate: product.endDate,
+         
               });
               onAddToCartSuccess?.();
             } catch (error) {

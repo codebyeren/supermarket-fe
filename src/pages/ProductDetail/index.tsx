@@ -251,8 +251,7 @@ const ProductDetail = () => {
                                     giftProductId: product.giftProductId,
                                     minOrderValue: product.minOrderValue,
                                     minOrderQuantity: product.minOrderQuantity,
-                                    startDate: product.startDate,
-                                    endDate: product.endDate,
+                            
                                 });
                                 setSuccess(true);
                                 setShowNotification(true);
