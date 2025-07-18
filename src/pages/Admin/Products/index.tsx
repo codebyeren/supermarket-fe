@@ -213,7 +213,7 @@ export default function AdminProducts() {
   const handleProductFormSuccess = async (formData: any) => {
     try {
       if (editingProduct) {
-        await updateProduct(formData.productId, formData);
+      await updateProduct(formData.productId, formData);
       } else {
         await createProduct(formData);
       }
@@ -237,7 +237,6 @@ export default function AdminProducts() {
   }
 
   if (error) {
-    window.alert(error);
   }
 
   return (

@@ -75,19 +75,25 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onClose, onSu
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    let categoryId = '';
-    if (form.childCategoryId) categoryId = form.childCategoryId;
-    else if (form.parentCategoryId) categoryId = form.parentCategoryId;
-    onSuccess({
-      ...form,
+    let categoryIds: number[] = [];
+    if (form.childCategoryId && form.parentCategoryId) categoryIds = [Number(form.parentCategoryId), Number(form.childCategoryId)];
+    else if (form.parentCategoryId) categoryIds = [Number(form.parentCategoryId)];
+    const requestBody: any = {
+      productName: form.productName,
       price: Number(form.price),
+      slug: form.slug,
+      status: form.status,
       quantity: Number(form.quantity),
       unitCost: Number(form.unitCost),
       totalAmount: Number(form.totalAmount),
       brandId: Number(form.brandId),
+      imageUrl: form.imageUrl || '',
       promotionId: form.promotionId ? Number(form.promotionId) : undefined,
-      categoryId: categoryId ? Number(categoryId) : undefined,
-    });
+      categoryId: categoryIds.length > 0 ? categoryIds : undefined,
+    };
+    // Xóa các trường undefined
+    Object.keys(requestBody).forEach(key => requestBody[key] === undefined && delete requestBody[key]);
+    onSuccess(requestBody);
   };
 
   const handleReset = () => {
