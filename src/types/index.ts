@@ -200,3 +200,10 @@ export interface AddCategory {
 export interface Category extends AddCategory {
   id: number;
 }
+export type FormDataPromotionAddType = {
+  promotionType: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+  discountPercent?: number;
+};

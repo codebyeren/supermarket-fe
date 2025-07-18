@@ -7,6 +7,7 @@ import { jwtDecode } from 'jwt-decode';
 import type { MyJwtPayload } from '../../types';
 import DropdownCart from '../DropdownCart';
 import Notification from '../Notification';
+import './header.css'
 const Header = () => {
     const navigate = useNavigate();
     const { isAuthenticated, user, logout, checkAuth } = useAuthStore();
@@ -71,8 +72,8 @@ const Header = () => {
     };
 
     return (
-        <header style={{ boxShadow: '0 2px 8px #e0f2f1', marginBottom: 2 }}>
-            <div className="bg-success text-white py-2 w-100" style={{ width: '100vw', padding: isMobile ? 8 : 0 }}>
+        <header style={{ boxShadow: '0 2px 8px #e0f2f1', marginBottom: 2  } } >
+            <div className="bg-success text-white py-2 w-100 bg" style={{ width: '100vw', padding: isMobile ? 8 : 0 }}>
                 <div
                     className="container-lg"
                     style={{

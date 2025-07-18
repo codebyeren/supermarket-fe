@@ -4,6 +4,7 @@ import { fetchPromotions } from '../../../services/promotionService';
 import AdminPopup from '../../../components/AdminPopup/AdminPopup';
 import axiosInstance from '../../../services/axiosInstance';
 import '../../../styles/admin-common.css';
+import PromotionFormModal from '../../../components/AdminPromotion/PromotionFormModal';
 
 interface Promotion {
   promotionId: number;
@@ -29,6 +30,8 @@ export default function AdminPromotions() {
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'inactive'>('all');
   const [detail, setDetail] = useState<Promotion | null>(null);
   const [showDetail, setShowDetail] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
+
   const [loadingDetail, setLoadingDetail] = useState(false);
 
   useEffect(() => {
@@ -87,8 +90,10 @@ export default function AdminPromotions() {
   return (
     <div className="admin-promotions">
       <div className="promotions-header">
-        <h1>Quản lý khuyến mãi</h1>
-        <button className="add-promotion-btn">+ Thêm khuyến mãi</button>
+        <h1>Quản lý khuyến mãi</h1><button className="add-promotion-btn" onClick={() => setShowAddModal(true)}>
+          + Thêm khuyến mãi
+        </button>
+
       </div>
 
       <div className="promotions-filters">
@@ -151,37 +156,16 @@ export default function AdminPromotions() {
         </div>
       )}
 
-      <AdminPopup open={showDetail} onClose={() => setShowDetail(false)}>
-        {detail && (
-          <div style={{minWidth: 350}}>
-            <h2>Chi tiết khuyến mãi</h2>
-            <div><b>Mã:</b> {detail.promotionId}</div>
-            <div><b>Loại:</b> {detail.promotionType}</div>
-            <div><b>Mô tả:</b> {detail.description}</div>
-            <div><b>Thời gian:</b> {detail.startDate.slice(0,10)} - {detail.endDate.slice(0,10)}</div>
-            {detail.discountPercent && <div><b>Giảm %:</b> {detail.discountPercent}%</div>}
-            {detail.discountAmount && <div><b>Giảm tiền:</b> {detail.discountAmount}</div>}
-            {detail.giftProductName && <div><b>Sản phẩm tặng:</b> {detail.giftProductName}</div>}
-            {detail.minOrderValue && <div><b>Đơn tối thiểu:</b> {detail.minOrderValue}</div>}
-            {detail.minOrderQuantity && <div><b>Số lượng tối thiểu:</b> {detail.minOrderQuantity}</div>}
-            <div><b>Trạng thái:</b> {detail.isActive ? 'Đang hoạt động' : 'Tạm dừng'}</div>
-            <div style={{marginTop: 12}}>
-              <b>Sản phẩm áp dụng:</b>
-              {detail.products && detail.products.length > 0 ? (
-                <ul style={{margin: 0, paddingLeft: 18}}>
-                  {detail.products.map((p: any) => (
-                    <li key={p.productId}>
-                      <span>{p.productName}</span> - <span>{p.price} USD</span>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <div>Không có sản phẩm áp dụng</div>
-              )}
-            </div>
-          </div>
-        )}
-      </AdminPopup>
+      {showAddModal && (
+        <PromotionFormModal
+          show={showAddModal}
+          onClose={() => setShowAddModal(false)}
+          onSuccess={() => {
+            fetchPromotions().then(setPromotions);
+            setShowAddModal(false);
+          }}
+        />
+      )}
     </div>
   );
 } 

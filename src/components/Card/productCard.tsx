@@ -130,6 +130,11 @@ const ProductCard = ({ product, onAddToCartSuccess, onAddToCartFail, hideAddToCa
 
       {!hideAddToCartButton && (
         <button
+          style={{
+            backgroundImage: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
+            color: '#fff',
+            border: 'none',
+          }}
           className="btn btn-outline-success btn-sm"
           onClick={(e) => {
             e.stopPropagation();

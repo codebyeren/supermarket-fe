@@ -48,10 +48,10 @@ const SortDropdown: React.FC<SortDropdownProps> = ({ currentSort, onSortChange, 
           transition: 'border-color 0.2s'
         }}
         onFocus={(e) => {
-          e.target.style.borderColor = '#2e7d32';
+          e.target.style.borderColor = 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)';
         }}
         onBlur={(e) => {
-          e.target.style.borderColor = '#ced4da';
+          e.target.style.borderColor = 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)';
         }}
       >
         {options.map((option) => (

@@ -226,6 +226,11 @@ const ProductDetail = () => {
                     )}
 
                     <button
+                        style={{
+                            backgroundImage: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
+                            color: '#fff',
+                            border: 'none',
+                        }}
                         className="btn btn-success btn-sm w-100 p-2 mt-2"
                         onClick={() => {
                             try {

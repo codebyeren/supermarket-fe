@@ -39,9 +39,10 @@ const SortPanel: React.FC<SortPanelProps> = ({ sortState, onSortChange, sortGrou
           width: '100%'
         }}
       >
+        
         {sortGroups.map(group => (
           <div key={group.key} style={{ minWidth: 170, marginBottom: 0, flex: '1 1 170px', maxWidth: 220 }}>
-            <div style={{ fontWeight: 600, color: '#2e7d32', marginBottom: 6 }}>{group.label}</div>
+            <div style={{ fontWeight: 600, color: '#7c3aed', marginBottom: 6 }}>{group.label}</div>
             <select
               value={sortState[group.key] || ''}
               onChange={e => onSortChange(group.key, e.target.value === '' ? undefined : (e.target.value as 'asc' | 'desc'))}

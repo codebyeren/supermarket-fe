@@ -179,14 +179,14 @@ const SearchPage: React.FC = () => {
         boxShadow: "0 4px 24px #e0f2f1",
         padding: isMobile ? 16 : 36,
         height: "fit-content",
-        border: "2px solid #2e7d32",
+        border: "2px solid #7c3aed",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
         marginBottom: isMobile ? 24 : 0
       }}>
-        <div style={{ fontWeight: 700, marginBottom: 24, fontSize: 24, color: '#2e7d32', letterSpacing: 1, textAlign: 'center' }}>Bộ lọc sản phẩm</div>
+        <div style={{ fontWeight: 700, marginBottom: 24, fontSize: 24, color: '#7c3aed', letterSpacing: 1, textAlign: 'center' }}>Bộ lọc sản phẩm</div>
         <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <label style={{ fontWeight: 600, marginBottom: 12, display: 'block', color: '#222', fontSize: 16, textAlign: 'center' }}>Khoảng giá (₫)</label>
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18, justifyContent: 'center' }}>
@@ -197,7 +197,7 @@ const SearchPage: React.FC = () => {
               value={minPrice}
               onChange={e => handlePriceChange('min', Number(e.target.value))}
               onBlur={handlePriceCommit}
-              style={{ width: 90, padding: 10, borderRadius: 10, border: "1.5px solid #2e7d32", fontWeight: 500, color: '#2e7d32', background: '#f9fff9', textAlign: 'center', fontSize: 16 }}
+              style={{ width: 90, padding: 10, borderRadius: 10, border: "1.5px solid #7c3aed", fontWeight: 500, color: '#7c3aed', background: '#f9fff9', textAlign: 'center', fontSize: 16 }}
             />
             <span style={{ color: '#888', fontWeight: 600, fontSize: 18 }}>-</span>
             <input
@@ -207,7 +207,7 @@ const SearchPage: React.FC = () => {
               value={maxPrice}
               onChange={e => handlePriceChange('max', Number(e.target.value))}
               onBlur={handlePriceCommit}
-              style={{ width: 90, padding: 10, borderRadius: 10, border: "1.5px solid #2e7d32", fontWeight: 500, color: '#2e7d32', background: '#f9fff9', textAlign: 'center', fontSize: 16 }}
+              style={{ width: 90, padding: 10, borderRadius: 10, border: "1.5px solid #7c3aed", fontWeight: 500, color: '#7c3aed', background: '#f9fff9', textAlign: 'center', fontSize: 16 }}
             />
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 10, width: '100%', justifyContent: 'center' }}>
@@ -219,7 +219,7 @@ const SearchPage: React.FC = () => {
               onChange={e => handlePriceChange('min', Number(e.target.value))}
               onMouseUp={handlePriceCommit}
               onTouchEnd={handlePriceCommit}
-              style={{ flex: 1, accentColor: '#2e7d32', marginRight: 8 }}
+              style={{ flex: 1, accentColor: '#7c3aed', marginRight: 8 }}
             />
             <input
               type="range"
@@ -229,7 +229,7 @@ const SearchPage: React.FC = () => {
               onChange={e => handlePriceChange('max', Number(e.target.value))}
               onMouseUp={handlePriceCommit}
               onTouchEnd={handlePriceCommit}
-              style={{ flex: 1, accentColor: '#2e7d32', marginLeft: 8 }}
+              style={{ flex: 1, accentColor: '#7c3aed', marginLeft: 8 }}
             />
           </div>
           <div style={{ fontSize: 14, color: '#888', marginTop: 8, textAlign: 'center', fontStyle: 'italic', maxWidth: 220 }}>

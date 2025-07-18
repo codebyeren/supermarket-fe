@@ -192,7 +192,7 @@ export default function UserInfoPage() {
                   <button type="button" className="btn btn-secondary w-100" onClick={() => setEditing(false)}>Cancel</button>
                 </div>
               ) : (
-                <button type="button" className="btn btn-primary w-100" onClick={() => setEditing(true)}>Edit</button>
+                <button type="button" style ={{backgroundColor : '#7c3aed'}}className="btn btn-primary w-100" onClick={() => setEditing(true)}>Edit</button>
               )}
             </div>
           </form>

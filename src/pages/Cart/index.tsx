@@ -37,7 +37,7 @@ const CartPage: React.FC = () => {
         <div className="empty-cart-message">
           <FaShoppingCart />
           <p>Your cart is currently empty.</p>
-          <button className="continue-shopping" onClick={() => navigate('/')}>Continue Shopping</button>
+          <button className="continue-shopping" style={{backgroundImage : 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)'}} onClick={() => navigate('/')}>Continue Shopping</button>
         </div>
       ) : (
         <>
@@ -106,7 +106,7 @@ const CartPage: React.FC = () => {
               <span>Total Amount:</span>
               <span className="total-price">{formatCurrency(getTotalPrice(), 'USD', 2)}</span>
             </div>
-            <button className="checkout-button" onClick={handleCheckout} disabled={items.length === 0}>
+            <button className="checkout-button"style={{backgroundImage : 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)'}} onClick={handleCheckout} disabled={items.length === 0}>
               <FaCreditCard /> <span>Proceed to Checkout</span>
             </button>
           </div>

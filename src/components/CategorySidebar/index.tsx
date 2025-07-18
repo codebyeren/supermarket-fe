@@ -66,7 +66,7 @@ const CategorySidebar: React.FC<Props> = ({ categories, brands }) => {
   };
 
   const ratingOptions = [
-    { value: 'all', label: 'Tất cả đánh giá' },
+    { value: 'all', label: 'All' },
     { value: '1', label: '>= 1 sao' },
     { value: '2', label: '>= 2 sao' },
     { value: '3', label: '>= 3 sao' },
@@ -89,7 +89,7 @@ const CategorySidebar: React.FC<Props> = ({ categories, brands }) => {
       }}
     >
       <ul style={{ listStyle: "none", paddingLeft: 0, margin: 0 }}>
-      <h3 style={{ margin: "0 0 20px 0", fontSize: 24, fontWeight: "bold", color: "#2e7d32" }}>
+      <h3 style={{ margin: "0 0 20px 0", fontSize: 24, fontWeight: "bold", color: "#7c3aed" }}>
           Categories
         </h3>
         {/* All Categories */}
@@ -98,7 +98,7 @@ const CategorySidebar: React.FC<Props> = ({ categories, brands }) => {
             to="/category/all"
             style={{
               fontWeight: "bold",
-              color: slug === "all" ? "#2e7d32" : "#222",
+              color: slug === "all" ? "#7c3aed" : "#222",
               background:  "transparent",
               borderRadius: 4,
               textDecoration: "none",
@@ -133,7 +133,7 @@ const CategorySidebar: React.FC<Props> = ({ categories, brands }) => {
                     }}
                     style={{
                       fontWeight: "bold",
-                      color: isParentActive ? "#2e7d32" : "#222",
+                      color: isParentActive ? "#7c3aed" : "#222",
                       background:  "transparent",
                       borderRadius: 4,
                       textDecoration: "none",
@@ -172,7 +172,7 @@ const CategorySidebar: React.FC<Props> = ({ categories, brands }) => {
                             padding: "12px 16px",
                             color: "#222",
                             background: slug === child.slug ? "#fff" : "transparent",
-                            border: slug === child.slug ? "2px solid #2e7d32" : "2px solid transparent",
+                            border: slug === child.slug ? "2px solid #7c3aed" : "2px solid transparent",
                             borderRadius: 6,
                             margin: "6px 8px",
                             fontWeight: 500,
@@ -194,7 +194,7 @@ const CategorySidebar: React.FC<Props> = ({ categories, brands }) => {
 
       {/* Rating Section */}
       <div style={{ marginTop: 40, borderTop: "1px solid #eee", paddingTop: 30 }}>
-        <h3 style={{ margin: "0 0 20px 0", fontSize: 24, fontWeight: "bold", color: "#2e7d32" }}>
+        <h3 style={{ margin: "0 0 20px 0", fontSize: 24, fontWeight: "bold", color: "#7c3aed" }}>
           Rating
         </h3>
         <div
@@ -216,11 +216,11 @@ const CategorySidebar: React.FC<Props> = ({ categories, brands }) => {
                 fontSize: 14,
                 padding: '6px 4px',
                 background: currentRating === num.toString() ? '#e8f5e9' : '#fff',
-                border: currentRating === num.toString() ? '2px solid #2e7d32' : '1px solid #e0e0e0',
+                border: currentRating === num.toString() ? '2px solid #7c3aed' : '1px solid #e0e0e0',
                 borderRadius: 6,
                 cursor: 'pointer',
                 fontWeight: currentRating === num.toString() ? 'bold' : 'normal',
-                color: currentRating === num.toString() ? '#2e7d32' : '#222',
+                color: currentRating === num.toString() ? '#7c3aed' : '#222',
                 transition: 'all 0.2s',
                 minWidth: 0
               }}
@@ -247,11 +247,11 @@ const CategorySidebar: React.FC<Props> = ({ categories, brands }) => {
                 fontSize: 14,
                 padding: '6px 4px',
                 background: currentRating === num.toString() ? '#e8f5e9' : '#fff',
-                border: currentRating === num.toString() ? '2px solid #2e7d32' : '1px solid #e0e0e0',
+                border: currentRating === num.toString() ? '2px solid #7c3aed' : '1px solid #e0e0e0',
                 borderRadius: 6,
                 cursor: 'pointer',
                 fontWeight: currentRating === num.toString() ? 'bold' : 'normal',
-                color: currentRating === num.toString() ? '#2e7d32' : '#222',
+                color: currentRating === num.toString() ? '#7c3aed' : '#222',
                 transition: 'all 0.2s',
                 minWidth: 0
               }}
@@ -267,11 +267,11 @@ const CategorySidebar: React.FC<Props> = ({ categories, brands }) => {
               fontSize: 13,
               padding: '6px 4px',
               background: !currentRating ? '#e8f5e9' : '#fff',
-              border: !currentRating ? '2px solid #2e7d32' : '1px solid #e0e0e0',
+              border: !currentRating ? '2px solid #7c3aed' : '1px solid #e0e0e0',
               borderRadius: 6,
               cursor: 'pointer',
               fontWeight: !currentRating ? 'bold' : 'normal',
-              color: !currentRating ? '#2e7d32' : '#222',
+              color: !currentRating ? '#7c3aed' : '#222',
               transition: 'all 0.2s',
               minWidth: 0
             }}
@@ -283,7 +283,7 @@ const CategorySidebar: React.FC<Props> = ({ categories, brands }) => {
 
       {/* Brands Section */}
       <div style={{ marginTop: 40, borderTop: "1px solid #eee", paddingTop: 30 }}>
-        <h3 style={{ margin: "0 0 20px 0", fontSize: 24, fontWeight: "bold", color: "#2e7d32" }}>
+        <h3 style={{ margin: "0 0 20px 0", fontSize: 24, fontWeight: "bold", color: "#7c3aed" }}>
           Brands
         </h3>
         
@@ -292,7 +292,7 @@ const CategorySidebar: React.FC<Props> = ({ categories, brands }) => {
           onClick={() => handleBrandSelect('all')}
           style={{
             fontWeight: "bold",
-            color: !currentBrand ? "#2e7d32" : "#222",
+            color: !currentBrand ? "#7c3aed" : "#222",
             background:  "transparent",
             border:  "2px solid transparent",
             borderRadius: 8,
@@ -318,7 +318,7 @@ const CategorySidebar: React.FC<Props> = ({ categories, brands }) => {
             maxHeight: "300px",
             overflowY: "auto",
             scrollbarWidth: "thin",
-            scrollbarColor: "#2e7d32 #f0f0f0"
+            scrollbarColor: "#7c3aed #f0f0f0"
           }}
         >
           <div
@@ -340,7 +340,7 @@ const CategorySidebar: React.FC<Props> = ({ categories, brands }) => {
                   justifyContent: "center",
                   padding: "16px 8px",
                   background: currentBrand === brand.slug ? "#e8f5e9" : "#fff",
-                  border: currentBrand === brand.slug ? "2px solid #2e7d32" : "2px solid #e0e0e0",
+                  border: currentBrand === brand.slug ? "2px solid #7c3aed" : "2px solid #e0e0e0",
                   borderRadius: 8,
                   cursor: "pointer",
                   transition: "all 0.2s",
@@ -351,7 +351,7 @@ const CategorySidebar: React.FC<Props> = ({ categories, brands }) => {
                 onMouseEnter={(e) => {
                   if (currentBrand !== brand.slug) {
                     e.currentTarget.style.background = "#f5f5f5";
-                    e.currentTarget.style.borderColor = "#2e7d32";
+                    e.currentTarget.style.borderColor = "#7c3aed";
                   }
                 }}
                 onMouseLeave={(e) => {

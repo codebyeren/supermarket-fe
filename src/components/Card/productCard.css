@@ -26,3 +26,8 @@
     font-size: .75rem;
   }
 }
+.btn{
+  border-color: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) ; 
+  color: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);;
+}
+
