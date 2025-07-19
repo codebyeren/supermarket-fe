@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import './Users.css';
 import '../../../styles/admin-common.css';
 import axiosInstance from '../../../services/axiosInstance';
+import type { RegisterFormData } from '../../../types';
+import { apiService } from '../../../services/api';
 
 const defaultUserForm = {
   firstName: '',
@@ -118,20 +120,36 @@ export default function AdminUsers() {
     [
       'middleName', 'homePhone', 'creditCardNumber', 'creditCardExpiry', 'cardHolderName', 'cvv', 'street', 'city', 'state', 'address'
     ].forEach(key => {
-      if (requestBody[key] === '') requestBody[key] = null;
+      if (requestBody[key] === '') requestBody[key] = undefined;
     });
     try {
       if (editingUser) {
-        await axiosInstance.put(`auth/users/${editingUser.customerId}`, requestBody);
-        window.alert('Cập nhật người dùng thành công!');
+        await axiosInstance.post('auth/update-info', requestBody);
+        window.alert('Update user successfully!');
       } else {
-        await axiosInstance.post('auth/users', requestBody);
-        window.alert('Thêm người dùng thành công!');
+        // Gọi API register
+        const registerData: RegisterFormData = {
+          firstName: requestBody.firstName,
+          middleName: requestBody.middleName,
+          lastName: requestBody.lastName,
+          country: requestBody.country,
+          state: requestBody.state,
+          city: requestBody.city,
+          mobile: requestBody.mobile,
+          email: requestBody.email,
+          dob: requestBody.dob,
+          username: requestBody.username || requestBody.email || requestBody.mobile,
+          password: requestBody.password || 'User@123', 
+          confirmPassword: requestBody.password || 'User@123',
+        };
+        const res = await apiService.register(registerData);
+        if (res.success) window.alert('Add user successfully!');
+        else window.alert(res.error || 'Add user failed!');
       }
       setShowForm(false);
       fetchUsers();
     } catch (err) {
-      window.alert('Lưu người dùng thất bại!');
+      window.alert('Save user failed!');
     }
   };
 
