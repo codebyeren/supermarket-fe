@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getAllProductsForAdmin, createProduct, updateProduct, deleteProduct, getProductBySlug } from '../../../services/productService';
+import { getAllProductsForAdmin, createProduct, updateProduct, deleteProduct, getProductBySlug, searchProducts, fetchAllProducts } from '../../../services/productService';
 import { getAllBrandsForAdmin } from '../../../services/brandService';
 import { getAllCategoriesForAdmin } from '../../../services/categoryService';
 import { fetchPromotions as fetchPromotionsApi } from '../../../services/promotionService';
@@ -10,6 +10,8 @@ import './Products.css';
 import '../../../styles/admin-common.css';
 import AdminPopup from '../../../components/AdminPopup';
 import ProductFormModal from '../../../components/AdminProduct/ProductFormModal';
+import { useRef } from 'react';
+import { LoadingOutlined } from '@ant-design/icons';
 
 export interface ProductFormData {
   productId: number;
@@ -54,6 +56,7 @@ export default function AdminProducts() {
   const [selectedParent, setSelectedParent] = useState('all');
   const [selectedChild, setSelectedChild] = useState('all');
   const [promotions, setPromotions] = useState<any[]>([]);
+  const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // useEffect fetch data ban đầu (brands, categories)
   useEffect(() => {
@@ -64,7 +67,18 @@ export default function AdminProducts() {
   // useEffect fetch products khi filter thay đổi
   useEffect(() => {
     fetchProducts();
-  }, [searchTerm, selectedParent, selectedChild, filterBrand]);
+  }, [selectedParent, selectedChild, filterBrand]);
+
+  // Tự động search khi nhập searchTerm (debounce 200ms)
+  useEffect(() => {
+    if (searchTimeout.current) clearTimeout(searchTimeout.current);
+    searchTimeout.current = setTimeout(() => {
+      fetchProducts();
+    }, 200);
+    return () => {
+      if (searchTimeout.current) clearTimeout(searchTimeout.current);
+    };
+  }, [searchTerm]);
 
   // useEffect cập nhật childCategories khi chọn cha
   useEffect(() => {
@@ -101,7 +115,7 @@ export default function AdminProducts() {
       let categorySlug = '';
       if (selectedChild !== 'all') {
         const foundParent = categories.find(cat => String(cat.id) === selectedParent);
-        const foundChild = foundParent?.children.find(child => String(child.id) === selectedChild);
+        const foundChild = foundParent?.children?.find(child => String(child.id) === selectedChild);
         categorySlug = foundChild?.slug || '';
       } else if (selectedParent !== 'all') {
         const foundParent = categories.find(cat => String(cat.id) === selectedParent);
@@ -112,16 +126,33 @@ export default function AdminProducts() {
         const foundBrand = brands.find(brand => String(brand.id) === filterBrand);
         brandSlug = foundBrand?.slug || '';
       }
-      const filters = {
-        searchName: searchTerm,
-        category: categorySlug,
-        brand: brandSlug
-      };
-      const productsData = await getAllProductsForAdmin(filters);
-      setProducts(Array.isArray(productsData) ? productsData : []);
+      let productsData: Product[] = [];
+      let response: any;
+      if (!searchTerm.trim() && categorySlug === '' && brandSlug === '') {
+        response = await fetchAllProducts();
+      } else if (searchTerm.trim()) {
+        response = await searchProducts({ searchName: searchTerm.trim() });
+      } else {
+        const filters = {
+          category: categorySlug,
+          brand: brandSlug
+        };
+        response = await getAllProductsForAdmin(filters);
+      }
+      // Xử lý trường hợp API trả về null, không phải mảng, hoặc code 404
+      if (!response || (Array.isArray(response) && response.length === 0) || response.code === 404 || response.data === null) {
+        setProducts([]);
+      } else if (Array.isArray(response)) {
+        setProducts(response);
+      } else if (Array.isArray(response.data)) {
+        setProducts(response.data);
+      } else {
+        setProducts([]);
+      }
     } catch (err) {
       setError('Cannot load products');
       console.error('Error fetching products:', err);
+      setProducts([]);
     } finally {
       setLoading(false);
     }
@@ -256,14 +287,20 @@ export default function AdminProducts() {
       </div>
 
       <div className="products-filters">
-        <div className="search-box">
+        <div className="search-box" style={{ position: 'relative' }}>
           <input
             type="text"
             placeholder="Search products..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="admin-search-input"
+            style={{ paddingRight: 32 }}
           />
+          {loading && (
+            <span style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', color: '#888' }}>
+              <LoadingOutlined spin />
+            </span>
+          )}
         </div>
 
         <div className="filter-controls">
@@ -310,44 +347,62 @@ export default function AdminProducts() {
         </div>
       </div>
 
-      <table className="admin-table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Product Name</th>
-            <th>Price</th>
-            <th>Quantity</th>
-            <th>Promotion Name</th>
-            <th>Promotion Description</th>
-            <th>Image</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {products.map(product => (
-            <tr key={product.productId}>
-              <td>{product.productId}</td>
-              <td>{product.productName}</td>
-              <td>{formatPrice(product.price)}</td>
-              <td>{product.quantity}</td>
-              <td>{product.promotionType || 'None'}</td>
-              <td>{product.promotionDescription || 'None'}</td>
-              <td><img src={`/img/${product.imageUrl}`} alt={product.productName} style={{width: 48, height: 48, objectFit: 'cover', borderRadius: 4}} /></td>
-              <td>
-                <button className="admin-btn edit-btn" onClick={() => handleEditProduct(product)}>Edit</button>
-                <button className="admin-btn delete-btn" onClick={() => handleDeleteProduct(product.productId)}>Delete</button>
-                <button className="admin-btn detail-btn" onClick={() => handleShowDetail(product.slug)}>Detail</button>
-              </td>
+      <div style={{ minHeight: 400 }}>
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Product Name</th>
+              <th>Price</th>
+              <th>Quantity</th>
+              <th>Promotion Name</th>
+              <th>Promotion Description</th>
+              <th>Image</th>
+              <th>Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {loading ? (
+              <tr>
+                <td colSpan={8} style={{ textAlign: 'center' }}>
+                  <div className="loading">Đang tải dữ liệu sản phẩm...</div>
+                </td>
+              </tr>
+            ) : products.length > 0 ? (
+              products.map(product => (
+                <tr key={product.productId}>
+                  <td>{product.productId}</td>
+                  <td>{product.productName}</td>
+                  <td>{formatPrice(product.price)}</td>
+                  <td>{product.quantity}</td>
+                  <td>{product.promotionType || 'None'}</td>
+                  <td>{product.promotionDescription || 'None'}</td>
+                  <td><img src={`/img/${product.imageUrl}`} alt={product.productName} style={{width: 48, height: 48, objectFit: 'cover', borderRadius: 4}} /></td>
+                  <td>
+                    <button className="admin-btn edit-btn" onClick={() => handleEditProduct(product)}>Edit</button>
+                    <button className="admin-btn delete-btn" onClick={() => handleDeleteProduct(product.productId)}>Delete</button>
+                    <button className="admin-btn detail-btn" onClick={() => handleShowDetail(product.slug)}>Detail</button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              (searchTerm.trim() || filterBrand !== 'all' || selectedParent !== 'all' || selectedChild !== 'all') ? (
+                <tr>
+                  <td colSpan={8} style={{ textAlign: 'center' }}>
+                    <div className="no-products">Don't have any products</div>
+                  </td>
+                </tr>
+              ) : null
+            )}
+          </tbody>
+        </table>
+      </div>
 
-      {products.length === 0 && (
+      {/* {products.length === 0 && (
         <div className="no-products">
           <p>No products found</p>
         </div>
-      )}
+      )} */}
 
       {/* Add/Edit Modal */}
       <ProductFormModal

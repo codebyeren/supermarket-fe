@@ -2,36 +2,63 @@
 import React, { useState } from 'react';
 import { forgotPassword } from '../../services/api';
 import { useNavigate } from 'react-router-dom';
-import './forgot.css'
+import ModernAuth from '../../components/ModernAuth';
+import ModernInput from '../../components/ModernInput';
+import ModernButton from '../../components/ModernButton';
 
-const ForgotStep1_SendEmail = () => {
+const ForgotPass = () => {
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSendEmail = async () => {
+  const handleSendEmail = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
     try {
       await forgotPassword({ email });
       navigate('/auth/verify-code', { state: { email } });
     } catch {
-      setError('Không thể gửi mã. Hãy kiểm tra email.');
+      setError('Cannot send code. Please check your email.');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="d-flex justify-content-center align-items-center" style={{
-      minHeight: '100vh'
-    }}
+    <ModernAuth
+      type="login"
+      title="Forgot Password"
+      subtitle="Enter your email to receive a verification code"
+      switchText="Remembered your password?"
+      switchLink="/auth/login"
+      switchLinkText="Login"
+      hideBrand
     >
-      <div className="container py-5" style={{ maxWidth: 500 }}>
-        <h2>Khôi phục mật khẩu</h2>
-        {error && <div className="alert alert-danger">{error}</div>}
-        <label>Email:</label>
-        <input className="form-control mb-3" value={email} onChange={(e) => setEmail(e.target.value)} />
-        <button className="btn btn-primary w-100" onClick={handleSendEmail}>Gửi mã xác minh</button>
-      </div>
-    </div>
+      <form onSubmit={handleSendEmail}>
+        <ModernInput
+          name="email"
+          label="Email"
+          type="email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          error={error}
+          required
+          placeholder="Enter your email"
+        />
+        <ModernButton
+          type="submit"
+          variant="primary"
+          fullWidth
+          loading={loading}
+          disabled={loading}
+        >
+          Send verification code
+        </ModernButton>
+      </form>
+    </ModernAuth>
   );
 };
 
-export default ForgotStep1_SendEmail;
+export default ForgotPass;

@@ -359,7 +359,6 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, twoColumn }) => 
           select
           options={stateOptions}
           disabled={!formData.country || loadingStates}
-          required
         />
         <ModernInput
           name="city"
@@ -370,7 +369,6 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, twoColumn }) => 
           select
           options={cityOptions}
           disabled={!formData.state || loadingCities}
-          required
         />
         <ModernInput 
           name="email" 

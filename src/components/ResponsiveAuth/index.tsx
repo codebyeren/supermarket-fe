@@ -53,7 +53,7 @@ const ResponsiveAuth: React.FC<ResponsiveAuthProps> = ({
           {/* Logo */}
           <div className="responsive-auth-logo">
             <LazyImage
-              src="https://upload.wikimedia.org/wikipedia/commons/4/4e/SPX_Express_logo.png"
+              src="../../logo.png"
               alt="Logo"
               className="responsive-auth-logo-image"
               size={{ width: 120, height: 60 }}

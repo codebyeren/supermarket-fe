@@ -86,7 +86,7 @@ const Header = () => {
                 >
                     {/* Logo + Location */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12, justifyContent: isMobile ? 'center' : 'flex-start', marginBottom: isMobile ? 8 : 0 }}>
-                        <Link to="/" className="fw-bold fs-5 text-white text-decoration-none" style={{ fontSize: isMobile ? 22 : 26, letterSpacing: 1 }}>LOGO</Link>
+                        <Link to="/" className="fw-bold fs-5 text-white text-decoration-none" style={{ fontSize: isMobile ? 22 : 26, letterSpacing: 1 }}><img src="../../logo.png" alt="Logo" style={{ width: 100, height: 50 }} /></Link>
                         {!isMobile && (
                             <div className="d-flex align-items-center" style={{ fontSize: 15 }}>
                                 <FaMapMarkerAlt className="me-1" />

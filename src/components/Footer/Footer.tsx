@@ -7,7 +7,7 @@ const Footer: React.FC = () => {
       <div className="footer-container">
         {/* Logo & Intro */}
         <div className="footer-section footer-logo">
-          <div className="footer-logo-box">Logo</div>
+          <div className="footer-logo-box"></div>
           <p className="footer-desc">
             A full-service web design agency in Vietnam. We create beautiful, fast, and secure sites at affordable rates for small businesses and entrepreneurs alike.
           </p>

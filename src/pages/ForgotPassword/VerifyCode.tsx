@@ -2,36 +2,66 @@
 import React, { useState } from 'react';
 import { verifyCode } from '../../services/api';
 import { useLocation, useNavigate } from 'react-router-dom';
-import './forgot.css'
-const ForgotStep2_VerifyCode = () => {
+import ModernAuth from '../../components/ModernAuth';
+import ModernInput from '../../components/ModernInput';
+import ModernButton from '../../components/ModernButton';
+
+const VerifyCode = () => {
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { state } = useLocation();
   const email = state?.email;
 
-  const handleVerifyCode = async () => {
+  const handleVerifyCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
     try {
       await verifyCode({ email, code });
       navigate('/auth/reset-password', { state: { email, code } });
     } catch {
       setError('Mã xác minh không hợp lệ.');
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (!email) return <div className="container py-4">Thiếu thông tin email</div>;
+  if (!email) return <div className="container py-4">Missing email information</div>;
 
   return (
-    <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '100vh' }} >
-    <div className="container py-5" style={{ maxWidth: 500 }}>
-      <h2>Xác minh mã</h2>
-      {error && <div className="alert alert-danger">{error}</div>}
-      <label>Mã xác minh:</label>
-      <input className="form-control mb-3" value={code} onChange={(e) => setCode(e.target.value)} />
-      <button className="btn btn-success w-100" onClick={handleVerifyCode}>Xác minh</button>
-    </div>
-    </div>
+    <ModernAuth
+      type="login"
+      title="Verify Code"
+      subtitle="Enter the verification code sent to your email"
+      switchText="Remembered your password?"
+      switchLink="/auth/login"
+      switchLinkText="Login"
+      hideBrand
+    >
+      <form onSubmit={handleVerifyCode}>
+        <ModernInput
+          name="code"
+          label="Verification code"
+          value={code}
+          onChange={e => setCode(e.target.value)}
+          error={error}
+          required
+          placeholder="Enter verification code"
+        />
+        <ModernButton
+          type="submit"
+          variant="primary"
+          fullWidth
+          loading={loading}
+          disabled={loading}
+        >
+          Verify
+        </ModernButton>
+      </form>
+    </ModernAuth>
   );
 };
 
-export default ForgotStep2_VerifyCode;
+export default VerifyCode;

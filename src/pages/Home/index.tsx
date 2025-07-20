@@ -39,7 +39,7 @@ const HomePage = () => {
         setTopRatedProducts(data.topRatedProducts);
         setProductsByCategory(data.productyByCategory);
       } catch (error) {
-        console.error('Lỗi khi tải dữ liệu:', error);
+        console.error('Error loading data:', error);
       }
     };
 
@@ -141,7 +141,7 @@ const HomePage = () => {
 
       {showNotification && (
         <Notification
-          message={success ? 'Đã thêm vào giỏ hàng' : 'Thêm sản phẩm thất bại'}
+          message={success ? 'Added to cart' : 'Add product failed'}
           duration={2000}
           borderColor={success ? 'green' : 'red'}
           onClose={() => setShowNotification(false)}
