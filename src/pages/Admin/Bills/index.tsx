@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useState, useEffect } from 'react';
 import BillModal from '../../../components/Bill/BillModal';
 import './Bills.css';
 import '../../../styles/admin-common.css';
@@ -43,9 +42,11 @@ interface Bill {
   billAmount: number;
   paymentMethod: string;
   paymentStatus: string;
+  customer?: string;
+  address?: string;
+  phoneNumber?: string;
 }
 
-const API_URL = 'http://localhost:5050/api/orders';
 
 export default function AdminBills() {
   const [bills, setBills] = useState<Bill[]>([]);
@@ -55,9 +56,6 @@ export default function AdminBills() {
   const [selectedBill, setSelectedBill] = useState<Bill | null>(null);
   const [showModal, setShowModal] = useState(false);
 
-  // Lấy token từ localStorage
-  const token = localStorage.getItem('token');
-  const headers = { Authorization: `Bearer ${token}` };
 
   useEffect(() => {
     fetchBills();
@@ -68,7 +66,7 @@ export default function AdminBills() {
     setLoading(true);
     try {
       const res = await orderService.getOrders();
-      setBills(res.data || []);
+      setBills((res.data as Bill[]) || []);
     } catch (err) {
       // window.alert('Không thể tải danh sách hóa đơn!');
     } finally {
@@ -86,15 +84,6 @@ export default function AdminBills() {
     }
   };
 
-  const handleBillStatusChange = async (bill: Bill, newPaymentMethod: string, newPaymentStatus: string) => {
-    try {
-      await orderService.updateBill({ billId: bill.billId, paymentMethod: newPaymentMethod, paymentStatus: newPaymentStatus });
-      window.alert('Cập nhật trạng thái hóa đơn thành công!');
-      fetchBills();
-    } catch (err) {
-      window.alert('Cập nhật trạng thái hóa đơn thất bại!');
-    }
-  };
 
   const filteredBills = bills.filter(bill => {
     const matchesSearch = bill.billId.toString().includes(searchTerm) || bill.orderId.toString().includes(searchTerm);
@@ -228,7 +217,11 @@ export default function AdminBills() {
           onClose={() => setShowModal(false)}
           orderId={selectedBill.orderId}
           dateOfPurchase={selectedBill.dateOfPurchase}
-          customerInfo={{ fullName: 'Customer', address: '-', phone: '-' }}
+          customerInfo={{
+            fullName: selectedBill.customer || 'Customer',
+            address: selectedBill.address || '-',
+            phone: selectedBill.phoneNumber || '-'
+          }}
           orderItems={convertOrderItems(selectedBill.orderItems)}
           billDetails={convertBillDetails(selectedBill.billDetails)}
           orderAmount={selectedBill.orderAmount}

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Badge, Button, Modal, message, Space, Popconfirm, Card, Row, Col, Tag } from 'antd';
-import type { Order, OrderItem } from '../../types';
+import {  Button, Modal, message, Popconfirm, Card, Row, Col, Tag } from 'antd';
+import type { Order } from '../../types';
 import orderService from '../../services/orderService';
 import { LoadingService } from '../../services/LoadingService';
 import './OrderHistory.css';
@@ -190,6 +190,11 @@ const OrderHistory: React.FC = () => {
           width={800}
         >
           <div className="order-detail text-start">
+            <div className="order-customer-info mb-3">
+              <p><strong>Customer:</strong> {selectedOrder.customer || '-'}</p>
+              <p><strong>Address:</strong> {selectedOrder.address || '-'}</p>
+              <p><strong>Phone Number:</strong> {selectedOrder.phoneNumber || '-'}</p>
+            </div>
             <div className="order-info">
               <p><strong>Order Date:</strong> {formatDate(selectedOrder.dateOfPurchase)}</p>
               <p><strong>Order Status:</strong> {getStatusTag(selectedOrder.orderStatus)}</p>

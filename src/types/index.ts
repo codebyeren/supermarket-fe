@@ -161,6 +161,9 @@ export interface Order {
   paymentMethod: PaymentMethod;
   paymentStatus: PaymentStatus;
   billDetails: BillDetail[];
+  customer?: string;
+  address?: string;
+  phoneNumber?: string;
 }
 
 export interface CustomerAddress {
