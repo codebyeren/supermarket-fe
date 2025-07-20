@@ -47,7 +47,7 @@ const CategoryPage: React.FC = () => {
 
 
   const [currentPage, setCurrentPage] = useState(1);
-  const productsPerPage = 8;
+  const productsPerPage = 24;
 
   // Sort products
   const sortedProducts = useMemo(() => {
