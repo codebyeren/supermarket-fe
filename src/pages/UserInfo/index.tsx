@@ -66,8 +66,8 @@ export default function UserInfoPage() {
           middleName: userInfo.middleName,
           lastName: userInfo.lastName,
           homePhone: userInfo.homePhone || '',
-          creditCardNumber: userInfo.creditCardNumber || '',
-          creditCardExpiry: userInfo.creditCardExpiry || '',
+          creditCardNumber: userInfo.creditCardNumber || null,
+          creditCardExpiry: userInfo.creditCardExpiry || null,
           state: userInfo.state || '',
           city: userInfo.city || '',
           street: userInfo.street || '',
@@ -134,6 +134,10 @@ export default function UserInfoPage() {
   if (!user || !form) return <div className="p-4 text-danger">User information not found.</div>;
 
   const fullName = `${user.firstName} ${user.middleName ? user.middleName + ' ' : ''}${user.lastName}`;
+  const address = [user.street, user.state,user.city, user.country].filter(Boolean).join(', ');
+
+
+
 
   return (
     <div className="container-fluid min-vh-100 bg-light">
@@ -208,6 +212,14 @@ export default function UserInfoPage() {
                 value={form.dob}
                 onChange={handleChange}
                 disabled={!editing}
+              />
+            </div>
+            <div className="col-md-6">
+              <label className="form-label">Address</label>
+              <input
+                className="form-control"
+                value={address}
+                disabled
               />
             </div>
 

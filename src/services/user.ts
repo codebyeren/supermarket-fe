@@ -85,7 +85,7 @@ export const updateUserInfo = async (
   userInfo: UpdateUserInfoInput
 ): Promise<ApiResponse> => {
   try {
-    const response = await axiosInstance.put('/auth/update-info', userInfo);
+    const response = await axiosInstance.post('/auth/update-info', userInfo);
     return response.data as ApiResponse;
   } catch (error) {
     if (axios.isAxiosError(error)) {

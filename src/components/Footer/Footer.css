@@ -32,14 +32,14 @@
   align-items: flex-start;
 }
 .footer-logo-box {
-  background: #7a8c7a;
+  background: #ffffff;
   color: #fff;
   font-size: 2rem;
   font-weight: 700;
   text-align: center;
   padding: 36px 0;
   margin-bottom: 18px;
-  border: 3px solid #4e6e5d;
+  border: 3px solid #ffffff;
   border-radius: 12px;
   width: 100%;
   box-shadow: 0 2px 8px rgba(0,0,0,0.06);
