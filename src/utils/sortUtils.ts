@@ -41,34 +41,34 @@ const compareProducts = (a: Product, b: Product, key: keyof SortState, dir: 'asc
 export const sortGroups = [
   {
     key: 'price',
-    label: 'Giá',
+    label: 'Price',
     options: [
-      { value: 'asc', label: 'Tăng dần', description: 'Giá từ thấp đến cao' },
-      { value: 'desc', label: 'Giảm dần', description: 'Giá từ cao đến thấp' },
+      { value: 'asc', label: 'Ascending', description: 'Price from low to high' },
+      { value: 'desc', label: 'Descending', description: 'Price from high to low' },
     ]
   },
   {
     key: 'name',
-    label: 'Tên',
+    label: 'Name',
     options: [
-      { value: 'asc', label: 'A-Z', description: 'Tên từ A đến Z' },
-      { value: 'desc', label: 'Z-A', description: 'Tên từ Z đến A' },
+      { value: 'asc', label: 'A-Z', description: 'Name from A to Z' },
+      { value: 'desc', label: 'Z-A', description: 'Name from Z to A' },
     ]
   },
   {
     key: 'rating',
-    label: 'Đánh giá',
+    label: 'Rating',
     options: [
-      { value: 'desc', label: 'Cao nhất', description: 'Đánh giá từ cao đến thấp' },
-      { value: 'asc', label: 'Thấp nhất', description: 'Đánh giá từ thấp đến cao' },
+      { value: 'desc', label: 'Highest', description: 'Rating from high to low' },
+      { value: 'asc', label: 'Lowest', description: 'Rating from low to high' },
     ]
   },
   {
     key: 'date',
-    label: 'Ngày',
+    label: 'Date',
     options: [
-      { value: 'desc', label: 'Mới nhất', description: 'Ngày tạo mới nhất' },
-      { value: 'asc', label: 'Cũ nhất', description: 'Ngày tạo cũ nhất' },
+      { value: 'desc', label: 'Newest', description: 'Latest creation date' },
+      { value: 'asc', label: 'Oldest', description: 'Oldest creation date' },
     ]
   },
 ] as const; 

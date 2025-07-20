@@ -34,7 +34,7 @@ export default function AttachPromotionProductModal({ visible, onClose }: Props)
             setSelectedProductIds(productIds);
             setOriginalProductIds(productIds);
         } catch {
-            message.error('Không thể load sản phẩm đã gán.');
+            message.error('Cannot load attached products.');
             setSelectedProductIds([]);
             setOriginalProductIds([]);
         }
@@ -42,7 +42,7 @@ export default function AttachPromotionProductModal({ visible, onClose }: Props)
 
     const handleAttach = async () => {
         if (!selectedPromotionId) {
-            message.warning('Vui lòng chọn promotion trước!');
+            message.warning('Please select a promotion first!');
             return;
         }
         setLoading(true);
@@ -57,10 +57,10 @@ export default function AttachPromotionProductModal({ visible, onClose }: Props)
             for (const productId of toDeactivate) {
                 await updateProductPromotionIsActive(selectedPromotionId, productId, false);
             }
-            message.success('Cập nhật thành công!');
+            message.success('Update successful!');
             onClose();
         } catch {
-            message.error('Cập nhật thất bại!');
+            message.error('Update failed!');
         } finally {
             setLoading(false);
         }
@@ -69,7 +69,7 @@ export default function AttachPromotionProductModal({ visible, onClose }: Props)
     return (
         <Modal
             open={visible}
-            title="Gán promotion vào sản phẩm"
+            title="Attach Promotion to Products"
             onCancel={onClose}
             onOk={handleAttach}
             okButtonProps={{ disabled: !selectedPromotionId, loading }}
@@ -83,12 +83,12 @@ export default function AttachPromotionProductModal({ visible, onClose }: Props)
                         rowKey="promotionId"
                         columns={[
                             {
-                                title: 'Loại',
+                                title: 'Type',
                                 dataIndex: 'promotionType',
                                 render: (value: string) =>
                                     value.toLowerCase().replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase()),
                             },
-                            { title: 'Mô tả', dataIndex: 'description' },
+                            { title: 'Description', dataIndex: 'description' },
                         ]}
                         rowSelection={{
                             type: 'radio',
@@ -101,21 +101,21 @@ export default function AttachPromotionProductModal({ visible, onClose }: Props)
                 </div>
 
                 <div style={{ flex: 2 }}>
-                    <h4>Sản phẩm</h4>
+                    <h4>Products</h4>
                     <Table
                         dataSource={products}
                         rowKey="productId"
                         columns={[
                             {
-                                title: 'Ảnh',
+                                title: 'Image',
                                 dataIndex: 'imageUrl',
                                 render: (url: string) => (
                                     <img src={`/img/${url}`} alt="product" style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: 6 }} />
                                 ),
                             },
-                            { title: 'Tên sản phẩm', dataIndex: 'productName' },
+                            { title: 'Product Name', dataIndex: 'productName' },
                             {
-                                title: 'Giá',
+                                title: 'Price',
                                 dataIndex: 'price',
                                 render: (price: number) => `${price?.toLocaleString()} ₫`,
                             },

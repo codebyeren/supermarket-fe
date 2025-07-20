@@ -135,7 +135,7 @@ export default function AdminBills() {
   return (
     <div className="admin-bills">
       <div className="bills-header">
-        <h1>Manage Bills</h1>
+        <h1>Bill Management</h1>
         {/* Nút tạo mới hóa đơn, có thể mở modal tạo mới */}
         {/* <button className="add-bill-btn">+ Create Bill</button> */}
       </div>

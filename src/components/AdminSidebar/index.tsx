@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { clearAuthData, debugToken } from '../../utils/authUtils';
+import { clearAuthData } from '../../utils/authUtils';
 import { useAuthState } from '../../hooks/useAuthState';
 import './AdminSidebar.css';
 
@@ -18,7 +18,7 @@ const menuItems: MenuItem[] = [
   { id: 'products', label: 'Product Management', path: '/admin/products', icon: '📦', requiredRole: 'admin' },
   { id: 'categories', label: 'Category Management', path: '/admin/categories', icon: '📂', requiredRole: 'admin' },
   { id: 'brands', label: 'Brand Management', path: '/admin/brands', icon: '🏷️', requiredRole: 'admin' },
-  { id: 'bills', label: 'Invoice Management', path: '/admin/bills', icon: '🧾', requiredRole: 'admin' },
+  { id: 'bills', label: 'Bill Management', path: '/admin/bills', icon: '🧾', requiredRole: 'admin' },
   { id: 'promotions', label: 'Promotion Management', path: '/admin/promotions', icon: '🎉', requiredRole: 'admin' },
 ];
 
@@ -28,10 +28,6 @@ export default function AdminSidebar() {
   const { username, role: userRole, isAdmin, isLoading } = useAuthState();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  useEffect(() => {
-    debugToken();
-  }, []);
 
   const handleLogout = async () => {
     clearAuthData();

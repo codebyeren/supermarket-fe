@@ -18,7 +18,6 @@ const defaultForm = {
   status: 'active',
   quantity: '',
   unitCost: '',
-  totalAmount: '',
   brandId: '',
   imageUrl: '',
   promotionId: '',
@@ -49,6 +48,11 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onClose, onSu
       setForm(initialData);
       setImagePreview(initialData.imageUrl || '');
       if (fileInputRef.current) fileInputRef.current.value = '';
+    } else {
+      // Reset form khi không có initialData (add mode)
+      setForm(defaultForm);
+      setImagePreview('');
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   }, [initialData]);
 
@@ -75,9 +79,9 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onClose, onSu
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    let categoryIds: number[] = [];
-    if (form.childCategoryId && form.parentCategoryId) categoryIds = [Number(form.parentCategoryId), Number(form.childCategoryId)];
-    else if (form.parentCategoryId) categoryIds = [Number(form.parentCategoryId)];
+    let categoryId: number[] = [];
+    if (form.childCategoryId && form.parentCategoryId) categoryId = [Number(form.parentCategoryId), Number(form.childCategoryId)];
+    else if (form.parentCategoryId) categoryId = [Number(form.parentCategoryId)];
     const requestBody: any = {
       productName: form.productName,
       price: Number(form.price),
@@ -85,14 +89,23 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onClose, onSu
       status: form.status,
       quantity: Number(form.quantity),
       unitCost: Number(form.unitCost),
-      totalAmount: Number(form.totalAmount),
       brandId: Number(form.brandId),
       imageUrl: form.imageUrl || '',
       promotionId: form.promotionId ? Number(form.promotionId) : undefined,
-      categoryId: categoryIds.length > 0 ? categoryIds : undefined,
+      categoryId: categoryId.length > 0 ? categoryId : undefined,
     };
-    // Xóa các trường undefined
+    
+    // Thêm productId nếu đang edit
+    if (initialData && initialData.productId) {
+      requestBody.productId = initialData.productId;
+      console.log('✅ Edit mode - productId added:', initialData.productId);
+    } else {
+      console.log('❌ Edit mode but no productId found in initialData:', initialData);
+    }
+    
+    console.log('📤 Request body before cleanup:', requestBody);
     Object.keys(requestBody).forEach(key => requestBody[key] === undefined && delete requestBody[key]);
+    console.log('📤 Final request body:', requestBody);
     onSuccess(requestBody);
   };
 
@@ -102,11 +115,12 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onClose, onSu
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
-  // Khi đóng popup, reset preview ảnh và tên file
   React.useEffect(() => {
     if (!open) {
+      // Reset form hoàn toàn khi modal đóng
+      setForm(defaultForm);
       setImagePreview('');
-      setForm((prev: any) => ({ ...prev, imageUrl: '' }));
+      setChildCategories([]);
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
   }, [open]);
@@ -178,17 +192,15 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onClose, onSu
             </div>
             <div className="form-group">
               <label style={{fontWeight: 600, marginBottom: 8, fontSize: 18}}>Status:</label>
-              <select
+              <input
                 name="status"
+                type="text"
                 value={form.status}
                 onChange={handleChange}
                 required
                 className="admin-search-input"
                 style={{fontSize: 18, padding: '14px 18px', color: '#222'}}
-              >
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-              </select>
+              />
             </div>
             {/* Category cha */}
             <div className="form-group">
@@ -283,18 +295,7 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onClose, onSu
                 style={{fontSize: 18, padding: '14px 18px', color: '#222'}}
               />
             </div>
-            <div className="form-group">
-              <label style={{fontWeight: 600, marginBottom: 8, fontSize: 18}}>Total Amount:</label>
-              <input
-                name="totalAmount"
-                type="number"
-                value={form.totalAmount}
-                onChange={handleChange}
-                required
-                className="admin-search-input"
-                style={{fontSize: 18, padding: '14px 18px', color: '#222'}}
-              />
-            </div>
+          
             <div className="form-group">
               <label style={{fontWeight: 600, marginBottom: 8, fontSize: 18}}>Image:</label>
               <input

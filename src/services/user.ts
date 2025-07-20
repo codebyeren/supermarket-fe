@@ -85,7 +85,7 @@ export const updateUserInfo = async (
   userInfo: UpdateUserInfoInput
 ): Promise<ApiResponse> => {
   try {
-    const response = await axiosInstance.post('/auth/update-info', userInfo);
+    const response = await axiosInstance.put('/auth/update-info', userInfo);
     return response.data as ApiResponse;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -105,7 +105,7 @@ export const updateUserAddress = async (
   addressInfo: UpdateAddressInput
 ): Promise<ApiResponse> => {
   try {
-    const response = await axiosInstance.post('/auth/update-info', addressInfo);
+    const response = await axiosInstance.put('/auth/update-info', addressInfo);
     return response.data as ApiResponse;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -125,7 +125,7 @@ export const updatePaymentInfo = async (
   paymentInfo: UpdatePaymentInfoInput
 ): Promise<ApiResponse> => {
   try {
-    const response = await axiosInstance.post('/auth/update-info', paymentInfo);
+    const response = await axiosInstance.put('/auth/update-info', paymentInfo);
     return response.data as ApiResponse;
   } catch (error) {
     if (axios.isAxiosError(error)) {

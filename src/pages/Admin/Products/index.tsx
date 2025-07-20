@@ -19,7 +19,6 @@ export interface ProductFormData {
   status: string;
   quantity: number;
   unitCost: number;
-  totalAmount: number;
   brandId: number;
   imageUrl: string;
 }
@@ -165,8 +164,12 @@ export default function AdminProducts() {
 
   const handleEditProduct = async (product: Product) => {
     try {
+      console.log('🔍 Starting edit for product:', product);
       const detail = await getProductBySlug(product.slug);
       const p = detail.productDto;
+      console.log('📥 Product detail from API:', p);
+      console.log('🆔 Product ID from API:', p.productId);
+      
       // Map lại initialData cho form
       let parentCategoryId = '';
       let childCategoryId = '';
@@ -175,7 +178,7 @@ export default function AdminProducts() {
         const foundParent = categories.find(cat =>
           cat.children && cat.children.some(child => child.id === p.categoryId)
         );
-        if (foundParent) {
+        if (foundParent && foundParent.children && foundParent.children.length > 0) {
           parentCategoryId = String(foundParent.id);
           childCategoryId = String(p.categoryId);
         } else {
@@ -183,25 +186,23 @@ export default function AdminProducts() {
           parentCategoryId = String(p.categoryId);
         }
       }
-      console.log('Edit initialData', {
+      
+      const mappedData = {
         ...p,
         brandId: p.brandId !== undefined ? String(p.brandId) : '',
         promotionId: p.promotionId !== undefined ? String(p.promotionId) : '',
         parentCategoryId,
         childCategoryId,
-        status: p.status === 'active' || p.status === 'inactive' ? p.status : (p.status === 'Available' ? 'active' : 'inactive'),
-      });
-      setEditingProduct({
-        ...p,
-        brandId: p.brandId !== undefined ? String(p.brandId) : '',
-        promotionId: p.promotionId !== undefined ? String(p.promotionId) : '',
-        parentCategoryId,
-        childCategoryId,
-        status: p.status === 'active' || p.status === 'inactive' ? p.status : (p.status === 'Available' ? 'active' : 'inactive'),
-      });
+        status: p.status || 'active', // Giữ nguyên giá trị status như text
+      };
+      
+      console.log('✅ Final mapped data for editing:', mappedData);
+      console.log('🆔 Product ID in mapped data:', mappedData.productId);
+      
+      setEditingProduct(mappedData);
       setShowProductForm(true);
     } catch (e) {
-   
+      console.error('❌ Error in handleEditProduct:', e);
     }
   };
 
@@ -212,15 +213,21 @@ export default function AdminProducts() {
 
   const handleProductFormSuccess = async (formData: any) => {
     try {
+      console.log('📥 Received formData:', formData);
+      console.log('📥 editingProduct:', editingProduct);
+      
       if (editingProduct) {
-      await updateProduct(formData.productId, formData);
+        console.log('🔄 Updating product with ID:', formData.productId);
+        await updateProduct(formData.productId, formData);
       } else {
+        console.log('➕ Creating new product');
         await createProduct(formData);
       }
       await fetchProducts();
       setShowProductForm(false);
       setEditingProduct(null);
     } catch (err) {
+      console.error('❌ Error in handleProductFormSuccess:', err);
       setError('Cannot save product');
     }
   };

@@ -1,25 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { isAdmin } from '../utils/authUtils';
+import { useAuthState } from '../hooks/useAuthState';
 
 interface AdminProtectedRouteProps {
   children: React.ReactNode;
 }
 
 export default function AdminProtectedRoute({ children }: AdminProtectedRouteProps) {
-  const [isLoading, setIsLoading] = useState(true);
-  const [hasAdminAccess, setHasAdminAccess] = useState(false);
+  const { isAdmin, isLoading } = useAuthState();
   const location = useLocation();
-
-  useEffect(() => {
-    const checkAdminAuth = () => {
-      const adminStatus = isAdmin();
-      setHasAdminAccess(adminStatus);
-      setIsLoading(false);
-    };
-
-    checkAdminAuth();
-  }, []);
 
   if (isLoading) {
     return (
@@ -31,12 +20,12 @@ export default function AdminProtectedRoute({ children }: AdminProtectedRoutePro
         fontSize: '1.2rem',
         color: '#667eea'
       }}>
-        Đang kiểm tra quyền truy cập...
+        Checking access permissions...
       </div>
     );
   }
 
-  if (!hasAdminAccess) {
+  if (!isAdmin) {
     // Redirect to login page with return url
     return <Navigate to="/auth/login" state={{ from: location }} replace />;
   }

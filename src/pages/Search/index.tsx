@@ -186,9 +186,9 @@ const SearchPage: React.FC = () => {
         justifyContent: "center",
         marginBottom: isMobile ? 24 : 0
       }}>
-        <div style={{ fontWeight: 700, marginBottom: 24, fontSize: 24, color: '#7c3aed', letterSpacing: 1, textAlign: 'center' }}>Bộ lọc sản phẩm</div>
+        <div style={{ fontWeight: 700, marginBottom: 24, fontSize: 24, color: '#7c3aed', letterSpacing: 1, textAlign: 'center' }}>Product Filters</div>
         <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <label style={{ fontWeight: 600, marginBottom: 12, display: 'block', color: '#222', fontSize: 16, textAlign: 'center' }}>Khoảng giá (₫)</label>
+          <label style={{ fontWeight: 600, marginBottom: 12, display: 'block', color: '#222', fontSize: 16, textAlign: 'center' }}>Price Range (₫)</label>
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18, justifyContent: 'center' }}>
             <input
               type="number"
@@ -233,7 +233,7 @@ const SearchPage: React.FC = () => {
             />
           </div>
           <div style={{ fontSize: 14, color: '#888', marginTop: 8, textAlign: 'center', fontStyle: 'italic', maxWidth: 220 }}>
-            Bạn có thể nhập hoặc kéo để chọn khoảng giá muốn lọc sản phẩm phù hợp với nhu cầu của mình.
+            You can enter or drag to select the price range to filter products that suit your needs.
           </div>
         </div>
       </aside>
@@ -269,7 +269,7 @@ const SearchPage: React.FC = () => {
             <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
             {showNotification && (
               <Notification
-                message={success ? 'Đã thêm vào giỏ hàng' : 'Thêm vào giỏ hàng thất bại'}
+                message={success ? 'Added to cart' : 'Add to cart failed'}
                 duration={2000}
                 borderColor={success ? 'green' : 'red'}
                 onClose={() => setShowNotification(false)}

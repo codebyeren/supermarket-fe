@@ -27,34 +27,34 @@ export default function ManagePromotionProductStatusModal({ visible, onClose }: 
     if (!selectedPromotionId) return;
     try {
       await updateProductPromotionIsActive(selectedPromotionId, productId, isActive);
-      message.success('Cập nhật trạng thái thành công');
+      message.success('Status updated successfully');
     } catch {
-      message.error('Cập nhật trạng thái thất bại');
+      message.error('Status update failed');
     }
   };
 
   return (
     <Modal
       open={visible}
-      title="Quản lý trạng thái sản phẩm theo Promotion"
+      title="Manage Product Status by Promotion"
       onCancel={onClose}
       footer={null}
       width={1000}
     >
       <div style={{ display: 'flex', gap: '20px' }}>
         <div style={{ flex: 1 }}>
-          <h4>Chọn Promotion</h4>
+          <h4>Select Promotion</h4>
           <Table
             dataSource={promotions}
             rowKey="promotionId"
             columns={[
               {
-                title: 'Loại',
+                title: 'Type',
                 dataIndex: 'promotionType',
                 render: (value: string) =>
                   value.toLowerCase().replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
               },
-              { title: 'Mô tả', dataIndex: 'description' },
+              { title: 'Description', dataIndex: 'description' },
             ]}
             rowSelection={{
               type: 'radio',
@@ -67,13 +67,13 @@ export default function ManagePromotionProductStatusModal({ visible, onClose }: 
         </div>
 
         <div style={{ flex: 2 }}>
-          <h4>Danh sách sản phẩm</h4>
+          <h4>Product List</h4>
           <Table
             dataSource={products}
             rowKey="productId"
             columns={[
               {
-                title: 'Ảnh',
+                title: 'Image',
                 dataIndex: 'imageUrl',
                 render: (url: string) => (
                   <img
@@ -83,14 +83,14 @@ export default function ManagePromotionProductStatusModal({ visible, onClose }: 
                   />
                 ),
               },
-              { title: 'Tên sản phẩm', dataIndex: 'productName' },
+              { title: 'Product Name', dataIndex: 'productName' },
               {
-                title: 'Giá',
+                title: 'Price',
                 dataIndex: 'price',
                 render: (price: number) => `${price?.toLocaleString()} ₫`,
               },
               {
-                title: 'Kích hoạt',
+                title: 'Activate',
                 dataIndex: 'isActive',
                 render: (isActive: boolean, record: any) => (
                   <Button
@@ -98,7 +98,7 @@ export default function ManagePromotionProductStatusModal({ visible, onClose }: 
                     type={isActive ? 'primary' : 'default'}
                     onClick={() => handleToggleProductStatus(record.productId, !isActive)}
                   >
-                    {isActive ? 'Đang bật' : 'Tắt'}
+                    {isActive ? 'Active' : 'Inactive'}
                   </Button>
                 ),
               },

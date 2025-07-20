@@ -124,7 +124,7 @@ export default function AdminUsers() {
     });
     try {
       if (editingUser) {
-        await axiosInstance.post('auth/update-info', requestBody);
+        await axiosInstance.put('auth/update-info', requestBody);
         window.alert('Update user successfully!');
       } else {
         // Gọi API register
