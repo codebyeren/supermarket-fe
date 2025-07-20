@@ -26,6 +26,34 @@ export default function UserInfoPage() {
   const [editing, setEditing] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+  const validateForm = () => {
+    const newErrors: { [key: string]: string } = {};
+
+    if (!form!.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+      newErrors.email = 'Invalid email format';
+    }
+
+    if (!form!.mobile.match(/^[0-9]{9,10}$/)) {
+      newErrors.mobile = 'Invalid mobile phone number';
+    }
+
+    if (form!.homePhone && !form!.homePhone.match(/^[0-9]{9,10}$/)) {
+      newErrors.homePhone = 'Invalid home phone number';
+    }
+
+    if (form!.creditCardNumber && !form!.creditCardNumber.match(/^[0-9]{13,19}$/)) {
+      newErrors.creditCardNumber = 'Invalid credit card number';
+    }
+
+    if (form!.creditCardExpiry && !form!.creditCardExpiry.match(/^(0[1-9]|1[0-2])\/\d{2}$/)) {
+      newErrors.creditCardExpiry = 'Expiry must be in MM/YY format';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -65,10 +93,10 @@ export default function UserInfoPage() {
 
   const handleSave = async () => {
     if (!form) return;
+    if (!validateForm()) return;
 
     try {
       const res = await updateUserInfo({ ...form });
-
       if (res.code === 200) {
         setUser({ ...user!, ...form });
         setEditing(false);
@@ -134,26 +162,64 @@ export default function UserInfoPage() {
 
             <div className="col-md-6">
               <label className="form-label">Email</label>
-              <input type="email" name="email" className="form-control" value={form.email} onChange={handleChange} disabled={!editing} />
+              <input
+                type="email"
+                name="email"
+                className={`form-control ${errors.email ? 'is-invalid' : ''}`}
+                value={form.email}
+                onChange={handleChange}
+                disabled={!editing}
+              />
+              {errors.email && <div className="invalid-feedback">{errors.email}</div>}
             </div>
+
             <div className="col-md-6">
               <label className="form-label">Mobile Phone</label>
-              <input type="text" name="mobile" className="form-control" value={form.mobile} onChange={handleChange} disabled={!editing} />
+              <input
+                type="text"
+                name="mobile"
+                className={`form-control ${errors.mobile ? 'is-invalid' : ''}`}
+                value={form.mobile}
+                onChange={handleChange}
+                disabled={!editing}
+              />
+              {errors.mobile && <div className="invalid-feedback">{errors.mobile}</div>}
             </div>
 
             <div className="col-md-6">
               <label className="form-label">Home Phone</label>
-              <input type="text" name="homePhone" className="form-control" value={form.homePhone || ''} onChange={handleChange} disabled={!editing} />
+              <input
+                type="text"
+                name="homePhone"
+                className={`form-control ${errors.homePhone ? 'is-invalid' : ''}`}
+                value={form.homePhone || ''}
+                onChange={handleChange}
+                disabled={!editing}
+              />
+              {errors.homePhone && <div className="invalid-feedback">{errors.homePhone}</div>}
             </div>
 
             <div className="col-md-6">
               <label className="form-label">Date of Birth</label>
-              <input type="date" name="dob" className="form-control" value={form.dob} onChange={handleChange} disabled={!editing} />
+              <input
+                type="date"
+                name="dob"
+                className="form-control"
+                value={form.dob}
+                onChange={handleChange}
+                disabled={!editing}
+              />
             </div>
 
             <div className="col-md-6">
               <label className="form-label">Country</label>
-              <select name="country" className="form-select" value={form.country} onChange={handleChange} disabled={!editing}>
+              <select
+                name="country"
+                className="form-select"
+                value={form.country}
+                onChange={handleChange}
+                disabled={!editing}
+              >
                 {countryOptions.map(opt => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
                 ))}
@@ -162,27 +228,65 @@ export default function UserInfoPage() {
 
             <div className="col-md-6">
               <label className="form-label">State / Province</label>
-              <input type="text" name="state" className="form-control" value={form.state || ''} onChange={handleChange} disabled={!editing} />
+              <input
+                type="text"
+                name="state"
+                className="form-control"
+                value={form.state || ''}
+                onChange={handleChange}
+                disabled={!editing}
+              />
             </div>
 
             <div className="col-md-6">
               <label className="form-label">City</label>
-              <input type="text" name="city" className="form-control" value={form.city || ''} onChange={handleChange} disabled={!editing} />
+              <input
+                type="text"
+                name="city"
+                className="form-control"
+                value={form.city || ''}
+                onChange={handleChange}
+                disabled={!editing}
+              />
             </div>
 
             <div className="col-md-6">
               <label className="form-label">Street</label>
-              <input type="text" name="street" className="form-control" value={form.street || ''} onChange={handleChange} disabled={!editing} />
+              <input
+                type="text"
+                name="street"
+                className="form-control"
+                value={form.street || ''}
+                onChange={handleChange}
+                disabled={!editing}
+              />
             </div>
 
             <div className="col-md-6">
               <label className="form-label">Credit Card Number</label>
-              <input type="text" name="creditCardNumber" className="form-control" value={form.creditCardNumber || ''} onChange={handleChange} disabled={!editing} />
+              <input
+                type="text"
+                name="creditCardNumber"
+                className={`form-control ${errors.creditCardNumber ? 'is-invalid' : ''}`}
+                value={form.creditCardNumber || ''}
+                onChange={handleChange}
+                disabled={!editing}
+              />
+              {errors.creditCardNumber && <div className="invalid-feedback">{errors.creditCardNumber}</div>}
             </div>
 
             <div className="col-md-6">
               <label className="form-label">Credit Card Expiry</label>
-              <input type="text" name="creditCardExpiry" className="form-control" placeholder="MM/YY" value={form.creditCardExpiry || ''} onChange={handleChange} disabled={!editing} />
+              <input
+                type="text"
+                name="creditCardExpiry"
+                placeholder="MM/YY"
+                className={`form-control ${errors.creditCardExpiry ? 'is-invalid' : ''}`}
+                value={form.creditCardExpiry || ''}
+                onChange={handleChange}
+                disabled={!editing}
+              />
+              {errors.creditCardExpiry && <div className="invalid-feedback">{errors.creditCardExpiry}</div>}
             </div>
 
             <div className="col-12">
@@ -192,7 +296,7 @@ export default function UserInfoPage() {
                   <button type="button" className="btn btn-secondary w-100" onClick={() => setEditing(false)}>Cancel</button>
                 </div>
               ) : (
-                <button type="button" style ={{backgroundColor : '#7c3aed'}}className="btn btn-primary w-100" onClick={() => setEditing(true)}>Edit</button>
+                <button type="button" style={{ backgroundColor: '#7c3aed' }} className="btn btn-primary w-100" onClick={() => setEditing(true)}>Edit</button>
               )}
             </div>
           </form>
