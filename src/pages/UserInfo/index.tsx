@@ -14,6 +14,7 @@ export interface UserFormData {
   state?: string;
   city?: string;
   street?: string;
+  address?: string;
   mobile: string;
   country: string;
   dob: string;
@@ -71,6 +72,7 @@ export default function UserInfoPage() {
           state: userInfo.state || '',
           city: userInfo.city || '',
           street: userInfo.street || '',
+          address: userInfo.address || '',
           mobile: userInfo.mobile,
           country: userInfo.country,
           dob: userInfo.dob,
@@ -134,8 +136,6 @@ export default function UserInfoPage() {
   if (!user || !form) return <div className="p-4 text-danger">User information not found.</div>;
 
   const fullName = `${user.firstName} ${user.middleName ? user.middleName + ' ' : ''}${user.lastName}`;
-  const address = [user.street, user.state,user.city, user.country].filter(Boolean).join(', ');
-
 
 
 
@@ -218,7 +218,7 @@ export default function UserInfoPage() {
               <label className="form-label">Address</label>
               <input
                 className="form-control"
-                value={address}
+                value={form.address}
                 disabled
               />
             </div>

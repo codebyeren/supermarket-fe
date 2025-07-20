@@ -158,7 +158,6 @@ export default function AdminBills() {
         <table className="bills-table">
           <thead>
             <tr>
-              <th>Bill ID</th>
               <th>Order ID</th>
               <th>Status</th>
               <th>Date</th>
@@ -172,7 +171,6 @@ export default function AdminBills() {
           <tbody>
             {filteredBills.map(bill => (
               <tr key={bill.billId}>
-                <td className="bill-id">{bill.billId}</td>
                 <td>{bill.orderId}</td>
                 <td>
                   <select

@@ -87,7 +87,7 @@ const ShippingInfo: React.FC<ShippingInfoProps> = ({ onNext, onCancel }) => {
 
         <Form.Item
           name="street"
-          label="Sgti treet"
+          label="Street"
           rules={[{ required: true, message: 'Please enter your address' }]}
         >
           <Input placeholder="Street address" />

@@ -47,6 +47,7 @@ export default function AdminProducts() {
   const [editingProduct, setEditingProduct] = useState<any>(null);
 
   const [searchTerm, setSearchTerm] = useState('');
+  const [searchInput, setSearchInput] = useState('');
   const [filterBrand, setFilterBrand] = useState('all');
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [detailProduct, setDetailProduct] = useState<Product | null>(null);
@@ -69,15 +70,9 @@ export default function AdminProducts() {
     fetchProducts();
   }, [selectedParent, selectedChild, filterBrand]);
 
-  // Tự động search khi nhập searchTerm (debounce 200ms)
+  // useEffect fetch products khi searchTerm thay đổi
   useEffect(() => {
-    if (searchTimeout.current) clearTimeout(searchTimeout.current);
-    searchTimeout.current = setTimeout(() => {
-      fetchProducts();
-    }, 200);
-    return () => {
-      if (searchTimeout.current) clearTimeout(searchTimeout.current);
-    };
+    fetchProducts();
   }, [searchTerm]);
 
   // useEffect cập nhật childCategories khi chọn cha
@@ -291,8 +286,11 @@ export default function AdminProducts() {
           <input
             type="text"
             placeholder="Search products..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') setSearchTerm(searchInput);
+            }}
             className="admin-search-input"
             style={{ paddingRight: 32 }}
           />
