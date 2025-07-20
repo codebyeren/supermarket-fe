@@ -217,9 +217,12 @@ export default function UserInfoPage() {
             <div className="col-md-6">
               <label className="form-label">Address</label>
               <input
+                type="text"
+                name="address"
                 className="form-control"
                 value={form.address}
-                disabled
+                disabled={!editing}
+                onChange={handleChange}
               />
             </div>
 
@@ -304,8 +307,8 @@ export default function UserInfoPage() {
             <div className="col-12">
               {editing ? (
                 <div className="d-flex flex-column flex-sm-row gap-2">
-                  <button type="button" className="btn btn-success w-100" onClick={handleSave}>Save Changes</button>
-                  <button type="button" className="btn btn-secondary w-100" onClick={() => setEditing(false)}>Cancel</button>
+                  <button type="button" className="edit-btn w-100" style={{backgroundColor: '#17a2b8', color: 'white', fontWeight: 600, fontSize: 16, padding: '10px 32px', border: 'none', borderRadius: 8}} onClick={handleSave}>Save Changes</button>
+                  <button type="button" className="delete-btn w-100" style={{backgroundColor: '#dc3545', color: 'white', fontWeight: 600, fontSize: 16, padding: '10px 32px', border: 'none', borderRadius: 8}} onClick={() => setEditing(false)}>Cancel</button>
                 </div>
               ) : (
                 <button type="button" style={{ backgroundColor: '#7c3aed' }} className="btn btn-primary w-100" onClick={() => setEditing(true)}>Edit</button>
