@@ -19,8 +19,6 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, twoColumn }) => 
     middleName: '',
     lastName: '',
     country: '',
-    state: '',
-    city: '',
     mobile: '',
     email: '',
     dob: '',
@@ -33,39 +31,12 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, twoColumn }) => 
   
   // Location data
   const [countries, setCountries] = useState<Country[]>([]);
-  const [states, setStates] = useState<State[]>([]);
-  const [cities, setCities] = useState<City[]>([]);
   const [loadingCountries, setLoadingCountries] = useState(false);
-  const [loadingStates, setLoadingStates] = useState(false);
-  const [loadingCities, setLoadingCities] = useState(false);
 
   // Load countries on component mount
   useEffect(() => {
     loadCountries();
   }, []);
-
-  // Load states when country changes
-  useEffect(() => {
-    if (formData.country) {
-      loadStates(formData.country);
-      // Reset state and city when country changes
-      setFormData(prev => ({ ...prev, state: '', city: '' }));
-    } else {
-      setStates([]);
-      setCities([]);
-    }
-  }, [formData.country]);
-
-  // Load cities when state changes
-  useEffect(() => {
-    if (formData.country && formData.state) {
-      loadCities(formData.country, formData.state);
-      // Reset city when state changes
-      setFormData(prev => ({ ...prev, city: '' }));
-    } else {
-      setCities([]);
-    }
-  }, [formData.country, formData.state]);
 
   const loadCountries = async () => {
     setLoadingCountries(true);
@@ -79,51 +50,11 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, twoColumn }) => 
     }
   };
 
-  const loadStates = async (countryCode: string) => {
-    setLoadingStates(true);
-    try {
-      const statesData = await locationService.getStates(countryCode);
-      setStates(statesData);
-    } catch (error) {
-      console.error('Error loading states:', error);
-    } finally {
-      setLoadingStates(false);
-    }
-  };
-
-  const loadCities = async (countryCode: string, stateCode: string) => {
-    setLoadingCities(true);
-    try {
-      const citiesData = await locationService.getCities(countryCode, stateCode);
-      setCities(citiesData);
-    } catch (error) {
-      console.error('Error loading cities:', error);
-    } finally {
-      setLoadingCities(false);
-    }
-  };
-
   const countryOptions = [
     { value: '', label: 'Select country...' },
     ...countries.map(country => ({
       value: country.code,
       label: `${country.flag || ''} ${country.name}`
-    }))
-  ];
-
-  const stateOptions = [
-    { value: '', label: 'Select state/province...' },
-    ...states.map(state => ({
-      value: state.code,
-      label: state.name
-    }))
-  ];
-
-  const cityOptions = [
-    { value: '', label: 'Select district...' },
-    ...cities.map(city => ({
-      value: city.name,
-      label: city.name
     }))
   ];
 
@@ -349,26 +280,6 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, twoColumn }) => 
           options={countryOptions}
           disabled={loadingCountries}
           required
-        />
-        <ModernInput
-          name="state"
-          label="State/Province"
-          value={formData.state || ''}
-          onChange={handleInputChange}
-          error={errors.state}
-          select
-          options={stateOptions}
-          disabled={!formData.country || loadingStates}
-        />
-        <ModernInput
-          name="city"
-          label="District"
-          value={formData.city || ''}
-          onChange={handleInputChange}
-          error={errors.city}
-          select
-          options={cityOptions}
-          disabled={!formData.state || loadingCities}
         />
         <ModernInput 
           name="email" 
