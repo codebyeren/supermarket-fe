@@ -148,12 +148,17 @@ export default function AdminPromotions() {
       >
         <div className="promotions-header">
           <h1>Promotions Management</h1>
-          <button className="add-promotion-btn" onClick={() => setShowAddModal(true)}>
-            + Add Promotion
-          </button>
-          <button className="add-promotion-btn" onClick={() => setShowAttachPopup(true)}>Promotion Manager</button>
+          <div className="d-flex flex-column gap-2">
+            <button className="add-promotion-btn" onClick={() => setShowAddModal(true)}>
+              + Add Promotion
+            </button>
+            <button className="add-promotion-btn" onClick={() => setShowAttachPopup(true)}>
+              Promotion Manager
+            </button>
+          </div>
         </div>
       </header>
+
 
       <div className="promotions-filters">
         <div className="search-box">
@@ -274,7 +279,7 @@ export default function AdminPromotions() {
               </div>
 
               <div className="promotion-actions mt-2">
-                <button className="admin-btn edit-btn">Edit</button>
+
                 <button
                   className={`toggle-status-btn ${promotion.isActive ? 'active' : 'inactive'}`}
                   onClick={() => handleTogglePromotionStatus(promotion.promotionId, promotion.isActive)}
@@ -282,7 +287,7 @@ export default function AdminPromotions() {
                   {promotion.isActive ? 'Deactivate' : 'Activate'}
                 </button>
                 <button
-                  className="admin-btn detail-btn"
+                  className="aadmin-btn edit-btn"
                   onClick={() => {
                     setSelectedPromotionId(promotion.promotionId);
                     setShowDetail(true);

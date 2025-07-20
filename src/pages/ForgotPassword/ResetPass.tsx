@@ -2,16 +2,16 @@
 import React, { useEffect, useState } from 'react';
 import { changePassword } from '../../services/api';
 import { useLocation, useNavigate } from 'react-router-dom';
-
+import './forgot.css'
 const ForgotStep3_ResetPassword = () => {
   const [newPassword, setNewPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const { state } = useLocation();
   const { email, code } = state || {};
-useEffect ( () => {
-console.log(code)
-})
+  useEffect(() => {
+    console.log(code)
+  })
   const handleChangePassword = async () => {
     try {
       await changePassword({ email, newPassword });
@@ -24,14 +24,27 @@ console.log(code)
   if (!email || !code) return <div className="container py-4">Thiếu thông tin xác thực</div>;
 
   return (
-    <div className="container py-5" style={{ maxWidth: 500 }}>
-      <h2>Đặt lại mật khẩu</h2>
-      {error && <div className="alert alert-danger">{error}</div>}
-      <label>Mật khẩu mới:</label>
-      <input type="password" className="form-control mb-3" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
-      <button className="btn btn-success w-100" onClick={handleChangePassword}>Đổi mật khẩu</button>
+    <div className="d-flex justify-content-center align-items-center" style={{
+      minHeight: '100vh'
+     
+    }}
+    >
+      <div className="container py-5 border rounded shadow" style={{ maxWidth: 500, width: '100%' }}>
+        <h2 className="text-center mb-4">Đặt lại mật khẩu</h2>
+        {error && <div className="alert alert-danger">{error}</div>}
+        <label>Mật khẩu mới:</label>
+        <input
+          type="password"
+          className="form-control mb-3"
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+        />
+        <button className="btn btn-success w-100" onClick={handleChangePassword}>
+          Đổi mật khẩu
+        </button>
+      </div>
     </div>
   );
-};
+}
 
 export default ForgotStep3_ResetPassword;

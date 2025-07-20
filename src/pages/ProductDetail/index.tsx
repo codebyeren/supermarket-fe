@@ -59,52 +59,45 @@ const ProductDetail = () => {
     };
 
     useEffect(() => {
-        const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
-        if (!token) {
-            setLoading(false);
-            return;
-        }
-
         const loadProduct = async () => {
             try {
                 if (!slug) return;
 
+                const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
                 const data = await getProductBySlug(slug);
                 setProduct(data.productDto);
                 setRelatedProducts(data.relatedProducts);
                 setRatings(data.ratings);
-                setIsFavorite(data.productDto.isFavorite)
+                setIsFavorite(data.productDto.isFavorite);
+
                 const mainCategorySlug = data.categories?.[0]?.slug;
 
+                if (token) {
+                    const decoded = jwtDecode<{ userId?: string; id?: string }>(token);
+                    const userId = decoded?.userId || decoded?.id;
 
-                const decoded = jwtDecode<{ userId?: string; id?: string }>(token);
-                const userId = decoded?.userId || decoded?.id;
+                    const userRating = data.ratings.find(
+                        (r) => String(r.customerId) === String(userId)
+                    );
+
+                    if (userRating) {
+                        setHasUserRated(true);
+                        setUserRatingId(userRating.ratingId);
+                    } else {
+                        setHasUserRated(false);
+                        setUserRatingId(null);
+                    }
+                }
+
                 if (mainCategorySlug) {
                     const allInCategory = await fetchProductsByCategory(mainCategorySlug);
-
                     const productsInCategory = Object.values(allInCategory).flat();
-
                     const filtered = productsInCategory.filter(
                         (p) => p.productId !== data.productDto.productId
-
-
                     );
                     setCompareProducts(filtered);
-
-
                 }
 
-                const userRating = data.ratings.find(
-                    (r) => String(r.customerId) === String(userId)
-                );
-
-                if (userRating) {
-                    setHasUserRated(true);
-                    setUserRatingId(userRating.ratingId);
-                } else {
-                    setHasUserRated(false);
-                    setUserRatingId(null);
-                }
             } catch (err) {
                 console.error('❌ Lỗi khi tải sản phẩm:', err);
             } finally {
@@ -114,6 +107,7 @@ const ProductDetail = () => {
 
         loadProduct();
     }, [slug]);
+
     const formatCurrency = (value: number, currency: string = 'USD') =>
         new Intl.NumberFormat('en-US', {
             style: 'currency',
@@ -251,7 +245,7 @@ const ProductDetail = () => {
                                     giftProductId: product.giftProductId,
                                     minOrderValue: product.minOrderValue,
                                     minOrderQuantity: product.minOrderQuantity,
-                            
+
                                 });
                                 setSuccess(true);
                                 setShowNotification(true);
