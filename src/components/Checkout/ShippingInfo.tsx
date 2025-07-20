@@ -25,7 +25,7 @@ const ShippingInfo: React.FC<ShippingInfoProps> = ({ onNext, onCancel }) => {
       loadingService.showLoading();
       const userInfo = await getUserInfo();
       const fullName = `${userInfo.firstName} ${userInfo.middleName ? userInfo.middleName + ' ' : ''}${userInfo.lastName}`;
-      const address = [userInfo.street, userInfo.state, userInfo.city, userInfo.country].filter(Boolean).join(', ');
+
       form.setFieldsValue({
         fullName: fullName,
         street: userInfo.street || '',
@@ -34,7 +34,7 @@ const ShippingInfo: React.FC<ShippingInfoProps> = ({ onNext, onCancel }) => {
         country: userInfo.country || '',
         homePhone: userInfo.homePhone || '',
         mobilePhone: userInfo.mobile || '',
-        address,
+        address: userInfo.address || '',
       });
       loadingService.hideLoading();
     } catch (error) {
