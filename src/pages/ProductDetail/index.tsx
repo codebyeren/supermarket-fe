@@ -202,9 +202,19 @@ const ProductDetail = () => {
                             onSuccess={async () => {
                                 const data = await getProductBySlug(slug!);
                                 setRatings(data.ratings);
-
                                 setProduct(data.productDto);
+
+                                const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+                                if (token) {
+                                    const decoded = jwtDecode<{ userId?: string; id?: string }>(token);
+                                    const userId = decoded?.userId || decoded?.id;
+
+                                    const userRating = data.ratings.find(r => String(r.customerId) === String(userId));
+                                    setHasUserRated(!!userRating);
+                                    setUserRatingId(userRating?.ratingId ?? null);
+                                }
                             }}
+
                         />
                     )}
                     {showRatingEditModal && userRatingId && (
