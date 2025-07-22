@@ -12,6 +12,7 @@ import AdminPopup from '../../../components/AdminPopup';
 import ProductFormModal from '../../../components/AdminProduct/ProductFormModal';
 import { useRef } from 'react';
 import { LoadingOutlined } from '@ant-design/icons';
+import Pagination from '../../../components/Pagination';
 
 export interface ProductFormData {
   productId: number;
@@ -58,6 +59,8 @@ export default function AdminProducts() {
   const [selectedChild, setSelectedChild] = useState('all');
   const [promotions, setPromotions] = useState<any[]>([]);
   const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const productsPerPage = 20;
 
   // useEffect fetch data ban đầu (brands, categories)
   useEffect(() => {
@@ -86,6 +89,13 @@ export default function AdminProducts() {
       setSelectedChild('all');
     }
   }, [selectedParent, categories]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, selectedParent, selectedChild, filterBrand]);
+
+  const totalPages = Math.ceil(products.length / productsPerPage);
+  const paginatedProducts = products.slice((currentPage - 1) * productsPerPage, currentPage * productsPerPage);
 
   const fetchBrandsAndCategories = async () => {
     try {
@@ -366,8 +376,8 @@ export default function AdminProducts() {
                   <div className="loading">Đang tải dữ liệu sản phẩm...</div>
                 </td>
               </tr>
-            ) : products.length > 0 ? (
-              products.map(product => (
+            ) : paginatedProducts.length > 0 ? (
+              paginatedProducts.map(product => (
                 <tr key={product.productId}>
                   <td>{product.productId}</td>
                   <td>{product.productName}</td>
@@ -383,7 +393,7 @@ export default function AdminProducts() {
                   </td>
                 </tr>
               ))
-            ) : (
+            ) :
               (searchTerm.trim() || filterBrand !== 'all' || selectedParent !== 'all' || selectedChild !== 'all') ? (
                 <tr>
                   <td colSpan={8} style={{ textAlign: 'center' }}>
@@ -391,9 +401,10 @@ export default function AdminProducts() {
                   </td>
                 </tr>
               ) : null
-            )}
+            }
           </tbody>
         </table>
+        <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
       </div>
 
       {/* {products.length === 0 && (
