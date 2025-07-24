@@ -6,9 +6,12 @@ import { getAllProductsForAdmin } from '../../services/productService';
 interface Props {
     visible: boolean;
     onClose: () => void;
+    onSuccess?: () => void;
 }
 
-export default function AttachPromotionProductModal({ visible, onClose }: Props) {
+
+
+export default function AttachPromotionProductModal({ visible, onClose,onSuccess }: Props) {
     const [promotions, setPromotions] = useState<any[]>([]);
     const [products, setProducts] = useState<any[]>([]);
     const [selectedPromotionId, setSelectedPromotionId] = useState<number | null>(null);
@@ -39,7 +42,6 @@ export default function AttachPromotionProductModal({ visible, onClose }: Props)
             setOriginalProductIds([]);
         }
     };
-
     const handleAttach = async () => {
         if (!selectedPromotionId) {
             message.warning('Please select a promotion first!');
@@ -49,15 +51,22 @@ export default function AttachPromotionProductModal({ visible, onClose }: Props)
         try {
             const selected = new Set(selectedProductIds);
             const original = new Set(originalProductIds);
+
             const toCreate = selectedProductIds.filter(id => !original.has(id));
             const toDeactivate = originalProductIds.filter(id => !selected.has(id));
+
             for (const productId of toCreate) {
                 await attachProductToPromotion(selectedPromotionId, productId);
             }
             for (const productId of toDeactivate) {
                 await updateProductPromotionIsActive(selectedPromotionId, productId, false);
             }
+
             message.success('Update successful!');
+
+            /** ✅ Gọi callback để cập nhật cha */
+            if (onSuccess) onSuccess();
+
             onClose();
         } catch {
             message.error('Update failed!');
@@ -65,6 +74,7 @@ export default function AttachPromotionProductModal({ visible, onClose }: Props)
             setLoading(false);
         }
     };
+
 
     return (
         <Modal

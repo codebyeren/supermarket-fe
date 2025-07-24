@@ -10,6 +10,7 @@ export type SortState = {
 export const sortProducts = (products: Product[], sortState: SortState): Product[] => {
   const sortedProducts = [...products];
   const sortOrder: (keyof SortState)[] = ['price', 'name', 'rating', 'date'];
+    // const sortOrder: (keyof SortState)[] = ['price', 'name', 'rating'];
   return sortedProducts.sort((a, b) => {
     for (const key of sortOrder) {
       const dir = sortState[key];

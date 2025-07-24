@@ -37,17 +37,6 @@ const About: React.FC = () => {
         <h2>Our History</h2>
         <p>Founded in 2015, our supermarket started as a small store...</p>
       </section>
-
-      <section className="about-section team-section">
-        <h2>Meet Our Team</h2>
-        <div className="team-grid">
-          <div className="team-member"><img src="/images/h1.jpg" alt="Dev 1" /><h4>Nguyễn Văn A</h4><p>Frontend Developer</p></div>
-          <div className="team-member"><img src="/images/h2.jpg" alt="Dev 2" /><h4>Trần Thị B</h4><p>UI/UX Designer</p></div>
-          <div className="team-member"><img src="/images/h3.jpg" alt="Dev 3" /><h4>Lê Văn C</h4><p>Backend Developer</p></div>
-          <div className="team-member"><img src="/images/h4.jpg" alt="Dev 4" /><h4>Phạm Thị D</h4><p>Project Manager</p></div>
-          <div className="team-member"><img src="/images/h5.jpg" alt="Dev 5" /><h4>Hoàng Văn E</h4><p>QA Engineer</p></div>
-        </div>
-      </section>
     </div>
   );
 };

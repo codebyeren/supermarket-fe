@@ -41,6 +41,8 @@ export default function AdminPromotions() {
   const [showAttachPopup, setShowAttachPopup] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [loadingDetail, setLoadingDetail] = useState(false);
+  const [refreshDetailSignal, setRefreshDetailSignal] = useState(0);
+
 
   useEffect(() => {
     fetchPromotions().then(setPromotions);
@@ -311,12 +313,19 @@ export default function AdminPromotions() {
       <AttachPromotionProductModal
         visible={showAttachPopup}
         onClose={() => setShowAttachPopup(false)}
+        onSuccess={() => {
+          fetchPromotions().then(setPromotions);
+          setRefreshDetailSignal(prev => prev + 1);
+        }}
       />
+
       <PromotionDetailPopup
         visible={showDetail}
         onClose={() => setShowDetail(false)}
         promotionId={selectedPromotionId}
+        refreshSignal={refreshDetailSignal}
       />
+
 
       {showAddModal && (
         <PromotionFormModal
